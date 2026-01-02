@@ -567,3 +567,29 @@ theorem connectedSpace_iff_clopen :
     preconnectedSpace_iff_clopen, Set.nonempty_iff_univ_nonempty]
 
 instance [CompactSpace α] : CompactSpace <| ConnectedComponents α := Quotient.compactSpace
+
+namespace ConnectedComponents
+
+/-- Coercion sending a connected component its corresponding subset -/
+@[coe]
+def toSet (C : ConnectedComponents α) : Set α :=
+  ConnectedComponents.mk ⁻¹' {C}
+
+instance : Coe (ConnectedComponents α) (Set α) := ⟨toSet⟩
+
+theorem toSet_eq_connectedComponent_of_out (C : ConnectedComponents α) :
+    C = connectedComponent (Quotient.out C) := by
+  rw [← connectedComponents_preimage_singleton, toSet, mk]
+  simp_all only [Quotient.out_eq]
+
+theorem toSet_isConnected (C : ConnectedComponents α) :
+    IsConnected (C : Set α) := by
+  rw [toSet_eq_connectedComponent_of_out]
+  exact isConnected_connectedComponent
+
+theorem disjoint_ne {C D : ConnectedComponents α} (hCD : C ≠ D) :
+    Disjoint (C : Set α) D := by
+  rw [toSet, toSet]
+  grind only [= Set.disjoint_left, = disjoint_comm, = Set.mem_preimage, = Set.mem_singleton_iff]
+
+end ConnectedComponents
