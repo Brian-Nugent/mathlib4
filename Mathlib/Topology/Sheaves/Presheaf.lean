@@ -10,6 +10,7 @@ public import Mathlib.CategoryTheory.Adjunction.Unique
 public import Mathlib.CategoryTheory.Functor.KanExtension.Adjunction
 public import Mathlib.Topology.Sheaves.Init
 public import Mathlib.Data.Set.Subsingleton
+public import Mathlib.CategoryTheory.Abelian.FunctorCategory
 
 /-!
 # Presheaves on a topological space
@@ -142,6 +143,16 @@ theorem map_restrict
     e.app _ (x |_ U) = e.app _ x |_ U := by
   delta restrictOpen restrict
   rw [← ConcreteCategory.comp_apply, NatTrans.naturality, ConcreteCategory.comp_apply]
+
+lemma restrict_ext {F : X.Presheaf C} {U V W Y : Opens X} {s : ToType (F.obj (op U))}
+    {t : ToType (F.obj (op V))} (h1 : W = Y)
+    (hW1 : W ≤ U := by restrict_tac) (hY1 : Y ≤ U := by restrict_tac)
+    (hW2 : W ≤ V := by restrict_tac) (hY2 : Y ≤ V := by restrict_tac) (h : s |_ W = t |_ W) :
+    s |_ Y = t |_ Y := by grind
+
+lemma restrict_inf_flip {F : X.Presheaf C} {U V : Opens X} {s : ToType (F.obj (op U))}
+    {t : ToType (F.obj (op V))} (h : s |_ (U ⊓ V) = t |_ (U ⊓ V)) :
+    s |_ (V ⊓ U) = t |_ (V ⊓ U) := restrict_ext (inf_comm U V) _ _ _ _ h
 
 open CategoryTheory.Limits
 
@@ -304,6 +315,8 @@ def pullbackObjObjOfImageOpen {X Y : TopCat.{v}} (f : X ⟶ Y) (ℱ : Y.Presheaf
   exact IsColimit.coconePointUniqueUpToIso
     ((Opens.map f).op.isPointwiseLeftKanExtensionLeftKanExtensionUnit ℱ (op U))
     (colimitOfDiagramTerminal hx _)
+
+instance [Abelian C] : Abelian (Presheaf C X) := Abelian.functorCategoryAbelian
 
 end
 
