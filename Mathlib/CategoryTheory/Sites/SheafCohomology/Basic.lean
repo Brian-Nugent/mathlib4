@@ -10,6 +10,9 @@ public import Mathlib.Algebra.Category.Grp.Adjunctions
 public import Mathlib.Algebra.Homology.DerivedCategory.Ext.Basic
 public import Mathlib.CategoryTheory.Sites.Abelian
 public import Mathlib.CategoryTheory.Sites.ConstantSheaf
+public import Mathlib.Algebra.Homology.DerivedCategory.Ext.EnoughInjectives
+public import Mathlib.Algebra.Category.Grp.Zero
+public import Mathlib.CategoryTheory.Adjunction.Additive
 
 /-!
 # Sheaf cohomology
@@ -82,6 +85,49 @@ presheaf of sets `yoneda.obj U` to `F`. -/
 noncomputable abbrev cohomologyPresheaf (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) :
     Cᵒᵖ ⥤ AddCommGrpCat.{w'} :=
   (cohomologyPresheafFunctor J n).obj F
+
+end
+
+section
+
+variable [HasSheafify J AddCommGrpCat.{w}] [HasExt.{w'} (Sheaf J AddCommGrpCat.{w})]
+
+theorem H.eq_zero_of_injective (F : Sheaf J AddCommGrpCat.{w}) (n : ℕ) (x : H F (n + 1))
+    [Injective F] : x = 0 :=
+  Ext.eq_zero_of_injective x
+
+variable (F : Sheaf J AddCommGrpCat.{w}) {T : C} (hT : Limits.IsTerminal T)
+
+open AddCommGrpCat Opposite
+
+/-- The additive equivalence between `H F 0` and the evaluation of `F` at the terminal object -/
+noncomputable def H.equiv₀ : H F 0 ≃+ ((sheafSections J AddCommGrpCat).obj (op T)).obj F :=
+    AddEquiv.trans Ext.addEquiv₀ <|
+      AddEquiv.trans ((constantSheafAdj J AddCommGrpCat hT).homAddEquiv _ F)
+        (uliftZMultiplesAddEquiv _)
+
+variable {F G : Sheaf J AddCommGrpCat.{w}} (f : F ⟶ G)
+
+/-- Given a morphism of sheaves `f : F ⟶ G`, `H.map f n` is the induced additive map on cohomology
+    groups `H F n →+ H G n` -/
+noncomputable def H.map (n : ℕ) : H F n →+ H G n :=
+  ((Ext.mk₀ f).postcomp ((constantSheaf J AddCommGrpCat).obj (of (ULift ℤ))) (add_zero n))
+
+lemma H.addEquiv₀_comp (x : H F 0) : Ext.addEquiv₀ (H.map f 0 x) = Ext.addEquiv₀ x ≫ f := by
+  delta Ext.addEquiv₀ H.map
+  apply (Ext.mk₀_bijective _ G).injective
+  simp only [AddEquiv.coe_mk, Ext.mk₀_homEquiv₀_apply, Ext.mk₀_homEquiv₀_apply, ← Ext.mk₀_comp_mk₀]
+  rfl
+
+/-- `H.Equiv₀` is natural -/
+theorem H.Equiv₀_comp (x : H F 0) :
+    ((sheafSections J AddCommGrpCat).obj (op T)).map f (H.equiv₀ F hT x) =
+    H.equiv₀ G hT (H.map f 0 x) := by
+  delta equiv₀
+  simp only [Functor.flip_obj_obj, sheafToPresheaf_obj, Functor.flip_obj_map, sheafToPresheaf_map,
+    AddEquiv.trans_apply]
+  conv => rhs; right; right; equals Ext.addEquiv₀ x ≫ f => exact addEquiv₀_comp f x
+  rfl
 
 end
 
