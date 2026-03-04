@@ -134,15 +134,17 @@ def pullback_pres := (pres F).map (Sheaf.pullback _ (Opens.inclusion' U))
 lemma pullback_pres_exact : (pullback_pres U F).ShortExact :=
   (pres_exact F).map (Sheaf.pullback _ (Opens.inclusion' U))
 
+local instance : HasExt.{u} (TopCat.Sheaf AddCommGrpCat.{u} X) := hasExt_of_enoughInjectives _
+-- Why do I need to declare this again?
+
 set_option backward.isDefEq.respectTransparency false in
 theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X)}
     (hB : Opens.IsBasis B)
     (hinter : ∀ (U V : Opens X), U ∈ B → V ∈ B → U ⊓ V ∈ B)
     (vanish : ∀ (r : ℕ) (U : Opens X), 1 ≤ r → r ≤ n → U ∈ B →
     IsZero (H ((Sheaf.pullback AddCommGrpCat.{u} (Opens.inclusion' U)).obj F) r))
-    (c : H F (n + 1)) : ∃ (I : Type*) (u : I → Opens X),
-    (∀ i, u i ∈ B) ∧ (⋃ i, (u i).1 = Set.univ) ∧
-    (∀ i, H.map ((to_restrict (u i)).app F) (n + 1) c = 0) := by
+    (c : H F (n + 1)) : ∃ (I : Type u) (U : I → Opens X) (_ : IsOpenCover U),
+    (∀ i, U i ∈ B ∧ H.map ((to_restrict (U i)).app F) (n + 1) c = 0) := by
   induction n generalizing F with
   | zero =>
     have : Injective (pres F).X₂ := by dsimp [pres]; infer_instance
@@ -151,9 +153,9 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
         (AddCommGrpCat.of (ULift.{u, 0} ℤ))) (pres F).X₂ 1) :=
       Abelian.Ext.subsingleton_of_injective _ _ 0
 -- The first cohomology group of `(pres F).X₂` vanishes.
-    obtain ⟨s, hs⟩ := Abelian.Ext.covariant_sequence_exact₁ ((constantSheaf (Opens.grothendieckTopology X)
-      AddCommGrpCat.{u}).obj (AddCommGrpCat.of.{u} (ULift ℤ))) (pres_exact F) c
-      (Subsingleton.elim _ _) (n₀ := 0) rfl
+    obtain ⟨s, hs⟩ := Abelian.Ext.covariant_sequence_exact₁.{u}
+      ((constantSheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}).obj (AddCommGrpCat.of.{u}
+      (ULift ℤ))) (pres_exact F) c (Subsingleton.elim _ _) (n₀ := 0) rfl
 -- Using the long cohomology sequence, we find a global section `s` is `(pres F).X₃` that is
 -- sent to `c` by the connecting morphism.
 -- Technically `s` is not a section but an element of `H (pres F).X₃ 0`, so we need to apply
@@ -164,7 +166,19 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
       (TopCat.Sheaf.H.equiv₀ (pres F).X₃ s)
 -- As `(pres F).g : (pres F).X₂ ⟶ (pres F).X₃` is an epimorphism of sheaves, the section `s`
 -- lifts locally to sections of `(pres F).X₂`, on a cover `U : ι → Opens X`.
-    sorry
+    refine ⟨I, U, hU, fun i ↦ ⟨(h i).1, ?_⟩⟩
+    have eq₁ : (H.map ((to_restrict (U i)).app F) 1) c =
+      (H.map (η (U i) F) 0 s).comp (restrict_pres_exact (U i) F).extClass (zero_add _) := by
+      rw [← hs]
+      delta H.map
+      sorry
+-- The image of `c` by the map `F.H 1 X ⟶ ((restrict (U i)).obj F).H 1 X` is equal to the image by
+-- `(restrict_pres (U i) F).X₃.H 0 X ⟶ ((restrict (U i)).obj F).H 1 X` of the image of `s`
+-- by `H.map (η (U i) F)`.
+    rw [eq₁]
+    have eq₂ : H.map (η (U i) F) 0 s = sorry := by
+--    have := (h i).2
+      sorry
   | succ n hn => sorry
 
 end
