@@ -157,13 +157,14 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
 -- Using the long cohomology sequence, we find a global section `s` is `(pres F).X₃` that is
 -- sent to `c` by the connecting morphism.
 -- Technically `s` is not a section but an element of `H (pres F).X₃ 0`, so we need to apply
--- `TopCat.Sheaf.equiv₀` to make it a section.
+-- `TopCat.Sheaf.H.equiv₀` to make it a section.
     have : Sheaf.IsLocallySurjective (pres F).g :=
       (Sheaf.isLocallySurjective_iff_epi' _ _).mpr (pres_exact F).epi_g
-    have := (Presheaf.isLocallySurjective_iff _).mp this ⊤ (TopCat.Sheaf.H.equiv₀ (pres F).X₃ s)
+    obtain ⟨I, U, hU, t, h⟩ := Presheaf.exists_lift_cover_basis_of_isLocallySurjective this hB
+      (TopCat.Sheaf.H.equiv₀ (pres F).X₃ s)
 -- As `(pres F).g : (pres F).X₂ ⟶ (pres F).X₃` is an epimorphism of sheaves, the section `s`
--- lifts locally to sections of `(pres F).X₂`.
-
+-- lifts locally to sections of `(pres F).X₂`, on a cover `U : ι → Opens X`.
+    sorry
   | succ n hn => sorry
 
 end
