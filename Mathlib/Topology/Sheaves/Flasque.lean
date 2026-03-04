@@ -219,4 +219,18 @@ theorem H_isZero (F : Sheaf AddCommGrpCat X) [IsFlasque F] (n : ℕ) :
 instance {F : Sheaf AddCommGrpCat X} [IsFlasque F] (n : ℕ) : Subsingleton (H F (n + 1)) :=
   AddCommGrpCat.subsingleton_of_isZero (H_isZero F n)
 
+
+section Stabilities
+
+variable {Y : TopCat.{u}} (f : X ⟶ Y) (F)
+
+theorem pushforwardIsFlasque [IsFlasque F] : IsFlasque ((pushforward _ f).obj F) := sorry
+
+variable {f} (hf : Topology.IsOpenEmbedding f) (G : TopCat.Sheaf AddCommGrpCat Y)
+
+include hf in
+theorem pullbackIsFlasqueOfIsOpenEmbedding [IsFlasque G] : IsFlasque ((pullback _ f).obj G) := sorry
+
+end Stabilities
+
 end TopCat.Sheaf.IsFlasque

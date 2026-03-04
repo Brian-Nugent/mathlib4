@@ -107,6 +107,10 @@ def pullbackPushforwardAdjunction (f : X ⟶ Y) :
 instance : (pullback A f).IsLeftAdjoint := (pullbackPushforwardAdjunction A f).isLeftAdjoint
 instance : (pushforward A f).IsRightAdjoint := (pullbackPushforwardAdjunction A f).isRightAdjoint
 
+-- TODO: Pullbacks are exact. Maybe use `TopCat.Presheaf.stalkPullBackIso`?
+
+instance : PreservesFiniteLimits (pullback A f) := sorry
+
 end Sheaf
 
 end TopCat
