@@ -28,6 +28,9 @@ noncomputable abbrev restrict (U : Opens X) :
 
 --local instance (U : Opens X) : PreservesFiniteLimits (restrict U) := inferInstance
 
+local instance (U : Opens X) : (Sheaf.pullback AddCommGrpCat.{u} (Opens.inclusion' U)).Additive :=
+  sorry
+
 local instance (U : Opens X) : (restrict U).Additive := sorry
 
 noncomputable abbrev to_restrict (U : Opens X) :
@@ -126,18 +129,44 @@ lemma ηcond₂ : (pres F).g ≫ η U F = (to_restrict U).app (pres F).X₂ ≫ 
 set_option backward.isDefEq.respectTransparency false in
 local instance : Epi (η U F) := epi_of_epi_fac (ηcond₂ U F)
 
-end
+def pullback_pres := (pres F).map (Sheaf.pullback _ (Opens.inclusion' U))
 
+lemma pullback_pres_exact : (pullback_pres U F).ShortExact :=
+  (pres_exact F).map (Sheaf.pullback _ (Opens.inclusion' U))
 
---set_option backward.isDefEq.respectTransparency false in
+set_option backward.isDefEq.respectTransparency false in
 theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X)}
     (hB : Opens.IsBasis B)
     (hinter : ∀ (U V : Opens X), U ∈ B → V ∈ B → U ⊓ V ∈ B)
     (vanish : ∀ (r : ℕ) (U : Opens X), 1 ≤ r → r ≤ n → U ∈ B →
     IsZero (H ((Sheaf.pullback AddCommGrpCat.{u} (Opens.inclusion' U)).obj F) r))
-    (α : H F n) : ∃ (I : Type*) (u : I → Opens X),
+    (c : H F (n + 1)) : ∃ (I : Type*) (u : I → Opens X),
     (∀ i, u i ∈ B) ∧ (⋃ i, (u i).1 = Set.univ) ∧
-    (∀ i, H.map ((to_restrict (u i)).app F) n α = 0) := sorry
+    (∀ i, H.map ((to_restrict (u i)).app F) (n + 1) c = 0) := by
+  induction n generalizing F with
+  | zero =>
+    have : Injective (pres F).X₂ := by dsimp [pres]; infer_instance
+-- Why does Lean find the local instance I defined earlier?
+    have : Subsingleton (Ext ((constantSheaf (Opens.grothendieckTopology X) AddCommGrpCat).obj
+        (AddCommGrpCat.of (ULift.{u, 0} ℤ))) (pres F).X₂ 1) :=
+      Abelian.Ext.subsingleton_of_injective _ _ 0
+-- The first cohomology group of `(pres F).X₂` vanishes.
+    obtain ⟨s, hs⟩ := Abelian.Ext.covariant_sequence_exact₁ ((constantSheaf (Opens.grothendieckTopology X)
+      AddCommGrpCat.{u}).obj (AddCommGrpCat.of.{u} (ULift ℤ))) (pres_exact F) c
+      (Subsingleton.elim _ _) (n₀ := 0) rfl
+-- Using the long cohomology sequence, we find a global section `s` is `(pres F).X₃` that is
+-- sent to `c` by the connecting morphism.
+-- Technically `s` is not a section but an element of `H (pres F).X₃ 0`, so we need to apply
+-- `TopCat.Sheaf.equiv₀` to make it a section.
+    have : Sheaf.IsLocallySurjective (pres F).g :=
+      (Sheaf.isLocallySurjective_iff_epi' _ _).mpr (pres_exact F).epi_g
+    have := (Presheaf.isLocallySurjective_iff _).mp this ⊤ (TopCat.Sheaf.H.equiv₀ (pres F).X₃ s)
+-- As `(pres F).g : (pres F).X₂ ⟶ (pres F).X₃` is an epimorphism of sheaves, the section `s`
+-- lifts locally to sections of `(pres F).X₂`.
+
+  | succ n hn => sorry
+
+end
 
 end
 
