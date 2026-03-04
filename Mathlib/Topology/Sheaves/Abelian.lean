@@ -40,7 +40,8 @@ noncomputable instance : Abelian (Presheaf C X) := inferInstanceAs (Abelian (_ â
 
 namespace Sheaf
 
-instance : Abelian (Sheaf C X) := inferInstanceAs (Abelian (CategoryTheory.Sheaf _ _))
+noncomputable instance : Abelian (Sheaf C X) :=
+  inferInstanceAs (Abelian (CategoryTheory.Sheaf _ _))
 
 instance : (Sheaf.forget C X).Additive where
 

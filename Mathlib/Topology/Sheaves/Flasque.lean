@@ -87,6 +87,7 @@ lemma Under.R.trans {a b c : Under g s} (h1 : (R g s) a b) (h2 : (R g s) b c) : 
   rw [← h1.restricts, ← h2.restricts]
   exact Eq.symm (restrict_restrict h1.le h2.le c.sec)
 
+set_option backward.isDefEq.respectTransparency false in
 lemma Under.R.chains_bounded (c : Set (Under g s)) (h : IsChain (R g s) c) :
     ∃ ub, ∀ a ∈ c, (R g s) a ub := by
   let f : c → (Opens X) := fun x => x.val.V
@@ -109,6 +110,7 @@ lemma Under.R.chains_bounded (c : Set (Under g s)) (h : IsChain (R g s) c) :
   use ⟨iSup f, le, t, eq_app_of_forall_eq ht _ (fun i => i.val.app_s)⟩
   exact fun a ha => ⟨_, ht ⟨a, ha⟩⟩
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Given a short exact sequence of sheaves, `0 ⟶ 𝓕 ⟶ 𝓖 ⟶ 𝓗 ⟶ 0`, if `𝓕` is flasque then
 `𝓖(U) ⟶ 𝓗(U)` is surjective, for any open `U`. -/
 theorem epi_of_shortExact {S : ShortComplex (Sheaf AddCommGrpCat X)} (hS : S.ShortExact)
@@ -125,16 +127,13 @@ theorem epi_of_shortExact {S : ShortComplex (Sheaf AddCommGrpCat X)} (hS : S.Sho
       exact hS.epi_g
     -- We use local surjectivity to find a section of `S.X₂` on a neighborhood `W` of `x` that maps
     -- to `s |_ W`
-    obtain ⟨W, i, ⟨t₁, ht₁⟩, hW⟩ := (isLocallySurjective_iff S.g.val).mp this U s x hx
-    have := leOfHom i
+    obtain ⟨W, Wle, ⟨t₁, ht₁⟩, hW⟩ := (isLocallySurjective_iff S.g.val).mp this U s x hx
     --`t.sec` and `t₁` need not agree on their overlap so we need to deal with their difference `t₂`
     let t₂ := t.sec |_ (t.V ⊓ W) - t₁ |_ (t.V ⊓ W)
     have : (S.g.val.app (op (t.V ⊓ W))) t₂ = 0 := by
-      simp only [map_sub, map_restrict, t.app_s, restrict_restrict, ht₁, sub_eq_zero, t₂]
-      conv => rhs; arg 1; change s |_ W
-      simp only [restrict_restrict]
+      simp [map_restrict, t.app_s, restrict_restrict, ht₁, t₂]
     -- Since `S` is exact and `t₂` maps to zero, we can lift it to a section `t₃` of `S.X₁`
-    obtain ⟨t₃, ht₃⟩ := addCommGrpCat_shortExact_app_zero t₂ this hS.1 hS.2
+    obtain ⟨t₃, ht₃⟩ := addCommGrpCat_shortExact_app_zero hS.1 t₂ this hS.2
     have i₁ : t.V ⊓ W ⟶ W := homOfLE inf_le_right
     -- Using that `S.X₁` is flasque, we can lift `t₃` to a section on `W`
     obtain ⟨t₄, (ht₄ : t₄ |_ (t.V ⊓ W) = t₃)⟩ :=
@@ -156,21 +155,17 @@ theorem epi_of_shortExact {S : ShortComplex (Sheaf AddCommGrpCat X)} (hS : S.Sho
       exact ⟨⟨rfl, this⟩, Eq.symm (restrict_inf_flip this), rfl⟩
     have le : iSup f ≤ U := by
       simp only [iSup_le_iff, Fin.forall_fin_two]
-      exact ⟨t.le, leOfHom i⟩
+      exact ⟨t.le, Wle⟩
     have app : S.g.val.app (op (iSup f)) t₅ = s |_ (iSup f) := by
-      apply eq_app_of_forall_eq ht₅
-        (by rw [Fin.forall_fin_two]; exact ⟨t.le, leOfHom i⟩) ?_
+      apply eq_app_of_forall_eq ht₅ (by rw [Fin.forall_fin_two]; exact ⟨t.le, Wle⟩)
       rw [Fin.forall_fin_two]
       refine ⟨t.app_s, ?_⟩
       change S.g.val.app (op W) (t₁ + (S.f.val.app (op W)) t₄) = s |_ W
       have : (S.f.val.app (op W) ≫ S.g.val.app (op W)) = 0 := by
         change (S.f ≫ S.g).val.app (op W) = 0; rw [S.6]; rfl
-      simp only [map_add, ← ConcreteCategory.comp_apply, this, AddCommGrpCat.hom_zero,
-        AddMonoidHom.zero_apply, add_zero]
-      exact ht₁
+      simp [← ConcreteCategory.comp_apply, this, ht₁]
     let t₆ : Under S.g s := ⟨iSup f, le, t₅, app⟩
-    have htt₆ : R S.g s t t₆ := ⟨_, ht₅ 0⟩
-    exact (ht t₆ htt₆).le (by cat_disch)
+    exact (ht t₆ ⟨_, ht₅ 0⟩).le (by cat_disch)
   use t.sec |_ U
   conv => rhs; equals (S.g.val.app (op t.V)) t.sec |_ U =>
     rw [t.app_s, restrict_restrict, restrictOpen, restrict]
@@ -191,6 +186,7 @@ theorem X₃_shortExact_isFlasque_X₁_isFlasque_X₂ {S : ShortComplex (Sheaf A
 instance of_injective (I : Sheaf AddCommGrpCat.{u} X) [Injective I] : IsFlasque I where
   epi := fun i => epi_map_of_injective I (leOfHom i)
 
+set_option backward.isDefEq.respectTransparency false in
 /-- Flasque sheaves have no higher cohomology. For most applications, it is probably better to use
   `Subsingleton (H F (n + 1))` which can be proven by `infer_instance` -/
 theorem H_isZero (F : Sheaf AddCommGrpCat X) [IsFlasque F] (n : ℕ) :

@@ -128,6 +128,7 @@ def generator : (constZ.zeroOutside U).obj (op U) :=
 
 variable {U}
 
+set_option backward.isDefEq.respectTransparency false in
 open Classical in
 /-- Section hom: Given a section `s` of `F` on `U`, we obtain a presheaf morphism
 `constZ.zeroOutside U ⟶ F` that maps `generator U` to `s` -/
@@ -154,11 +155,13 @@ def sHom {F : Presheaf AddCommGrpCat.{u} X} (s : F.obj (op U)) :
       simp_all [isZero_zero]
     apply this.eq_of_src
 
+set_option backward.isDefEq.respectTransparency false in
 theorem sHom_app_generator {F : Presheaf AddCommGrpCat.{u} X}
     (s : F.obj (op U)) : (sHom s).app (op U) (generator U) = s := by
   simp [generator, ← comp_apply, uliftZMultiplesAddEquiv, homAddEquiv, AddEquiv.mk',
     homEquiv, uliftZMultiplesHom, AddEquiv.ulift]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem openHom_generator {V : Opens X} (h : V ≤ U) :
     (zeroOutside_openHom constZ h).app (op V) (generator V) = (generator U) |_ V := by
   simp [generator, Presheaf.restrictOpen, Presheaf.restrict, ← comp_apply]
@@ -192,8 +195,8 @@ theorem openHom_generator {V : Opens X} (h : V ≤ U) :
   erw [← ConcreteCategory.comp_apply, ← NatTrans.comp_app, ← toSheafify_naturality,
     NatTrans.comp_app, ConcreteCategory.comp_apply, Presheaf.zeroOutside.openHom_generator,
     Presheaf.map_restrict]
-  rfl
 
+set_option backward.isDefEq.respectTransparency false in
 instance {V : Opens X} (h : V ≤ U) :
     Mono (openHom h) := by
   have := Presheaf.zeroOutside_hom_mono ((Functor.const _).obj (AddCommGrpCat.of (ULift.{u,0} ℤ))) h
