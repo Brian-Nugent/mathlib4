@@ -26,6 +26,10 @@ noncomputable abbrev restrict (U : Opens X) :
     Sheaf.pullback AddCommGrpCat.{u} (Opens.inclusion' U) ⋙ Sheaf.pushforward AddCommGrpCat
     (Opens.inclusion' U)
 
+--local instance (U : Opens X) : PreservesFiniteLimits (restrict U) := inferInstance
+
+local instance (U : Opens X) : (restrict U).Additive := sorry
+
 noncomputable abbrev to_restrict (U : Opens X) :
     𝟭 _ ⟶ restrict U := (Sheaf.pullbackPushforwardAdjunction _ (Opens.inclusion' U)).unit
 
@@ -34,30 +38,96 @@ local instance (U : Opens X) (F : TopCat.Sheaf AddCommGrpCat.{u} X) [IsFlasque F
   have := IsFlasque.pullbackIsFlasqueOfIsOpenEmbedding (Opens.isOpenEmbedding U)
   apply IsFlasque.pushforwardIsFlasque
 
-local instance to_restrict_surjective_of_flasque (U : Opens X)
+local instance to_restrict_epi_of_flasque (U : Opens X)
     (F : TopCat.Sheaf AddCommGrpCat.{u} X) [IsFlasque F] : Epi ((to_restrict U).app F) := sorry
 -- This needs the stuff I did in the branch `pushpulladjunction`, to identify `to_restrict`
 -- to a restriction map. The theorem is call `truc` right now.
 
+/-
+First we set up some objects that will be useful for the proof:
+* A short exact sequence `S` or `pres` : 0 -> F -> I -> G -> 0 with I injective.
+* A short exact sequence `restrict_pres` : `0 -> (restict U).obj F -> (restrict U).obj I -> H -> 0`.
+* A monomorphism `ι : H -> (restrict U).obj G` whose composition with `restrict_pres.g` is
+`(restrict U).map S.g`.
+* An epimorphism `η : G ⟶ H` such that `η ≫ ι = (to_restrict U).app G` and
+`S.g ≫ η = (to_restrict U).app I ≫ restrict_pres.g`.
+-/
+
+noncomputable section
+
+variable (U : Opens X) (F : TopCat.Sheaf AddCommGrpCat.{u} X)
+
+def injpres : InjectivePresentation F := Classical.choice (EnoughInjectives.presentation F)
+
+local instance : Mono (injpres F).f := (injpres F).mono
+local instance : Injective (injpres F).J := (injpres F).injective
+
+def pres := ShortComplex.mk (injpres F).f (cokernel.π (injpres F).f) (by cat_disch)
+
+local instance : Mono (pres F).f := by dsimp [pres]; infer_instance
+local instance : Epi (pres F).g := by dsimp [pres]; infer_instance
+local instance : Injective (pres F).X₂ := by dsimp [pres]; infer_instance
+
+lemma pres_exact : (pres F).ShortExact :=
+  ShortComplex.ShortExact.mk (ShortComplex.exact_cokernel _)
+
+def restrict_pres := ShortComplex.mk ((restrict U).map (injpres F).f)
+  (cokernel.π ((restrict U).map (injpres F).f)) (by cat_disch)
+
+local instance : Mono (restrict_pres U F).f := by dsimp [restrict_pres]; infer_instance
+local instance : Epi (restrict_pres U F).g := by dsimp [restrict_pres]; infer_instance
+
+lemma restrict_pres_exact : (restrict_pres U F).ShortExact :=
+  ShortComplex.ShortExact.mk (ShortComplex.exact_cokernel _)
+
+lemma restrict_pres'_exact : ((pres F).map (restrict U)).Exact :=
+  ((restrict U).preservesFiniteLimits_iff_forall_exact_map_and_mono.mp inferInstance _
+  (pres_exact F)).1
+
+def ι : (restrict_pres U F).X₃ ⟶ (restrict U).obj (pres F).X₃ :=
+  cokernel.desc ((restrict U).map (pres F).f) ((restrict U).map (pres F).g)
+  (by rw [← Functor.map_comp, (pres F).zero, Functor.map_zero])
+
+lemma ιcond : (restrict_pres U F).g ≫ ι U F = ((pres F).map (restrict U)).g := by
+  dsimp [ι, restrict_pres, pres]; cat_disch
+
 set_option backward.isDefEq.respectTransparency false in
-example (U : Opens X) (F : TopCat.Sheaf AddCommGrpCat.{u} X) : 0 = 0 := by
-  obtain ⟨I, _, f, hf⟩ := CategoryTheory.EnoughInjectives.presentation F
-  let S := ShortComplex.mk f (cokernel.π f) (by cat_disch)
-  have hS : S.ShortExact := ShortComplex.ShortExact.mk (ShortComplex.exact_cokernel f)
-  let restrict_pres := ShortComplex.mk ((restrict U).map f) (cokernel.π ((restrict U).map f))
-    (by cat_disch)
-  have he : restrict_pres.ShortExact := ShortComplex.ShortExact.mk (ShortComplex.exact_cokernel _)
-  let ι : restrict_pres.X₃ ⟶ (restrict U).obj S.X₃ := cokernel.desc ((restrict U).map S.f)
-    ((restrict U).map S.g) (by rw [← Functor.map_comp, S.zero, Functor.map_zero])
-  have ιcond : restrict_pres.g ≫ ι = (restrict U).map S.g := sorry
-  have : Mono ι := sorry
-  set η : S.X₃ ⟶ restrict_pres.X₃ := cokernel.desc S.f ((to_restrict U).app S.X₂ ≫ restrict_pres.g)
-    (by simp only [← cancel_mono ι, Category.assoc, ιcond]; rw [← (to_restrict U).naturality];
+local instance : Mono (ι U F) := by
+  refine Preadditive.mono_of_cancel_zero _ (fun u hu ↦ ?_)
+  obtain ⟨A, v, _, w, hvw⟩ := surjective_up_to_refinements_of_epi (restrict_pres U F).g u
+  rw [← cancel_epi v, comp_zero, hvw]
+  have eq : w ≫ ((pres F).map (restrict U)).g = 0 := by
+    rw [← ιcond, ← Category.assoc, ← hvw, Category.assoc, hu, comp_zero]
+  obtain ⟨A', x, _, y, hxy⟩ := (restrict_pres'_exact U F).exact_up_to_refinements _ eq
+  rw [← cancel_epi x, comp_zero, ← Category.assoc, hxy, Category.assoc]
+  change y ≫ ((restrict_pres U F).f ≫_) = 0
+  rw [ShortComplex.zero, comp_zero]
+
+set_option backward.isDefEq.respectTransparency false in
+def η : (pres F).X₃ ⟶ (restrict_pres U F).X₃ :=
+  cokernel.desc (pres F).f ((to_restrict U).app (pres F).X₂ ≫ (restrict_pres U F).g)
+    (by simp only [← cancel_mono (ι U F), Category.assoc, ιcond, ShortComplex.map_g]
+        rw [← (to_restrict U).naturality];
         simp only [Functor.comp_obj, Functor.id_obj, Functor.id_map, ShortComplex.zero_assoc,
           zero_comp])
-  have ηcond₁ : η ≫ ι = (to_restrict U).app S.X₃ := sorry
-  have ηcond₂ : S.g ≫ η = (to_restrict U).app S.X₂ ≫ restrict_pres.g := sorry
-  have : Epi η := sorry
+
+set_option backward.isDefEq.respectTransparency false in
+lemma ηcond₁ : η U F ≫ ι U F = (to_restrict U).app (pres F).X₃ := by
+  dsimp [η]
+  rw [← cancel_epi (cokernel.π (pres F).f), ← Category.assoc, cokernel.π_desc, Category.assoc,
+    ιcond, ShortComplex.map_g, ← (to_restrict U).naturality, Functor.id_map]
+  rfl
+
+set_option backward.isDefEq.respectTransparency false in
+lemma ηcond₂ : (pres F).g ≫ η U F = (to_restrict U).app (pres F).X₂ ≫ (restrict_pres U F).g := by
+    rw [← cancel_mono (ι U F), Category.assoc, ηcond₁, Category.assoc, ιcond, ShortComplex.map_g,
+      ← (to_restrict U).naturality, Functor.id_map]
+
+set_option backward.isDefEq.respectTransparency false in
+local instance : Epi (η U F) := epi_of_epi_fac (ηcond₂ U F)
+
+end
+
 
 --set_option backward.isDefEq.respectTransparency false in
 theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X)}
@@ -67,7 +137,7 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
     IsZero (H ((Sheaf.pullback AddCommGrpCat.{u} (Opens.inclusion' U)).obj F) r))
     (α : H F n) : ∃ (I : Type*) (u : I → Opens X),
     (∀ i, u i ∈ B) ∧ (⋃ i, (u i).1 = Set.univ) ∧
-    (∀ i, H.map (to_restrict (u i) F) n α = 0) := sorry
+    (∀ i, H.map ((to_restrict (u i)).app F) n α = 0) := sorry
 
 end
 
