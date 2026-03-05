@@ -86,12 +86,6 @@ noncomputable abbrev cohomologyPresheaf (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ
     Cᵒᵖ ⥤ AddCommGrpCat.{w'} :=
   (cohomologyPresheafFunctor J n).obj F
 
-/-- Given an abelian sheaf `F` on `(C, J)`, `n : ℕ` and `X : C`, this is
-the degree-`n` sheaf cohomology of `X` with values in `F`. -/
-noncomputable abbrev H' (F : Sheaf J AddCommGrpCat.{v}) (n : ℕ) (X : C) :
-    AddCommGrpCat.{w'} :=
-  (F.cohomologyPresheaf n).obj (Opposite.op X)
-
 end
 
 section
@@ -147,6 +141,55 @@ theorem H.equiv₀_symm_comp (x : F.val.obj (op T)) :
     H.map f 0 ((H.equiv₀ F hT).symm x) = (H.equiv₀ G hT).symm (f.val.app (op T) x) := by
   apply (H.equiv₀ G hT).injective
   simp [← H.equiv₀_comp]
+
+lemma H.map_apply {n : ℕ} (x : H F n) :
+    H.map f n x = x.comp (Ext.mk₀ f) (add_zero n) := rfl
+
+@[simp]
+lemma H.map_id_apply {n : ℕ} (x : H F n) : H.map (𝟙 F) n x = x := by
+  simp [H.map_apply]
+
+lemma H.map_comp_apply {n : ℕ} {G' : Sheaf J AddCommGrpCat.{w}} (g : G ⟶ G') (x : H F n) :
+    H.map (f ≫ g) n x = H.map g n (H.map f n x) := by
+  simp [H.map_apply]
+
+attribute [local simp] H.map_comp_apply in
+variable (J) in
+/-- `H` as a functor. -/
+@[simps]
+noncomputable def functorH (n : ℕ) : Sheaf J AddCommGrpCat.{w} ⥤ AddCommGrpCat.{w'} where
+  obj F := .of (H F n)
+  map f := AddCommGrpCat.ofHom (H.map f n)
+
+set_option backward.isDefEq.respectTransparency false in
+instance (n : ℕ) : (functorH J n).Additive where
+  map_add {_ _ f g} := by ext; dsimp; simp only [H.map_apply, Ext.mk₀_add, Ext.comp_add]
+
+variable [HasExt.{w} (Sheaf J AddCommGrpCat.{w})]
+omit [HasExt.{w'} (Sheaf J AddCommGrpCat)]
+
+set_option backward.isDefEq.respectTransparency false in
+variable (J) in
+/-- The natural isomorphism between cohomology in degree `0` and global sections. -/
+noncomputable def functorHNatIsoSheafSections :
+    functorH J 0 ≅ (sheafSections J _).obj (op T) where
+  hom := {
+    app F := AddCommGrpCat.ofHom (H.equiv₀ F hT).toAddMonoidHom
+    naturality _ _ _ := by
+      ext
+      simp [H.equiv₀_comp]
+  }
+  inv := {
+    app F := AddCommGrpCat.ofHom (H.equiv₀ F hT).symm.toAddMonoidHom
+    naturality _ _ _ := by
+      ext
+      simp [H.equiv₀_symm_comp]
+  }
+
+lemma H.map_comp_delta {S S' : ShortComplex (Sheaf J AddCommGrpCat.{w})} (hS : S.ShortExact)
+    (hS' : S'.ShortExact) (f : S ⟶ S') {n₀ n₁ : ℕ}
+    (hn₀ : n₀ + 1 = n₁) (x : H S.X₃ n₀) :
+    H.map f.τ₁ n₁ (x.comp hS.extClass hn₀) = (H.map f.τ₃ n₀ x).comp hS'.extClass hn₀ := sorry
 
 end
 

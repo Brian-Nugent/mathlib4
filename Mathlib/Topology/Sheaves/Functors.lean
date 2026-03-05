@@ -130,6 +130,12 @@ def sheafPullback : Y.Sheaf A ⥤ X.Sheaf A :=
   haveI := Topology.IsOpenEmbedding.functor_isContinuous hf
   hf.isOpenMap.functor.sheafPushforwardContinuous _ _ _
 
+open Opposite
+
+def sheafPullback_sections_top (U : Opens X) (F : X.Sheaf A) :
+    (((Opens.isOpenEmbedding U).sheafPullback A).obj F).val.obj (op ⊤) ≅ F.val.obj (op U) :=
+  F.val.mapIso (eqToIso (by simp)).op
+
 variable {FA : A → A → Type*} {CA : A → Type w}
 variable [∀ X Y, FunLike (FA X Y) (CA X) (CA Y)] [ConcreteCategory.{w} A FA] [HasColimits A]
 variable [HasLimits A] [PreservesLimits (CategoryTheory.forget A)]

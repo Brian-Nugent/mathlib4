@@ -153,9 +153,8 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
         (AddCommGrpCat.of (ULift.{u, 0} ℤ))) (pres F).X₂ 1) :=
       Abelian.Ext.subsingleton_of_injective _ _ 0
 -- The first cohomology group of `(pres F).X₂` vanishes.
-    obtain ⟨s, hs⟩ := Abelian.Ext.covariant_sequence_exact₁.{u}
-      ((constantSheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}).obj (AddCommGrpCat.of.{u}
-      (ULift ℤ))) (pres_exact F) c (Subsingleton.elim _ _) (n₀ := 0) rfl
+    obtain ⟨s, hs⟩ := Abelian.Ext.covariant_sequence_exact₁.{u} _ (pres_exact F) c
+      (Subsingleton.elim _ _) (n₀ := 0) rfl
 -- Using the long cohomology sequence, we find a global section `s` is `(pres F).X₃` that is
 -- sent to `c` by the connecting morphism.
 -- Technically `s` is not a section but an element of `H (pres F).X₃ 0`, so we need to apply
@@ -176,8 +175,20 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
 -- `(restrict_pres (U i) F).X₃.H 0 X ⟶ ((restrict (U i)).obj F).H 1 X` of the image of `s`
 -- by `H.map (η (U i) F)`.
     rw [eq₁]
-    have eq₂ : H.map (η (U i) F) 0 s = sorry := by
+    have eq₂ : H.map (η (U i) F) 0 s = H.map (restrict_pres (U i) F).g 0 sorry := by
 --    have := (h i).2
+--      have := (TopCat.Sheaf.H.equiv₀ (pres F).X₂).symm (t i)
+      have := t i
+      set u := ConcreteCategory.hom (((sheafToPresheaf _ _).mapIso (((Opens.isOpenEmbedding
+        (U i)).sheafPullbackIso _).app
+        (pres F).X₂)).app (Opposite.op ⊤)).inv
+        (by dsimp [Topology.IsOpenEmbedding.sheafPullback] at this ⊢
+            convert this
+        )
+      dsimp [Topology.IsOpenEmbedding.sheafPullback] at u
+
+      have := H.map
+        (((Opens.isOpenEmbedding (U i)).sheafPullbackIso _).app (pres F).X₂).inv 0 (t i)
       sorry
   | succ n hn => sorry
 
