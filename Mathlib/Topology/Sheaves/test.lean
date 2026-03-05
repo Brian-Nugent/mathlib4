@@ -33,6 +33,16 @@ noncomputable abbrev restrict_sections_top (U : Opens X) (F : X.Sheaf AddCommGrp
   (((sheafToPresheaf _ _).mapIso ((((Opens.isOpenEmbedding U)).sheafPullbackIso _).app F))).app
   (Opposite.op ⊤) ≪≫ U.sheafPullback_sections_top _ F
 
+lemma restrict_section_top_hom_naturality (U : Opens X) {F F' : X.Sheaf AddCommGrpCat.{u}}
+    (f : F ⟶ F') (s : ((restrict U).obj F).val.obj (op ⊤)) :
+    (restrict_sections_top U F').hom (((restrict U).map f).val.app (op ⊤) s) =
+    f.val.app (op U) ((restrict_sections_top U F).hom s) := sorry
+
+lemma restrict_section_top_inv_naturality (U : Opens X) {F F' : X.Sheaf AddCommGrpCat.{u}}
+    (f : F ⟶ F') (s : F.val.obj (op U)) :
+    (restrict_sections_top U F').inv (f.val.app (op U) s) =
+    ((restrict U).map f).val.app (op ⊤) ((restrict_sections_top U F).inv s) := sorry
+
 local instance (U : Opens X) : (Sheaf.pullback AddCommGrpCat.{u} (Opens.inclusion' U)).Additive :=
   sorry
 
@@ -194,12 +204,15 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
       --have : Mono ((ι (U i) F).val.app (op ⊤)) := inferInstance
       apply (ConcreteCategory.mono_iff_injective_of_preservesPullback
         ((ι (U i) F).val.app (op ⊤))).mp inferInstance
-      have := ηcond₁ (U i) F
       rw [TopCat.Sheaf.H.equiv₀_comp, ← TopCat.Sheaf.H.map_comp_apply, ηcond₁]
       conv_rhs => rw [← TopCat.Sheaf.H.equiv₀_comp, AddEquiv.apply_symm_apply]
       have := ιcond (U i) F
---    have := (h i).2
-      sorry
+      apply_fun (fun x ↦ x.val.app (op ⊤) ((((ConcreteCategory.hom
+        (restrict_sections_top (U i) (pres F).X₂).inv) (t i))))) at this
+      convert this.symm
+      erw [← restrict_section_top_inv_naturality]; rw [(h i).2]
+      rw [← TopCat.Sheaf.H.equiv₀_comp]
+      erw [restrict_sections_top_inv_eq_to_restrict]
     rw [eq₂]
     have := (H.longSequence_exact (restrict_pres_exact (U i) F) 0 1 rfl).zero 1
     dsimp [H.longSequence, Ext.covariantSequence] at this
