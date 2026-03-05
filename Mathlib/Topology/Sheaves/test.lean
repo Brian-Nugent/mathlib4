@@ -11,7 +11,7 @@ universe w' w v u
 
 namespace CategoryTheory
 
-open Abelian TopologicalSpace TopCat Limits Sheaf
+open Abelian TopologicalSpace TopCat Limits Sheaf Opposite
 
 variable {X : TopCat.{u}}
 
@@ -27,6 +27,11 @@ noncomputable abbrev restrict (U : Opens X) :
     (Opens.inclusion' U)
 
 --local instance (U : Opens X) : PreservesFiniteLimits (restrict U) := inferInstance
+
+noncomputable abbrev restrict_sections_top (U : Opens X) (F : X.Sheaf AddCommGrpCat.{u}) :
+    ((restrict U).obj F).val.obj (op ⊤) ≅ F.val.obj (op U) :=
+  (((sheafToPresheaf _ _).mapIso ((((Opens.isOpenEmbedding U)).sheafPullbackIso _).app F))).app
+  (Opposite.op ⊤) ≪≫ U.sheafPullback_sections_top _ F
 
 local instance (U : Opens X) : (Sheaf.pullback AddCommGrpCat.{u} (Opens.inclusion' U)).Additive :=
   sorry
@@ -144,7 +149,7 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
     (vanish : ∀ (r : ℕ) (U : Opens X), 1 ≤ r → r ≤ n → U ∈ B →
     IsZero (H ((Sheaf.pullback AddCommGrpCat.{u} (Opens.inclusion' U)).obj F) r))
     (c : H F (n + 1)) : ∃ (I : Type u) (U : I → Opens X) (_ : IsOpenCover U),
-    (∀ i, U i ∈ B ∧ H.map ((to_restrict (U i)).app F) (n + 1) c = 0) := by
+    (∀ i, U i ∈ B ∧ TopCat.Sheaf.H.map ((to_restrict (U i)).app F) (n + 1) c = 0) := by
   induction n generalizing F with
   | zero =>
     have : Injective (pres F).X₂ := by dsimp [pres]; infer_instance
@@ -166,30 +171,31 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
 -- As `(pres F).g : (pres F).X₂ ⟶ (pres F).X₃` is an epimorphism of sheaves, the section `s`
 -- lifts locally to sections of `(pres F).X₂`, on a cover `U : ι → Opens X`.
     refine ⟨I, U, hU, fun i ↦ ⟨(h i).1, ?_⟩⟩
-    have eq₁ : (H.map ((to_restrict (U i)).app F) 1) c =
-      (H.map (η (U i) F) 0 s).comp (restrict_pres_exact (U i) F).extClass (zero_add _) := by
+    have eq₁ : (TopCat.Sheaf.H.map ((to_restrict (U i)).app F) 1) c =
+      (TopCat.Sheaf.H.map (η (U i) F) 0 s).comp (restrict_pres_exact (U i) F).extClass (zero_add _) := by
       rw [← hs]
-      delta H.map
+      delta TopCat.Sheaf.H.map
       sorry
 -- The image of `c` by the map `F.H 1 X ⟶ ((restrict (U i)).obj F).H 1 X` is equal to the image by
 -- `(restrict_pres (U i) F).X₃.H 0 X ⟶ ((restrict (U i)).obj F).H 1 X` of the image of `s`
 -- by `H.map (η (U i) F)`.
     rw [eq₁]
-    have eq₂ : H.map (η (U i) F) 0 s = H.map (restrict_pres (U i) F).g 0 sorry := by
---    have := (h i).2
---      have := (TopCat.Sheaf.H.equiv₀ (pres F).X₂).symm (t i)
-      have := t i
-      set u := ConcreteCategory.hom (((sheafToPresheaf _ _).mapIso (((Opens.isOpenEmbedding
-        (U i)).sheafPullbackIso _).app
-        (pres F).X₂)).app (Opposite.op ⊤)).inv
-        (by dsimp [Topology.IsOpenEmbedding.sheafPullback] at this ⊢
-            convert this
-        )
-      dsimp [Topology.IsOpenEmbedding.sheafPullback] at u
+    have eq₂ : TopCat.Sheaf.H.map (η (U i) F) 0 s = TopCat.Sheaf.H.map (restrict_pres (U i) F).g 0
+        ((TopCat.Sheaf.H.equiv₀ (restrict_pres (U i) F).X₂).symm
+        ((restrict_sections_top (U i) (pres F).X₂).inv (t i))) := by
+      have := ((restrict_sections_top (U i) (pres F).X₂).inv (t i))
+      apply (TopCat.Sheaf.H.equiv₀ (restrict_pres (U i) F).X₃).injective
+      have : Mono (ι (U i) F) := inferInstance
+      --have : Mono ((ι (U i) F).val.app (op ⊤)) := inferInstance
+      apply (ConcreteCategory.mono_iff_injective_of_preservesPullback
+        ((ι (U i) F).val.app (op ⊤))).mp inferInstance
 
-      have := H.map
-        (((Opens.isOpenEmbedding (U i)).sheafPullbackIso _).app (pres F).X₂).inv 0 (t i)
+--    have := (h i).2
       sorry
+    rw [eq₂]
+    have := (H.longSequence_exact (restrict_pres_exact (U i) F) 0 1 rfl).zero 1
+    dsimp [H.longSequence, Ext.covariantSequence] at this
+    exact congr($this _)
   | succ n hn => sorry
 
 end
