@@ -76,8 +76,10 @@ instance : HasExt.{u} (CategoryTheory.Sheaf (Opens.grothendieckTopology X) AddCo
 /-- The cohomology of a sheaf of abelian groups in degree `n`. -/
 def H (F : (Sheaf AddCommGrpCat.{u} X)) (n : ℕ) : Type u := CategoryTheory.Sheaf.H F n
 
+variable {F G : Sheaf AddCommGrpCat X} (f : F ⟶ G)
+
 /-- Given a morphism `𝓕 ⟶ 𝓖`, we get an induced morphism on cohomology `H 𝓕 n ⟶ H 𝓖 n` -/
-def H.map {F G : Sheaf AddCommGrpCat X} (f : F ⟶ G) (n : ℕ) : H F n → H G n :=
+def H.map (n : ℕ) : H F n → H G n :=
     CategoryTheory.Sheaf.H.map f n
 
 instance {F : (Sheaf AddCommGrpCat X)} {n : ℕ} : AddCommGroup (H F n) :=
@@ -102,6 +104,19 @@ set_option backward.isDefEq.respectTransparency false in
 theorem H.equiv₀_symm_comp {F G : Sheaf AddCommGrpCat X} (f : F ⟶ G) (x : F.val.obj (op ⊤)) :
     H.map f 0 ((H.equiv₀ F).symm x) = (H.equiv₀ G).symm (f.val.app (op ⊤) x)
   := CategoryTheory.Sheaf.H.equiv₀_symm_comp Limits.isTerminalTop f x
+
+lemma H.map_apply {n : ℕ} (x : H F n) :
+    H.map f n x = x.comp (Abelian.Ext.mk₀ f) (add_zero n) := rfl
+
+set_option backward.isDefEq.respectTransparency false in
+@[simp]
+lemma H.map_id_apply {n : ℕ} (x : H F n) : H.map (𝟙 F) n x = x := by
+  simp [H.map_apply]
+
+set_option backward.isDefEq.respectTransparency false in
+lemma H.map_comp_apply {n : ℕ} {G' : Sheaf AddCommGrpCat.{u} X} (g : G ⟶ G') (x : H F n) :
+    H.map (f ≫ g) n x = H.map g n (H.map f n x) := by
+  simp [H.map_apply]
 
 end
 

@@ -41,6 +41,11 @@ local instance (U : Opens X) : (restrict U).Additive := sorry
 noncomputable abbrev to_restrict (U : Opens X) :
     𝟭 _ ⟶ restrict U := (Sheaf.pullbackPushforwardAdjunction _ (Opens.inclusion' U)).unit
 
+lemma restrict_sections_top_inv_eq_to_restrict (U : Opens X) (F : X.Sheaf AddCommGrpCat.{u})
+    (s : F.val.obj (op ⊤)) :
+    ((to_restrict U).app F).val.app (op ⊤) s = (restrict_sections_top U F).inv
+    (Presheaf.restrictOpen s U (by simp)) := sorry
+
 local instance (U : Opens X) (F : TopCat.Sheaf AddCommGrpCat.{u} X) [IsFlasque F] :
     IsFlasque ((restrict U).obj F) := by
   have := IsFlasque.pullbackIsFlasqueOfIsOpenEmbedding (Opens.isOpenEmbedding U)
@@ -147,7 +152,7 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
     (hB : Opens.IsBasis B)
     (hinter : ∀ (U V : Opens X), U ∈ B → V ∈ B → U ⊓ V ∈ B)
     (vanish : ∀ (r : ℕ) (U : Opens X), 1 ≤ r → r ≤ n → U ∈ B →
-    IsZero (H ((Sheaf.pullback AddCommGrpCat.{u} (Opens.inclusion' U)).obj F) r))
+    Subsingleton (H ((Sheaf.pullback AddCommGrpCat.{u} (Opens.inclusion' U)).obj F) r))
     (c : H F (n + 1)) : ∃ (I : Type u) (U : I → Opens X) (_ : IsOpenCover U),
     (∀ i, U i ∈ B ∧ TopCat.Sheaf.H.map ((to_restrict (U i)).app F) (n + 1) c = 0) := by
   induction n generalizing F with
@@ -189,7 +194,10 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
       --have : Mono ((ι (U i) F).val.app (op ⊤)) := inferInstance
       apply (ConcreteCategory.mono_iff_injective_of_preservesPullback
         ((ι (U i) F).val.app (op ⊤))).mp inferInstance
-
+      have := ηcond₁ (U i) F
+      rw [TopCat.Sheaf.H.equiv₀_comp, ← TopCat.Sheaf.H.map_comp_apply, ηcond₁]
+      conv_rhs => rw [← TopCat.Sheaf.H.equiv₀_comp, AddEquiv.apply_symm_apply]
+      have := ιcond (U i) F
 --    have := (h i).2
       sorry
     rw [eq₂]
