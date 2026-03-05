@@ -186,10 +186,14 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
 -- As `(pres F).g : (pres F).X₂ ⟶ (pres F).X₃` is an epimorphism of sheaves, the section `s`
 -- lifts locally to sections of `(pres F).X₂`, on a cover `U : ι → Opens X`.
     refine ⟨I, U, hU, fun i ↦ ⟨(h i).1, ?_⟩⟩
-    have eq₁ : (TopCat.Sheaf.H.map ((to_restrict (U i)).app F) 1) c =
-      (TopCat.Sheaf.H.map (η (U i) F) 0 s).comp (restrict_pres_exact (U i) F).extClass (zero_add _) := by
+    have eq₁ : (TopCat.Sheaf.H.map ((to_restrict (U i)).app F) 1) c = (TopCat.Sheaf.H.map
+        (η (U i) F) 0 s).comp (restrict_pres_exact (U i) F).extClass (zero_add _) := by
       rw [← hs]
-      delta TopCat.Sheaf.H.map
+      dsimp [TopCat.Sheaf.H.map, H.map, Ext.postcomp]
+      erw [AddMonoidHom.flip_apply, Ext.bilinearComp_apply_apply, AddMonoidHom.flip_apply,
+        Ext.bilinearComp_apply_apply]
+      simp only [Ext.comp_assoc_of_third_deg_zero, Ext.comp_assoc_of_second_deg_zero]
+      -- this requires naturality of `extClass` with respect to morphisms of short exact sequences!
       sorry
 -- The image of `c` by the map `F.H 1 X ⟶ ((restrict (U i)).obj F).H 1 X` is equal to the image by
 -- `(restrict_pres (U i) F).X₃.H 0 X ⟶ ((restrict (U i)).obj F).H 1 X` of the image of `s`
