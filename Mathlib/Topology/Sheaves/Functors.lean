@@ -128,7 +128,7 @@ composition by the functor `IsOpenMap.functor f` (sending an open `U` to `f '' U
 -/
 def sheafPullback : Y.Sheaf A ⥤ X.Sheaf A :=
   haveI := Topology.IsOpenEmbedding.functor_isContinuous hf
-  hf.isOpenMap.functor.sheafPushforwardContinuous _ _ _
+  hf.functor.sheafPushforwardContinuous _ _ _
 
 open Opposite
 
