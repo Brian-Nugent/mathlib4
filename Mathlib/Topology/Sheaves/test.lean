@@ -157,6 +157,7 @@ lemma pullback_pres_exact : (pullback_pres U F).ShortExact :=
 local instance : HasExt.{u} (TopCat.Sheaf AddCommGrpCat.{u} X) := hasExt_of_enoughInjectives _
 -- Why do I need to declare this again?
 
+--set_option maxHeartbeats 500000 in
 set_option backward.isDefEq.respectTransparency false in
 theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X)}
     (hB : Opens.IsBasis B)
@@ -193,8 +194,10 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
       erw [AddMonoidHom.flip_apply, Ext.bilinearComp_apply_apply, AddMonoidHom.flip_apply,
         Ext.bilinearComp_apply_apply]
       simp only [Ext.comp_assoc_of_third_deg_zero, Ext.comp_assoc_of_second_deg_zero]
-      -- this requires naturality of `extClass` with respect to morphisms of short exact sequences!
-      sorry
+      have := (pres_exact F).extClass_naturality (restrict_pres_exact (U i) F) (ShortComplex.homMk
+        ((to_restrict (U i)).app F) ((to_restrict (U i)).app (pres F).X₂)
+        (η  (U i) F) (by dsimp [restrict_pres, pres]; simp) (ηcond₂ (U i) F).symm)
+      rw [dsimp% this]
 -- The image of `c` by the map `F.H 1 X ⟶ ((restrict (U i)).obj F).H 1 X` is equal to the image by
 -- `(restrict_pres (U i) F).X₃.H 0 X ⟶ ((restrict (U i)).obj F).H 1 X` of the image of `s`
 -- by `H.map (η (U i) F)`.
