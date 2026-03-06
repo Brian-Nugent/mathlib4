@@ -165,6 +165,11 @@ lemma bijective_H_pullback_pres (F : TopCat.Sheaf AddCommGrpCat.{u} X) (U : Open
 lemma bijective_H_pres (F : TopCat.Sheaf AddCommGrpCat.{u} X) (r : ℕ) :
     Function.Bijective (H.connectingHom (pres_exact F) r (r + 1)) := sorry
 
+lemma restrict_sequence_short_exact {S : ShortComplex (X.Sheaf AddCommGrpCat.{u})}
+    (hS : S.ShortExact) (U : Opens X) {B : Set (Opens X)} (hB : Opens.IsBasis B)
+    (vanish : ∀ (V : B), Subsingleton (H ((Sheaf.pullback _ (Opens.inclusion' (U ⊓ V))).obj
+    S.X₁) 1)) : (S.map (restrict U)).ShortExact := sorry
+
 local instance : HasExt.{u} (TopCat.Sheaf AddCommGrpCat.{u} X) := hasExt_of_enoughInjectives _
 -- Why do I need to declare this again?
 
@@ -249,7 +254,9 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
       have : Subsingleton ((pullback_pres U F).X₁.H (r + 1)) := vanish (r + 1) U (by lia)
         (by lia) hU
       exact (Equiv.ofBijective _ (bijective_H_pullback_pres F U r)).subsingleton
-    have he : ∀ (U : Opens X), U ∈ B → ((pres F).map (restrict U)).ShortExact := sorry
+    have he : ∀ (U : Opens X), U ∈ B → ((pres F).map (restrict U)).ShortExact :=
+      fun U hU ↦ restrict_sequence_short_exact (pres_exact F) U hB
+        (fun V ↦ vanish 1 (U ⊓ V) (le_refl 1) (by lia) (hinter U V.1 hU V.2))
     obtain ⟨c', hc'⟩ := (bijective_H_pres F (n + 1)).2 c
     obtain ⟨I, U, hcover, hU⟩ := hn (pres F).X₃ vanishG c'
     use I, U, hcover
@@ -262,7 +269,7 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
     have := (hU i).2
     dsimp [TopCat.Sheaf.H.map, pres] at this
     rw [this]
-    erw [AddMonoidHom.map_zero]
+    erw [(H.connectingHom (he (U i) (hU i).1) (n + 1) (n + 1 + 1) rfl).map_zero]
 
 end
 
