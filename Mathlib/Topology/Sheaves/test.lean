@@ -155,9 +155,15 @@ lemma pullback_pres_exact : (pullback_pres U F).ShortExact :=
   (pres_exact F).map (Sheaf.pullback _ (Opens.inclusion' U))
 
 /--
-Statement (**) from the notes. Uses the fact that pullbacks are exact.
+Statement (**) from the notes, i.e. the fact that `H^r(U,G) -> H^{r+1}(U,F)` is bijective
+(where `G` is the third sheaf in `pres F`).
+Uses the fact that pullbacks are exact.
 -/
-lemma iso_H_pres (r : ℕ) (U : Opens X) : 0 = 0 := sorry
+lemma bijective_H_pullback_pres (F : TopCat.Sheaf AddCommGrpCat.{u} X) (U : Opens X) (r : ℕ) :
+    Function.Bijective (H.connectingHom (pullback_pres_exact U F) r (r + 1)) := sorry
+
+lemma bijective_H_pres (F : TopCat.Sheaf AddCommGrpCat.{u} X) (r : ℕ) :
+    Function.Bijective (H.connectingHom (pres_exact F) r (r + 1)) := sorry
 
 local instance : HasExt.{u} (TopCat.Sheaf AddCommGrpCat.{u} X) := hasExt_of_enoughInjectives _
 -- Why do I need to declare this again?
@@ -212,21 +218,20 @@ theorem prop1_base (F : TopCat.Sheaf AddCommGrpCat.{u} X) {B : Set (Opens X)}
     have : Mono (ι (U i) F) := inferInstance
     apply (ConcreteCategory.mono_iff_injective_of_preservesPullback
         ((ι (U i) F).val.app (op ⊤))).mp inferInstance
-    rw [TopCat.Sheaf.H.equiv₀_comp, ← TopCat.Sheaf.H.map_comp_apply, ηcond₁]
-    conv_rhs => rw [← TopCat.Sheaf.H.equiv₀_comp, AddEquiv.apply_symm_apply]
+    rw [TopCat.Sheaf.H.equiv₀_naturality, ← TopCat.Sheaf.H.map_comp_apply, ηcond₁]
+    conv_rhs => rw [← TopCat.Sheaf.H.equiv₀_naturality, AddEquiv.apply_symm_apply]
     have := ιcond (U i) F
     apply_fun (fun x ↦ x.val.app (op ⊤) ((((ConcreteCategory.hom
         (restrict_sections_top (U i) (pres F).X₂).inv) (t i))))) at this
     convert this.symm
     erw [← restrict_section_top_inv_naturality]; rw [(h i).2]
-    rw [← TopCat.Sheaf.H.equiv₀_comp]
+    rw [← TopCat.Sheaf.H.equiv₀_naturality]
     erw [restrict_sections_top_inv_eq_to_restrict]
   rw [eq₂]
   have := (H.longSequence_exact (restrict_pres_exact (U i) F) 0 1 rfl).zero 1
   dsimp [H.longSequence, Ext.covariantSequence] at this
   exact congr($this _)
 
---set_option maxHeartbeats 500000 in
 set_option backward.isDefEq.respectTransparency false in
 theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X)}
     (hB : Opens.IsBasis B)
@@ -238,8 +243,26 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
   induction n generalizing F with
   | zero => exact prop1_base F hB c
   | succ n hn =>
-    sorry
-
+    have vanishG : ∀ (r : ℕ) (U : Opens X), 1 ≤ r → r ≤ n → U ∈ B → Subsingleton
+        (H ((Sheaf.pullback AddCommGrpCat.{u} (Opens.inclusion' U)).obj (pres F).X₃) r) := by
+      intro r U h₁ h₂ hU
+      have : Subsingleton ((pullback_pres U F).X₁.H (r + 1)) := vanish (r + 1) U (by lia)
+        (by lia) hU
+      exact (Equiv.ofBijective _ (bijective_H_pullback_pres F U r)).subsingleton
+    have he : ∀ (U : Opens X), U ∈ B → ((pres F).map (restrict U)).ShortExact := sorry
+    obtain ⟨c', hc'⟩ := (bijective_H_pres F (n + 1)).2 c
+    obtain ⟨I, U, hcover, hU⟩ := hn (pres F).X₃ vanishG c'
+    use I, U, hcover
+    refine fun i ↦ ⟨(hU i).1, ?_⟩
+    rw [← hc']
+    have := H.connectingHom_naturality (pres_exact F) (he (U i) (hU i).1) ((pres F).mapNatTrans
+      (to_restrict (U i))) (n + 1) (n + 1 + 1) rfl c'
+    dsimp [pres, TopCat.Sheaf.H.map] at this ⊢
+    rw [this]
+    have := (hU i).2
+    dsimp [TopCat.Sheaf.H.map, pres] at this
+    rw [this]
+    erw [AddMonoidHom.map_zero]
 
 end
 

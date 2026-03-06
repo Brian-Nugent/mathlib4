@@ -29,11 +29,17 @@ namespace Sheaf
 variable [HasSheafify J AddCommGrpCat.{w}] [HasExt.{w'} (Sheaf J AddCommGrpCat.{w})] (n : ℕ)
 
 variable {S : ShortComplex (Sheaf J AddCommGrpCat.{w})} (hS : S.ShortExact) (n₀ : ℕ)
-    (n₁ : ℕ := n₀ + 1)
+    (n₁ : ℕ)
 
 /-- The connecting homomorphism from `Hⁿ(S.X₃)` to `Hⁿ⁺¹(S.X₁)` -/
 noncomputable def H.connectingHom (h : n₀ + 1 = n₁ := by omega) : H S.X₃ n₀ →+ H S.X₁ n₁ :=
   hS.extClass.postcomp _ h
+
+lemma H.connectingHom_naturality {S₁ S₂ : ShortComplex (Sheaf J AddCommGrpCat.{w})}
+    (h₁ : S₁.ShortExact) (h₂ : S₂.ShortExact) (f : S₁ ⟶ S₂) (n₀ n₁ : ℕ) (h : n₀ + 1 = n₁ := by lia)
+    (c : S₁.X₃.H n₀) :
+    H.map f.τ₁ n₁ (H.connectingHom h₁ n₀ n₁ h c) = H.connectingHom h₂ n₀ n₁ h (H.map f.τ₃ n₀ c) :=
+  sorry
 
 open AddCommGrpCat
 
@@ -63,8 +69,8 @@ lemma longSequence_exact₃' (h : n₀ + 1 = n₁ := by omega) :
 
 lemma longSequence_exact₂' (n : ℕ) :
     (ShortComplex.mk (ofHom (H.map S.f n)) (ofHom (H.map S.g n)) (by
-      convert ((longSequence_exact hS n).sc 0).zero)).Exact := by
-  convert (longSequence_exact hS n).exact 0
+      convert ((longSequence_exact hS n (n + 1)).sc 0).zero)).Exact := by
+  convert (longSequence_exact hS n (n + 1)).exact 0
 
 include hS in
 lemma longSequence_exact₂ (x₂ : H S.X₂ n) (hx₂ : H.map S.g n x₂ = 0) :
