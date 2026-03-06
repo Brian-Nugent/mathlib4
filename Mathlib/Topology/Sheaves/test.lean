@@ -2,10 +2,10 @@ module
 
 public import Mathlib.Combinatorics.Quiver.ReflQuiver
 public import Mathlib.Topology.Sheaves.Flasque
+public import Mathlib.AlgebraicGeometry.Scheme
+public import Mathlib
 
 @[expose] public section
-
-assert_not_exists TwoSidedIdeal
 
 universe w' w v u
 
@@ -278,3 +278,50 @@ end
 end Sheaf
 
 end CategoryTheory
+
+namespace AlgebraicGeometry.Scheme.Modules
+
+open TopCat Sheaf CategoryTheory AddCommGrpCat Limits
+
+variable (n : ℕ) {X : Scheme.{u}} [IsAffine X] (F : X.Modules)
+
+noncomputable abbrev sheaf : Sheaf Ab X :=
+  (SheafOfModules.toSheaf X.ringCatSheaf).obj F
+
+/- noncomputable abbrev restrict (U : Opens X) :
+    TopCat.Sheaf AddCommGrpCat.{u} X ⥤ TopCat.Sheaf AddCommGrpCat.{u} X :=
+    Sheaf.pullback AddCommGrpCat.{u} (Opens.inclusion' U) ⋙ Sheaf.pushforward AddCommGrpCat
+    (Opens.inclusion' U) -/
+
+#check restrict
+
+noncomputable abbrev openRestrictPush (U : Opens X) : X.Modules ⥤ X.Modules :=
+  restrictFunctor U.ι ⋙ pushforward U.ι
+
+noncomputable abbrev toOpenRestrictPush (U : X.Opens) := (restrictAdjunction U.ι).unit
+
+private lemma vanish_base : Subsingleton (H F.sheaf 1) := sorry
+
+
+instance : Subsingleton (H F.sheaf (n + 1)) := by
+  revert F X
+  refine Nat.case_strong_induction_on (p := fun n => ∀ {X : Scheme} [IsAffine X] (F : X.Modules),
+    Subsingleton ((F.sheaf).H (n + 1))) n vanish_base ?_
+  intro n hi X _ F
+  apply subsingleton_of_forall_eq 0
+  intro s
+  obtain ⟨I, ⟨U, ⟨_, hU⟩⟩⟩ := Sheaf.prop1 F.sheaf (n + 1) (isBasis_affineOpens X) sorry (by
+    intro r U hr hrn hU
+    have : r - 1 < n := sorry
+    sorry) s
+  have : Finite I := sorry
+  let j : I → X.Modules := fun i => (openRestrictPush (U i)).obj F
+  let G : X.Modules := ∏ᶜ j
+  let res : F ⟶ G := Pi.lift (fun b => (toOpenRestrictPush (U b)).app F)
+  haveI : Mono res := sorry
+  let S := ShortComplex.mk res (cokernel.π res) (by cat_disch)
+  have := hi n (Nat.le_refl n) S.X₃
+  
+  sorry
+
+end AlgebraicGeometry.Scheme.Modules
