@@ -7,6 +7,7 @@ Authors: Brian Nugent
 module
 
 public import Mathlib.CategoryTheory.Sites.EpiMono
+public import Mathlib.CategoryTheory.Sites.SheafCohomology.ExactSequences
 public import Mathlib.Topology.Sheaves.AddCommGrpCat
 public import Mathlib.Topology.Sheaves.LocallySurjective
 public import Mathlib.Topology.Sheaves.ZeroOutside
@@ -45,16 +46,37 @@ open scoped AlgebraicGeometry
 
 variable {X : TopCat.{u}}
 
-namespace TopCat.Sheaf
+namespace TopCat
+
+namespace Presheaf
+
+variable {C : Type v} [Category.{w} C] (F : Presheaf C X)
 
 /-- A sheaf is flasque if all of the restriction morphisms are epimorphisms. -/
-class IsFlasque {C : Type v} [Category.{w} C] (F : Sheaf C X) : Prop where
-  epi : ∀{U V : Opens X} (i : U ⟶ V), Epi (F.val.map i.op)
+class IsFlasque : Prop where
+  epi : ∀{U V : (Opens X)ᵒᵖ} (i : U ⟶ V), Epi (F.map i)
 
 namespace IsFlasque
 
-instance (priority := low) {C : Type v} [Category.{w} C] (F : Sheaf C X) [h : IsFlasque F]
-    {U V : Opens X} (i : U ⟶ V) : Epi (F.val.map i.op) := h.epi i
+instance (priority := low) [h : IsFlasque F]
+    {U V : (Opens X)ᵒᵖ} (i : U ⟶ V) : Epi (F.map i) := h.epi i
+
+theorem pushforward_isFlasque {Y : TopCat.{u}} [IsFlasque F] (f : X ⟶ Y) :
+    IsFlasque (f _* F) where
+  epi {U V} i := by
+    simp only [pushforward_obj_obj, pushforward_obj_map]
+    infer_instance
+
+end IsFlasque
+
+end Presheaf
+
+namespace Sheaf
+
+/-- A sheaf is flasque if it is flasque as a presheaf -/
+abbrev IsFlasque {C : Type v} [Category.{w} C] (F : Sheaf C X) := Presheaf.IsFlasque F.val
+
+namespace IsFlasque
 
 variable {U : Opens X} {F G : Sheaf AddCommGrpCat X} (g : F ⟶ G) (s : G.val.obj (op U))
 
@@ -177,14 +199,14 @@ then `𝓗` is flasque. -/
 theorem X₃_shortExact_isFlasque_X₁_isFlasque_X₂ {S : ShortComplex (Sheaf AddCommGrpCat X)}
     (hS : S.ShortExact) [IsFlasque S.X₁] [IsFlasque S.X₂] : IsFlasque S.X₃ where
   epi {U V} := fun i => by
-    have : Epi (S.g.1.app (op V) ≫ S.X₃.val.map i.op) := by
-      rw [← S.g.val.naturality i.op]
+    have : Epi (S.g.1.app U ≫ S.X₃.val.map i) := by
+      rw [← S.g.val.naturality i]
       exact CategoryTheory.epi_comp' inferInstance (epi_of_shortExact hS)
-    exact CategoryTheory.epi_of_epi (S.g.1.app (op V)) (S.X₃.val.map i.op)
+    exact CategoryTheory.epi_of_epi (S.g.1.app U) (S.X₃.val.map i)
 
 /-- Injective sheaves are flasque. -/
 instance of_injective (I : Sheaf AddCommGrpCat.{u} X) [Injective I] : IsFlasque I where
-  epi := fun i => epi_map_of_injective I (leOfHom i)
+  epi := fun i => epi_map_of_injective I (leOfHom i.unop)
 
 set_option backward.isDefEq.respectTransparency false in
 /-- Flasque sheaves have no higher cohomology. For most applications, it is probably better to use
@@ -204,7 +226,7 @@ theorem H_isZero (F : Sheaf AddCommGrpCat X) [IsFlasque F] (n : ℕ) :
       ← Equiv.surjective_comp (H.equiv₀ I).symm.toEquiv]
     change Function.Surjective ((H.map S.g 0) ∘ (H.equiv₀ I).symm.toEquiv)
     conv => right; equals (H.equiv₀ S.X₃).symm.toEquiv ∘ S.g.val.app (op ⊤)
-      => ext x; exact H.equiv₀_symm_comp S.g x
+      => ext x; exact H.equiv₀_symm_naturality S.g x
     rw [Equiv.comp_surjective, ← AddCommGrpCat.epi_iff_surjective]
     exact epi_of_shortExact hS
   | succ n hn =>

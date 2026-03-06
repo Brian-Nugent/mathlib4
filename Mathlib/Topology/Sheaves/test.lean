@@ -154,8 +154,77 @@ def pullback_pres := (pres F).map (Sheaf.pullback _ (Opens.inclusion' U))
 lemma pullback_pres_exact : (pullback_pres U F).ShortExact :=
   (pres_exact F).map (Sheaf.pullback _ (Opens.inclusion' U))
 
+/--
+Statement (**) from the notes. Uses the fact that pullbacks are exact.
+-/
+lemma iso_H_pres (r : ℕ) (U : Opens X) : 0 = 0 := sorry
+
 local instance : HasExt.{u} (TopCat.Sheaf AddCommGrpCat.{u} X) := hasExt_of_enoughInjectives _
 -- Why do I need to declare this again?
+
+set_option backward.isDefEq.respectTransparency false in
+/--
+Base case of the induction in `prop1`.
+-/
+theorem prop1_base (F : TopCat.Sheaf AddCommGrpCat.{u} X) {B : Set (Opens X)}
+    (hB : Opens.IsBasis B) (c : H F 1) :
+    ∃ (I : Type u) (U : I → Opens X) (_ : IsOpenCover U),
+    (∀ i, U i ∈ B ∧ TopCat.Sheaf.H.map ((to_restrict (U i)).app F) 1 c = 0) := by
+  have : Injective (pres F).X₂ := by dsimp [pres]; infer_instance
+-- Why does Lean find the local instance I defined earlier?
+  have : Subsingleton (Ext ((constantSheaf (Opens.grothendieckTopology X) AddCommGrpCat).obj
+      (AddCommGrpCat.of (ULift.{u, 0} ℤ))) (pres F).X₂ 1) :=
+    Abelian.Ext.subsingleton_of_injective _ _ 0
+-- The first cohomology group of `(pres F).X₂` vanishes.
+  obtain ⟨s, hs⟩ := Abelian.Ext.covariant_sequence_exact₁.{u} _ (pres_exact F) c
+    (Subsingleton.elim _ _) (n₀ := 0) rfl
+-- Using the long cohomology sequence, we find a global section `s` is `(pres F).X₃` that is
+-- sent to `c` by the connecting morphism.
+-- Technically `s` is not a section but an element of `H (pres F).X₃ 0`, so we need to apply
+-- `TopCat.Sheaf.H.equiv₀` to make it a section.
+  have : Sheaf.IsLocallySurjective (pres F).g :=
+    (Sheaf.isLocallySurjective_iff_epi' _ _).mpr (pres_exact F).epi_g
+  obtain ⟨I, U, hU, t, h⟩ := Presheaf.exists_lift_cover_basis_of_isLocallySurjective this hB
+    (TopCat.Sheaf.H.equiv₀ (pres F).X₃ s)
+-- As `(pres F).g : (pres F).X₂ ⟶ (pres F).X₃` is an epimorphism of sheaves, the section `s`
+-- lifts locally to sections of `(pres F).X₂`, on a cover `U : ι → Opens X`.
+  refine ⟨I, U, hU, fun i ↦ ⟨(h i).1, ?_⟩⟩
+  have eq₁ : (TopCat.Sheaf.H.map ((to_restrict (U i)).app F) 1) c = (TopCat.Sheaf.H.map
+      (η (U i) F) 0 s).comp (restrict_pres_exact (U i) F).extClass (zero_add _) := by
+    rw [← hs]
+    dsimp [TopCat.Sheaf.H.map, H.map, Ext.postcomp]
+    erw [AddMonoidHom.flip_apply, Ext.bilinearComp_apply_apply, AddMonoidHom.flip_apply,
+        Ext.bilinearComp_apply_apply]
+    simp only [Ext.comp_assoc_of_third_deg_zero, Ext.comp_assoc_of_second_deg_zero]
+    have := (pres_exact F).extClass_naturality (restrict_pres_exact (U i) F) (ShortComplex.homMk
+        ((to_restrict (U i)).app F) ((to_restrict (U i)).app (pres F).X₂)
+        (η  (U i) F) (by dsimp [restrict_pres, pres]; simp) (ηcond₂ (U i) F).symm)
+    rw [dsimp% this]
+-- The image of `c` by the map `F.H 1 X ⟶ ((restrict (U i)).obj F).H 1 X` is equal to the image by
+-- `(restrict_pres (U i) F).X₃.H 0 X ⟶ ((restrict (U i)).obj F).H 1 X` of the image of `s`
+-- by `H.map (η (U i) F)`.
+  rw [eq₁]
+  have eq₂ : TopCat.Sheaf.H.map (η (U i) F) 0 s = TopCat.Sheaf.H.map (restrict_pres (U i) F).g 0
+        ((TopCat.Sheaf.H.equiv₀ (restrict_pres (U i) F).X₂).symm
+        ((restrict_sections_top (U i) (pres F).X₂).inv (t i))) := by
+    have := ((restrict_sections_top (U i) (pres F).X₂).inv (t i))
+    apply (TopCat.Sheaf.H.equiv₀ (restrict_pres (U i) F).X₃).injective
+    have : Mono (ι (U i) F) := inferInstance
+    apply (ConcreteCategory.mono_iff_injective_of_preservesPullback
+        ((ι (U i) F).val.app (op ⊤))).mp inferInstance
+    rw [TopCat.Sheaf.H.equiv₀_comp, ← TopCat.Sheaf.H.map_comp_apply, ηcond₁]
+    conv_rhs => rw [← TopCat.Sheaf.H.equiv₀_comp, AddEquiv.apply_symm_apply]
+    have := ιcond (U i) F
+    apply_fun (fun x ↦ x.val.app (op ⊤) ((((ConcreteCategory.hom
+        (restrict_sections_top (U i) (pres F).X₂).inv) (t i))))) at this
+    convert this.symm
+    erw [← restrict_section_top_inv_naturality]; rw [(h i).2]
+    rw [← TopCat.Sheaf.H.equiv₀_comp]
+    erw [restrict_sections_top_inv_eq_to_restrict]
+  rw [eq₂]
+  have := (H.longSequence_exact (restrict_pres_exact (U i) F) 0 1 rfl).zero 1
+  dsimp [H.longSequence, Ext.covariantSequence] at this
+  exact congr($this _)
 
 --set_option maxHeartbeats 500000 in
 set_option backward.isDefEq.respectTransparency false in
@@ -167,64 +236,10 @@ theorem prop1 (F : TopCat.Sheaf AddCommGrpCat.{u} X) (n : ℕ) {B : Set (Opens X
     (c : H F (n + 1)) : ∃ (I : Type u) (U : I → Opens X) (_ : IsOpenCover U),
     (∀ i, U i ∈ B ∧ TopCat.Sheaf.H.map ((to_restrict (U i)).app F) (n + 1) c = 0) := by
   induction n generalizing F with
-  | zero =>
-    have : Injective (pres F).X₂ := by dsimp [pres]; infer_instance
--- Why does Lean find the local instance I defined earlier?
-    have : Subsingleton (Ext ((constantSheaf (Opens.grothendieckTopology X) AddCommGrpCat).obj
-        (AddCommGrpCat.of (ULift.{u, 0} ℤ))) (pres F).X₂ 1) :=
-      Abelian.Ext.subsingleton_of_injective _ _ 0
--- The first cohomology group of `(pres F).X₂` vanishes.
-    obtain ⟨s, hs⟩ := Abelian.Ext.covariant_sequence_exact₁.{u} _ (pres_exact F) c
-      (Subsingleton.elim _ _) (n₀ := 0) rfl
--- Using the long cohomology sequence, we find a global section `s` is `(pres F).X₃` that is
--- sent to `c` by the connecting morphism.
--- Technically `s` is not a section but an element of `H (pres F).X₃ 0`, so we need to apply
--- `TopCat.Sheaf.H.equiv₀` to make it a section.
-    have : Sheaf.IsLocallySurjective (pres F).g :=
-      (Sheaf.isLocallySurjective_iff_epi' _ _).mpr (pres_exact F).epi_g
-    obtain ⟨I, U, hU, t, h⟩ := Presheaf.exists_lift_cover_basis_of_isLocallySurjective this hB
-      (TopCat.Sheaf.H.equiv₀ (pres F).X₃ s)
--- As `(pres F).g : (pres F).X₂ ⟶ (pres F).X₃` is an epimorphism of sheaves, the section `s`
--- lifts locally to sections of `(pres F).X₂`, on a cover `U : ι → Opens X`.
-    refine ⟨I, U, hU, fun i ↦ ⟨(h i).1, ?_⟩⟩
-    have eq₁ : (TopCat.Sheaf.H.map ((to_restrict (U i)).app F) 1) c = (TopCat.Sheaf.H.map
-        (η (U i) F) 0 s).comp (restrict_pres_exact (U i) F).extClass (zero_add _) := by
-      rw [← hs]
-      dsimp [TopCat.Sheaf.H.map, H.map, Ext.postcomp]
-      erw [AddMonoidHom.flip_apply, Ext.bilinearComp_apply_apply, AddMonoidHom.flip_apply,
-        Ext.bilinearComp_apply_apply]
-      simp only [Ext.comp_assoc_of_third_deg_zero, Ext.comp_assoc_of_second_deg_zero]
-      have := (pres_exact F).extClass_naturality (restrict_pres_exact (U i) F) (ShortComplex.homMk
-        ((to_restrict (U i)).app F) ((to_restrict (U i)).app (pres F).X₂)
-        (η  (U i) F) (by dsimp [restrict_pres, pres]; simp) (ηcond₂ (U i) F).symm)
-      rw [dsimp% this]
--- The image of `c` by the map `F.H 1 X ⟶ ((restrict (U i)).obj F).H 1 X` is equal to the image by
--- `(restrict_pres (U i) F).X₃.H 0 X ⟶ ((restrict (U i)).obj F).H 1 X` of the image of `s`
--- by `H.map (η (U i) F)`.
-    rw [eq₁]
-    have eq₂ : TopCat.Sheaf.H.map (η (U i) F) 0 s = TopCat.Sheaf.H.map (restrict_pres (U i) F).g 0
-        ((TopCat.Sheaf.H.equiv₀ (restrict_pres (U i) F).X₂).symm
-        ((restrict_sections_top (U i) (pres F).X₂).inv (t i))) := by
-      have := ((restrict_sections_top (U i) (pres F).X₂).inv (t i))
-      apply (TopCat.Sheaf.H.equiv₀ (restrict_pres (U i) F).X₃).injective
-      have : Mono (ι (U i) F) := inferInstance
-      --have : Mono ((ι (U i) F).val.app (op ⊤)) := inferInstance
-      apply (ConcreteCategory.mono_iff_injective_of_preservesPullback
-        ((ι (U i) F).val.app (op ⊤))).mp inferInstance
-      rw [TopCat.Sheaf.H.equiv₀_comp, ← TopCat.Sheaf.H.map_comp_apply, ηcond₁]
-      conv_rhs => rw [← TopCat.Sheaf.H.equiv₀_comp, AddEquiv.apply_symm_apply]
-      have := ιcond (U i) F
-      apply_fun (fun x ↦ x.val.app (op ⊤) ((((ConcreteCategory.hom
-        (restrict_sections_top (U i) (pres F).X₂).inv) (t i))))) at this
-      convert this.symm
-      erw [← restrict_section_top_inv_naturality]; rw [(h i).2]
-      rw [← TopCat.Sheaf.H.equiv₀_comp]
-      erw [restrict_sections_top_inv_eq_to_restrict]
-    rw [eq₂]
-    have := (H.longSequence_exact (restrict_pres_exact (U i) F) 0 1 rfl).zero 1
-    dsimp [H.longSequence, Ext.covariantSequence] at this
-    exact congr($this _)
-  | succ n hn => sorry
+  | zero => exact prop1_base F hB c
+  | succ n hn =>
+    sorry
+
 
 end
 
