@@ -31,15 +31,22 @@ variable [HasSheafify J AddCommGrpCat.{w}] [HasExt.{w'} (Sheaf J AddCommGrpCat.{
 variable {S : ShortComplex (Sheaf J AddCommGrpCat.{w})} (hS : S.ShortExact) (n₀ : ℕ)
     (n₁ : ℕ := n₀ + 1)
 
+namespace H
+
 /-- The connecting homomorphism from `Hⁿ(S.X₃)` to `Hⁿ⁺¹(S.X₁)` -/
-noncomputable def H.connectingHom (h : n₀ + 1 = n₁ := by omega) : H S.X₃ n₀ →+ H S.X₁ n₁ :=
+noncomputable def connectingHom (h : n₀ + 1 = n₁ := by omega) : H S.X₃ n₀ →+ H S.X₁ n₁ :=
   hS.extClass.postcomp _ h
+
+variable {S₁ S₂ : ShortComplex (Sheaf J AddCommGrpCat.{w})}
+    (h₁ : S₁.ShortExact) (h₂ : S₂.ShortExact) (f : S₁ ⟶ S₂)
+
+theorem connectingHom_naturality (h : n₀ + 1 = n₁ := by omega) (x : H S₁.X₃ n₀) :
+    connectingHom h₂ n₀ n₁ h (map f.τ₃ n₀ x) = map f.τ₁ n₁ (connectingHom h₁ n₀ n₁ h x) := sorry
 
 open AddCommGrpCat
 
-namespace H
-
 /-- The long exact sequence on sheaf cohomology. -/
+@[simps!]
 noncomputable def longSequence (h : n₀ + 1 = n₁ := by omega) :
     ComposableArrows AddCommGrpCat.{w'} 5 := ComposableArrows.mk₅
   (ofHom (H.map S.f n₀))
@@ -47,6 +54,26 @@ noncomputable def longSequence (h : n₀ + 1 = n₁ := by omega) :
   (ofHom (H.connectingHom hS n₀ n₁))
   (ofHom (H.map S.f n₁))
   (ofHom (H.map S.g n₁))
+
+attribute [local simp] map_comp_apply in
+noncomputable def longSequence_hom (h : n₀ + 1 = n₁ := by omega) :
+    longSequence h₁ n₀ n₁ h ⟶ longSequence h₂ n₀ n₁ h := by
+  fapply ComposableArrows.homMk₅
+  · exact (ofHom (map f.τ₁ n₀))
+  · exact (ofHom (map f.τ₂ n₀))
+  · exact (ofHom (map f.τ₃ n₀))
+  · exact (ofHom (map f.τ₁ n₁))
+  · exact (ofHom (map f.τ₂ n₁))
+  · exact (ofHom (map f.τ₃ n₁))
+  · simp
+    have := f.4
+
+
+    sorry
+  sorry
+  sorry
+  sorry
+  sorry
 
 theorem longSequence_exact (h : n₀ + 1 = n₁ := by omega) : (longSequence hS n₀ n₁ h).Exact :=
   Ext.covariantSequence_exact _ hS n₀ n₁ h
