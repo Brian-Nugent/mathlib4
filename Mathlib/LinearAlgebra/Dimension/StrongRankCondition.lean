@@ -425,20 +425,20 @@ theorem Ideal.rank_eq {R S : Type*} [CommRing R] [StrongRankCondition R] [Ring S
 namespace Module
 
 omit [StrongRankCondition R] in
-theorem rank_pos_of_free [Module.Free R M] [Nontrivial M] :
+theorem rank_pos_of_free [Module.IsFree R M] [Nontrivial M] :
     0 < Module.rank R M :=
   have := Module.nontrivial R M
   (pos_of_ne_zero <| Cardinal.mk_ne_zero _).trans_le
-    (Free.chooseBasis R M).linearIndependent.cardinal_le_rank
+    (IsFree.chooseBasis R M).linearIndependent.cardinal_le_rank
 
-theorem rank_pos_iff_of_free [Module.Free R M] :
+theorem rank_pos_iff_of_free [Module.IsFree R M] :
     0 < Module.rank R M ↔ Nontrivial M := by
   refine ⟨fun h ↦ ?_, fun _ ↦ rank_pos_of_free⟩
   rw [← not_subsingleton_iff_nontrivial]
   intro h'
   simp only [rank_subsingleton', lt_self_iff_false] at h
 
-theorem rank_zero_iff_of_free [Module.Free R M] :
+theorem rank_zero_iff_of_free [Module.IsFree R M] :
     Module.rank R M = 0 ↔ Subsingleton M := by
   rw [← not_nontrivial_iff_subsingleton, iff_not_comm,
     ← Module.rank_pos_iff_of_free (R := R), pos_iff_ne_zero]
@@ -524,18 +524,18 @@ noncomputable instance {R M : Type*} [DivisionRing R] [AddCommGroup M] [Module R
 theorem finrank_eq_rank [Module.Finite R M] : ↑(finrank R M) = Module.rank R M := by
   rw [Module.finrank, cast_toNat_of_lt_aleph0 (rank_lt_aleph0 R M)]
 
-theorem finrank_eq_zero_iff_of_free [Module.Free R M] [Module.Finite R M] :
+theorem finrank_eq_zero_iff_of_free [Module.IsFree R M] [Module.Finite R M] :
     Module.finrank R M = 0 ↔ Subsingleton M := by
   have := Module.rank_lt_aleph0 R M
   rw [← not_le] at this
   simp [Module.finrank, this, Module.rank_zero_iff_of_free]
 
 @[nontriviality]
-theorem finrank_eq_zero_of_subsingleton [Module.Free R M] [Subsingleton M] :
+theorem finrank_eq_zero_of_subsingleton [Module.IsFree R M] [Subsingleton M] :
     Module.finrank R M = 0 :=
   (finrank_eq_zero_iff_of_free R M).mpr inferInstance
 
-theorem finrank_pos_iff_of_free [Module.Free R M] [Module.Finite R M] :
+theorem finrank_pos_iff_of_free [Module.IsFree R M] [Module.Finite R M] :
     0 < Module.finrank R M ↔ Nontrivial M := by
   rw [← not_subsingleton_iff_nontrivial, ← iff_not_comm]
   simp [Module.finrank_eq_zero_iff_of_free]
@@ -677,7 +677,7 @@ An extension of rings `R ⊆ S` is quadratic if `S` is a free `R`-algebra of ran
 -/
 -- TODO. use this in connection with `NumberTheory.Zsqrtd`
 class IsQuadraticExtension (R S : Type*) [CommSemiring R] [StrongRankCondition R] [Semiring S]
-    [Algebra R S] extends Module.Free R S where
+    [Algebra R S] extends Module.IsFree R S where
   finrank_eq_two' : Module.finrank R S = 2
 
 theorem IsQuadraticExtension.finrank_eq_two (R S : Type*) [CommSemiring R] [StrongRankCondition R]

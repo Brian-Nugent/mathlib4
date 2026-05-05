@@ -89,9 +89,9 @@ open scoped Classical in
 theorem _root_.NumberField.mixedEmbedding.volume_fundamentalDomain_latticeBasis :
     volume (fundamentalDomain (latticeBasis K)) =
       (2 : ℝ≥0∞)⁻¹ ^ nrComplexPlaces K * sqrt ‖discr K‖₊ := by
-  let f : Module.Free.ChooseBasisIndex ℤ (𝓞 K) ≃ (K →+* ℂ) :=
+  let f : Module.IsFree.ChooseBasisIndex ℤ (𝓞 K) ≃ (K →+* ℂ) :=
     (canonicalEmbedding.latticeBasis K).indexEquiv (Pi.basisFun ℂ _)
-  let e : (index K) ≃ Module.Free.ChooseBasisIndex ℤ (𝓞 K) := (indexEquiv K).trans f.symm
+  let e : (index K) ≃ Module.IsFree.ChooseBasisIndex ℤ (𝓞 K) := (indexEquiv K).trans f.symm
   let M := (mixedEmbedding.stdBasis K).toMatrix ((latticeBasis K).reindex e.symm)
   let N := Algebra.embeddingsMatrixReindex ℚ ℂ (integralBasis K ∘ f.symm)
     RingHom.equivRatAlgHom

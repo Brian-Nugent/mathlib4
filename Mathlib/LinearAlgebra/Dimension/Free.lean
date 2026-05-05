@@ -35,7 +35,7 @@ section Tower
 variable (F : Type u) (K : Type v) (A : Type w)
 variable [Semiring F] [Semiring K] [AddCommMonoid A]
 variable [Module F K] [Module K A] [Module F A] [IsScalarTower F K A]
-variable [StrongRankCondition F] [StrongRankCondition K] [Module.Free F K] [Module.Free K A]
+variable [StrongRankCondition F] [StrongRankCondition K] [Module.IsFree F K] [Module.IsFree K A]
 
 /-- Tower law: if `A` is a `K`-module and `K` is an extension of `F` then
 $\operatorname{rank}_F(A) = \operatorname{rank}_F(K) * \operatorname{rank}_K(A)$.
@@ -44,8 +44,8 @@ The universe polymorphic version of `rank_mul_rank` below. -/
 theorem lift_rank_mul_lift_rank :
     Cardinal.lift.{w} (Module.rank F K) * Cardinal.lift.{v} (Module.rank K A) =
       Cardinal.lift.{v} (Module.rank F A) := by
-  let b := Module.Free.chooseBasis F K
-  let c := Module.Free.chooseBasis K A
+  let b := Module.IsFree.chooseBasis F K
+  let c := Module.IsFree.chooseBasis K A
   rw [← (Module.rank F K).lift_id, ← b.mk_eq_rank, ← (Module.rank K A).lift_id, ← c.mk_eq_rank,
     ← lift_umax.{w, v}, ← (b.smulTower c).mk_eq_rank, mk_prod, lift_mul, lift_lift, lift_lift,
     lift_lift, lift_lift, lift_umax.{v, w}]
@@ -56,7 +56,7 @@ $\operatorname{rank}_F(A) = \operatorname{rank}_F(K) * \operatorname{rank}_K(A)$
 This is a simpler version of `lift_rank_mul_lift_rank` with `K` and `A` in the same universe. -/
 @[stacks 09G9]
 theorem rank_mul_rank (A : Type v) [AddCommMonoid A]
-    [Module K A] [Module F A] [IsScalarTower F K A] [Module.Free K A] :
+    [Module K A] [Module F A] [IsScalarTower F K A] [Module.IsFree K A] :
     Module.rank F K * Module.rank K A = Module.rank F A := by
   convert lift_rank_mul_lift_rank F K A <;> rw [lift_id]
 
@@ -71,11 +71,11 @@ end Tower
 
 variable {R : Type u} {S : Type*} {M M₁ : Type v} {M' : Type v'}
 variable [Semiring R]
-variable [AddCommMonoid M] [Module R M] [Module.Free R M]
-variable [AddCommMonoid M'] [Module R M'] [Module.Free R M']
-variable [AddCommMonoid M₁] [Module R M₁] [Module.Free R M₁]
+variable [AddCommMonoid M] [Module R M] [Module.IsFree R M]
+variable [AddCommMonoid M'] [Module R M'] [Module.IsFree R M']
+variable [AddCommMonoid M₁] [Module R M₁] [Module.IsFree R M₁]
 
-namespace Module.Free
+namespace Module.IsFree
 
 variable {N : Type v} [AddCommMonoid N] [Module R N]
 variable {N' : Type v'} [AddCommMonoid N'] [Module R N']
@@ -86,7 +86,7 @@ theorem exists_linearMap_injective_of_linearIndependent_of_lift_rank_le
     ∃ f : M →ₗ[R] N', Function.Injective f := by
   nontriviality M
   have := Module.nontrivial R M
-  rcases Module.Free.exists_set R M with ⟨_, ⟨B⟩⟩
+  rcases Module.IsFree.exists_set R M with ⟨_, ⟨B⟩⟩
   replace cnd := (Cardinal.lift_le.2 B.linearIndependent.cardinal_le_rank).trans cnd
   rw [Cardinal.lift_mk_le'] at cnd
   rcases cnd with ⟨i, hi⟩
@@ -108,13 +108,13 @@ theorem exists_linearMap_injective_of_rank_lt (cnd : Module.rank R M < Module.ra
     ∃ f : M →ₗ[R] N, Function.Injective f :=
   exists_linearMap_injective_of_lift_rank_lt (by simpa using cnd)
 
-end Module.Free
+end Module.IsFree
 
 section StrongRankCondition
 
 variable [StrongRankCondition R]
 
-namespace Module.Free
+namespace Module.IsFree
 
 variable (R M)
 
@@ -138,9 +138,9 @@ lemma rank_eq_mk_of_infinite_lt [Infinite R] (h_lt : lift.{v} #R < lift.{u} #M) 
   refine lift_inj.mp ((max_eq_iff.mp h.symm).resolve_right <| not_and_of_not_left _ ?_).left
   exact (lift_umax.{v, u}.symm ▸ h_lt).ne
 
-end Module.Free
+end Module.IsFree
 
-open Module.Free
+open Module.IsFree
 
 open Cardinal
 
@@ -148,7 +148,7 @@ theorem lift_rank_le_iff_exists_linearMap :
     Cardinal.lift.{v'} (Module.rank R M) ≤ Cardinal.lift.{v} (Module.rank R M') ↔
     ∃ f : M →ₗ[R] M', Function.Injective f where
   mp h := by
-    rcases Module.Free.exists_set R M' with ⟨_, ⟨B⟩⟩
+    rcases Module.IsFree.exists_set R M' with ⟨_, ⟨B⟩⟩
     exact exists_linearMap_injective_of_linearIndependent_of_lift_rank_le B.linearIndependent
       (B.mk_eq_rank''.symm ▸ h)
   mpr := fun ⟨f, hf⟩ ↦ LinearMap.lift_rank_le_of_injective f hf
@@ -165,8 +165,8 @@ theorem finrank_le_iff_exists_linearMap [Module.Finite R M] [Module.Finite R M']
 theorem nonempty_linearEquiv_of_lift_rank_eq
     (cnd : Cardinal.lift.{v'} (Module.rank R M) = Cardinal.lift.{v} (Module.rank R M')) :
     Nonempty (M ≃ₗ[R] M') := by
-  obtain ⟨⟨α, B⟩⟩ := Module.Free.exists_basis (R := R) (M := M)
-  obtain ⟨⟨β, B'⟩⟩ := Module.Free.exists_basis (R := R) (M := M')
+  obtain ⟨⟨α, B⟩⟩ := Module.IsFree.exists_basis (R := R) (M := M)
+  obtain ⟨⟨β, B'⟩⟩ := Module.IsFree.exists_basis (R := R) (M := M')
   have : Cardinal.lift.{v', v} #α = Cardinal.lift.{v, v'} #β := by
     rw [B.mk_eq_rank'', cnd, B'.mk_eq_rank'']
   exact (Cardinal.lift_mk_eq.{v, v', 0}.1 this).map (B.equiv B')
@@ -226,14 +226,14 @@ namespace Module
 
 /-- A free module of rank zero is trivial. -/
 lemma subsingleton_of_rank_zero (h : Module.rank R M = 0) : Subsingleton M := by
-  rw [← Basis.mk_eq_rank'' (Module.Free.chooseBasis R M), Cardinal.mk_eq_zero_iff] at h
-  exact (Module.Free.chooseBasis R M).repr.subsingleton
+  rw [← Basis.mk_eq_rank'' (Module.IsFree.chooseBasis R M), Cardinal.mk_eq_zero_iff] at h
+  exact (Module.IsFree.chooseBasis R M).repr.subsingleton
 
-/-- See `rank_lt_aleph0` for the inverse direction without `Module.Free R M`. -/
+/-- See `rank_lt_aleph0` for the inverse direction without `Module.IsFree R M`. -/
 lemma rank_lt_aleph0_iff : Module.rank R M < ℵ₀ ↔ Module.Finite R M := by
-  rw [Free.rank_eq_card_chooseBasisIndex, mk_lt_aleph0_iff]
-  exact ⟨fun h ↦ Finite.of_basis (Free.chooseBasis R M),
-    fun I ↦ Finite.of_fintype (Free.ChooseBasisIndex R M)⟩
+  rw [IsFree.rank_eq_card_chooseBasisIndex, mk_lt_aleph0_iff]
+  exact ⟨fun h ↦ Finite.of_basis (IsFree.chooseBasis R M),
+    fun I ↦ Finite.of_fintype (IsFree.ChooseBasisIndex R M)⟩
 
 theorem finrank_of_not_finite (h : ¬Module.Finite R M) : finrank R M = 0 := by
   rw [finrank, toNat_eq_zero, ← not_lt, Module.rank_lt_aleph0_iff]
@@ -246,18 +246,18 @@ theorem finite_of_finrank_pos (h : 0 < finrank R M) : Module.Finite R M := by
 theorem finite_of_finrank_eq_succ {n : ℕ} (hn : finrank R M = n.succ) : Module.Finite R M :=
   finite_of_finrank_pos <| by rw [hn]; exact n.succ_pos
 
-theorem finite_iff_of_rank_eq_nsmul {W} [AddCommMonoid W] [Module R W] [Module.Free R W] {n : ℕ}
+theorem finite_iff_of_rank_eq_nsmul {W} [AddCommMonoid W] [Module R W] [Module.IsFree R W] {n : ℕ}
     (hn : n ≠ 0) (hVW : Module.rank R M = n • Module.rank R W) :
     Module.Finite R M ↔ Module.Finite R W := by
   simp only [← rank_lt_aleph0_iff, hVW, nsmul_lt_aleph0_iff_of_ne_zero hn]
 
 variable (R S M) in
-omit [Module.Free R M] in
+omit [Module.IsFree R M] in
 /-- Also see `Module.finrank_top_le_finrank_of_isScalarTower`
 for a version with different typeclass constraints. -/
 lemma finrank_top_le_finrank_of_isScalarTower_of_free [Semiring S] [StrongRankCondition S]
     [Module S M] [Module R S] [FaithfulSMul R S] [Module.Finite R S]
-    [IsScalarTower R S S] [IsScalarTower R S M] [Module.Free S M] :
+    [IsScalarTower R S S] [IsScalarTower R S M] [Module.IsFree S M] :
     finrank S M ≤ finrank R M := by
   by_cases H : Module.Finite S M
   · have := Module.Finite.trans (R := R) S M
@@ -271,7 +271,7 @@ variable (R) in
 for a version with different typeclass constraints. -/
 lemma finrank_bot_le_finrank_of_isScalarTower_of_free (S T : Type*) [Semiring S] [Semiring T]
     [Module R T] [Module S T] [Module R S] [IsScalarTower R S T]
-    [IsScalarTower S T T] [FaithfulSMul S T] [Module.Finite S T] [Module.Free R S] :
+    [IsScalarTower S T T] [FaithfulSMul S T] [Module.Finite S T] [Module.IsFree R S] :
     finrank R S ≤ finrank R T := by
   by_cases H : Module.Finite R S
   · have := Module.Finite.trans (R := R) S T
@@ -285,7 +285,7 @@ variable (R M)
 /-- A finite rank free module has a basis indexed by `Fin (finrank R M)`. -/
 noncomputable def finBasis [Module.Finite R M] :
     Basis (Fin (finrank R M)) R M :=
-  (Module.Free.chooseBasis R M).reindex (Fintype.equivFinOfCardEq
+  (Module.IsFree.chooseBasis R M).reindex (Fintype.equivFinOfCardEq
     (finrank_eq_card_chooseBasisIndex R M).symm)
 
 /-- A rank `n` free module has a basis indexed by `Fin n`. -/
@@ -316,7 +316,7 @@ theorem Basis.nonempty_unique_index_of_finrank_eq_one
 
 theorem nonempty_linearEquiv_of_finrank_eq_one (d1 : Module.finrank R M = 1) :
     Nonempty (R ≃ₗ[R] M) := by
-  let ⟨ι, b⟩ := (Module.Free.exists_basis R M).some
+  let ⟨ι, b⟩ := (Module.IsFree.exists_basis R M).some
   have : Unique ι := (b.nonempty_unique_index_of_finrank_eq_one d1).some
   exact ⟨((b.equivFun).trans (LinearEquiv.funUnique ι R R)).symm⟩
 
@@ -329,7 +329,7 @@ theorem basisUnique_repr_eq_zero_iff {ι : Type*} [Unique ι]
     fun hv => by rw [hv, map_zero, Finsupp.zero_apply]⟩
 
 variable {R : Type*} [CommSemiring R] [StrongRankCondition R]
-    {M : Type*} [AddCommMonoid M] [Module R M] [Module.Free R M]
+    {M : Type*} [AddCommMonoid M] [Module R M] [Module.IsFree R M]
 
 theorem _root_.LinearMap.existsUnique_eq_smul_id_of_finrank_eq_one
     (d1 : Module.finrank R M = 1) (u : M →ₗ[R] M) :

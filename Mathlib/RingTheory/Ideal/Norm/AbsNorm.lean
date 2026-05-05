@@ -183,9 +183,9 @@ theorem cardQuot_pow_of_prime [IsDedekindDomain S] (hP : P ≠ ⊥) {i : ℕ} :
 end PPrime
 
 /-- Multiplicativity of the ideal norm in number rings. -/
-theorem cardQuot_mul [IsDedekindDomain S] [Module.Free ℤ S] (I J : Ideal S) :
+theorem cardQuot_mul [IsDedekindDomain S] [Module.IsFree ℤ S] (I J : Ideal S) :
     cardQuot (I * J) = cardQuot I * cardQuot J := by
-  let b := Module.Free.chooseBasis ℤ S
+  let b := Module.IsFree.chooseBasis ℤ S
   haveI : Infinite S := Infinite.of_surjective _ b.repr.toEquiv.surjective
   exact UniqueFactorizationMonoid.multiplicative_of_coprime cardQuot I J (cardQuot_bot _ _)
       (fun {I J} hI => by simp [Ideal.isUnit_iff.mp hI, Ideal.mul_top])
@@ -197,18 +197,18 @@ theorem cardQuot_mul [IsDedekindDomain S] [Module.Free ℤ S] (I J : Ideal S) :
           (hIJ (Ideal.dvd_iff_le.mpr le_sup_left) (Ideal.dvd_iff_le.mpr le_sup_right)))
 
 /-- The absolute norm of the ideal `I : Ideal R` is the cardinality of the quotient `R ⧸ I`. -/
-noncomputable def Ideal.absNorm [Nontrivial S] [IsDedekindDomain S] [Module.Free ℤ S] :
+noncomputable def Ideal.absNorm [Nontrivial S] [IsDedekindDomain S] [Module.IsFree ℤ S] :
     Ideal S →*₀ ℕ where
   toFun := Submodule.cardQuot
   map_mul' I J := by rw [cardQuot_mul]
   map_one' := by rw [Ideal.one_eq_top, cardQuot_top]
   map_zero' := by
-    have : Infinite S := Module.Free.infinite ℤ S
+    have : Infinite S := Module.IsFree.infinite ℤ S
     rw [Ideal.zero_eq_bot, cardQuot_bot]
 
 namespace Ideal
 
-variable [Nontrivial S] [IsDedekindDomain S] [Module.Free ℤ S]
+variable [Nontrivial S] [IsDedekindDomain S] [Module.IsFree ℤ S]
 
 theorem absNorm_apply (I : Ideal S) : absNorm I = cardQuot I := rfl
 
@@ -299,7 +299,7 @@ theorem absNorm_span_singleton (r : S) :
   by_cases hr : r = 0
   · simp only [hr, Ideal.span_zero, Ideal.absNorm_bot,
       LinearMap.det_zero'', Set.singleton_zero, map_zero, Int.natAbs_zero]
-  let b := Module.Free.chooseBasis ℤ S
+  let b := Module.IsFree.chooseBasis ℤ S
   rw [← natAbs_det_equiv _ (b.equiv (basisSpanSingleton b hr) (Equiv.refl _))]
   congr
   refine b.ext fun i => ?_

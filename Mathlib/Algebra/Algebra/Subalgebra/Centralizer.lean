@@ -64,7 +64,7 @@ For any subset `S ⊆ A`, the centralizer of `S ⊗ 1 ⊆ A ⊗ B` is `C_A(S) �
 centralizer of `S` in `A`.
 -/
 lemma centralizer_coe_image_includeLeft_eq_center_tensorProduct
-    (S : Set A) [Module.Free R B] :
+    (S : Set A) [Module.IsFree R B] :
     Subalgebra.centralizer R
       (Algebra.TensorProduct.includeLeft (S := R) '' S) =
     (Algebra.TensorProduct.map (Subalgebra.centralizer R (S : Set A)).val
@@ -74,7 +74,7 @@ lemma centralizer_coe_image_includeLeft_eq_center_tensorProduct
   constructor
   · intro hw
     rw [mem_centralizer_iff] at hw
-    let ℬ := Module.Free.chooseBasis R B
+    let ℬ := Module.IsFree.chooseBasis R B
     obtain ⟨b, rfl⟩ := TensorProduct.eq_repr_basis_right ℬ w
     refine Subalgebra.sum_mem _ fun j hj => ⟨⟨b j, ?_⟩ ⊗ₜ[R] ℬ j, by simp⟩
     rw [Subalgebra.mem_centralizer_iff]
@@ -104,7 +104,7 @@ For any subset `S ⊆ B`, the centralizer of `1 ⊗ S ⊆ A ⊗ B` is `A ⊗ C_B
 centralizer of `S` in `B`.
 -/
 lemma centralizer_coe_image_includeRight_eq_center_tensorProduct
-    (S : Set B) [Module.Free R A] :
+    (S : Set B) [Module.IsFree R A] :
     Subalgebra.centralizer R
       (Algebra.TensorProduct.includeRight '' S) =
     (Algebra.TensorProduct.map (AlgHom.id R A)
@@ -132,7 +132,7 @@ For any subalgebra `S` of `A`, the centralizer of `S ⊗ 1 ⊆ A ⊗ B` is `C_A(
 the centralizer of `S` in `A`.
 -/
 lemma centralizer_coe_map_includeLeft_eq_center_tensorProduct
-    (S : Subalgebra R A) [Module.Free R B] :
+    (S : Subalgebra R A) [Module.IsFree R B] :
     Subalgebra.centralizer R
       (S.map (Algebra.TensorProduct.includeLeft (R := R) (B := B))) =
     (Algebra.TensorProduct.map (Subalgebra.centralizer R (S : Set A)).val
@@ -145,7 +145,7 @@ For any subalgebra `S` of `B`, the centralizer of `1 ⊗ S ⊆ A ⊗ B` is `A �
 the centralizer of `S` in `B`.
 -/
 lemma centralizer_coe_map_includeRight_eq_center_tensorProduct
-    (S : Subalgebra R B) [Module.Free R A] :
+    (S : Subalgebra R B) [Module.IsFree R A] :
     Subalgebra.centralizer R
       (S.map (Algebra.TensorProduct.includeRight (R := R) (A := A))) =
     (Algebra.TensorProduct.map (AlgHom.id R A)
@@ -156,7 +156,7 @@ lemma centralizer_coe_map_includeRight_eq_center_tensorProduct
 Let `R` be a commutative ring and `A, B` be `R`-algebras where `B` is free as `R`-module.
 Then the centralizer of `A ⊗ 1 ⊆ A ⊗ B` is `C(A) ⊗ B` where `C(A)` is the center of `A`.
 -/
-lemma centralizer_coe_range_includeLeft_eq_center_tensorProduct [Module.Free R B] :
+lemma centralizer_coe_range_includeLeft_eq_center_tensorProduct [Module.IsFree R B] :
     Subalgebra.centralizer R
       (Algebra.TensorProduct.includeLeft : A →ₐ[R] A ⊗[R] B).range =
     (Algebra.TensorProduct.map (Subalgebra.center R A).val (AlgHom.id R B)).range := by
@@ -169,7 +169,7 @@ lemma centralizer_coe_range_includeLeft_eq_center_tensorProduct [Module.Free R B
 Let `R` be a commutative ring and `A, B` be `R`-algebras where `A` is free as `R`-module.
 Then the centralizer of `1 ⊗ B ⊆ A ⊗ B` is `A ⊗ C(B)` where `C(B)` is the center of `B`.
 -/
-lemma centralizer_range_includeRight_eq_center_tensorProduct [Module.Free R A] :
+lemma centralizer_range_includeRight_eq_center_tensorProduct [Module.IsFree R A] :
     Subalgebra.centralizer R
       (Algebra.TensorProduct.includeRight : B →ₐ[R] A ⊗[R] B).range =
     (Algebra.TensorProduct.map (AlgHom.id R A) (center R B).val).range := by
@@ -178,14 +178,14 @@ lemma centralizer_range_includeRight_eq_center_tensorProduct [Module.Free R A] :
   ext
   simp [includeRight]
 
-lemma centralizer_tensorProduct_eq_center_tensorProduct_left [Module.Free R B] :
+lemma centralizer_tensorProduct_eq_center_tensorProduct_left [Module.IsFree R B] :
     Subalgebra.centralizer R
       (Algebra.TensorProduct.map (AlgHom.id R A) (Algebra.ofId R B)).range =
     (Algebra.TensorProduct.map (Subalgebra.center R A).val (AlgHom.id R B)).range := by
   rw [← centralizer_coe_range_includeLeft_eq_center_tensorProduct]
   simp [Algebra.TensorProduct.map_range]
 
-lemma centralizer_tensorProduct_eq_center_tensorProduct_right [Module.Free R A] :
+lemma centralizer_tensorProduct_eq_center_tensorProduct_right [Module.IsFree R A] :
     Subalgebra.centralizer R
       (Algebra.TensorProduct.map (Algebra.ofId R A) (AlgHom.id R B)).range =
     (Algebra.TensorProduct.map (AlgHom.id R A) (center R B).val).range := by

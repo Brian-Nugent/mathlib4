@@ -791,7 +791,7 @@ instance [AddMonoid k] [SMulZeroClass S k] [SMulZeroClass Sᵐᵒᵖ k] [IsCentr
     IsCentralScalar S (SkewMonoidAlgebra k G) :=
   ⟨fun _ ⟨_⟩ ↦ by simp_rw [← ofFinsupp_smul, op_smul_eq_smul]⟩
 
-section Module.Free
+section Module.IsFree
 
 variable [Semiring S]
 
@@ -803,10 +803,10 @@ def toFinsuppLinearEquiv [AddCommMonoid k] [Module S k] : SkewMonoidAlgebra k G 
 def basisSingleOne [Semiring k] : Module.Basis G k (SkewMonoidAlgebra k G) where
   repr := toFinsuppLinearEquiv
 
-instance [Semiring k] : Module.Free k (SkewMonoidAlgebra k G) :=
-  Module.Free.of_basis basisSingleOne
+instance [Semiring k] : Module.IsFree k (SkewMonoidAlgebra k G) :=
+  Module.IsFree.of_basis basisSingleOne
 
-end Module.Free
+end Module.IsFree
 
 variable {M α : Type*} [Monoid G] [AddCommMonoid M] [MulAction G α]
 

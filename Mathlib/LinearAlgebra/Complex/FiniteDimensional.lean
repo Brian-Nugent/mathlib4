@@ -64,13 +64,13 @@ open Cardinal Module
 
 @[simp]
 lemma Real.rank_rat_real : Module.rank ℚ ℝ = continuum := by
-  refine (Free.rank_eq_mk_of_infinite_lt ℚ ℝ ?_).trans mk_real
+  refine (IsFree.rank_eq_mk_of_infinite_lt ℚ ℝ ?_).trans mk_real
   simpa [mk_real] using aleph0_lt_continuum
 
 /-- `C` has an uncountable basis over `ℚ`. -/
 @[simp, stacks 09G0]
 lemma Complex.rank_rat_complex : Module.rank ℚ ℂ = continuum := by
-  refine (Free.rank_eq_mk_of_infinite_lt ℚ ℂ ?_).trans Cardinal.mk_complex
+  refine (IsFree.rank_eq_mk_of_infinite_lt ℚ ℂ ?_).trans Cardinal.mk_complex
   simpa using aleph0_lt_continuum
 
 /-- `ℂ` and `ℝ` are isomorphic as vector spaces over `ℚ`, or equivalently,

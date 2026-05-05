@@ -185,11 +185,11 @@ theorem coe_det [DecidableEq M] :
   · congr -- use the correct `DecidableEq` instance
   rfl
 
-theorem _root_.Module.Free.of_det_ne_one {f : M →ₗ[R] M} (hf : f.det ≠ 1) :
-    Module.Free R M := by
+theorem _root_.Module.IsFree.of_det_ne_one {f : M →ₗ[R] M} (hf : f.det ≠ 1) :
+    Module.IsFree R M := by
   by_cases H : ∃ s : Finset M, Nonempty (Module.Basis s R M)
   · rcases H with ⟨s, ⟨hs⟩⟩
-    exact Module.Free.of_basis hs
+    exact Module.IsFree.of_basis hs
   · classical simp [LinearMap.coe_det, H] at hf
 
 end
@@ -246,7 +246,7 @@ theorem det_id : LinearMap.det (LinearMap.id : M →ₗ[A] M) = 1 :=
 
 /-- Multiplying a map by a scalar `c` multiplies its determinant by `c ^ dim M`. -/
 @[simp]
-theorem det_smul [Module.Free A M] (c : A) (f : M →ₗ[A] M) :
+theorem det_smul [Module.IsFree A M] (c : A) (f : M →ₗ[A] M) :
     LinearMap.det (c • f) = c ^ Module.finrank A M * LinearMap.det f := by
   nontriviality A
   by_cases H : ∃ s : Finset M, Nonempty (Basis s A M)
@@ -268,7 +268,7 @@ theorem det_zero' {ι : Type*} [Finite ι] [Nonempty ι] (b : Basis ι A M) :
 and `0` otherwise. We give a formula that also works in infinite dimension, where we define
 the determinant to be `1`. -/
 @[simp]
-theorem det_zero [Module.Free A M] :
+theorem det_zero [Module.IsFree A M] :
     LinearMap.det (0 : M →ₗ[A] M) = (0 : A) ^ Module.finrank A M := by
   simp only [← zero_smul A (1 : M →ₗ[A] M), det_smul, mul_one, map_one]
 
@@ -317,16 +317,16 @@ theorem det_conj {N : Type*} [AddCommGroup N] [Module A N] (f : M →ₗ[A] M) (
 theorem isUnit_det {A : Type*} [CommRing A] [Module A M] (f : M →ₗ[A] M) (hf : IsUnit f) :
     IsUnit (LinearMap.det f) := IsUnit.map LinearMap.det hf
 
-lemma isUnit_iff_isUnit_det [Module.Finite R M] [Module.Free R M] (f : M →ₗ[R] M) :
+lemma isUnit_iff_isUnit_det [Module.Finite R M] [Module.IsFree R M] (f : M →ₗ[R] M) :
     IsUnit f ↔ IsUnit f.det := by
-  let b := Module.Free.chooseBasis R M
+  let b := Module.IsFree.chooseBasis R M
   rw [← isUnit_toMatrix_iff b, ← det_toMatrix b, Matrix.isUnit_iff_isUnit_det (toMatrix b b f)]
 
 /-- If a linear map has determinant different from `1`, then the module is free. -/
-theorem free_of_det_ne_one {f : M →ₗ[R] M} (hf : f.det ≠ 1) : Module.Free R M := by
+theorem isFree_of_det_ne_one {f : M →ₗ[R] M} (hf : f.det ≠ 1) : Module.IsFree R M := by
   by_cases H : ∃ s : Finset M, Nonempty (Basis s R M)
   · rcases H with ⟨s, ⟨hs⟩⟩
-    exact Module.Free.of_basis hs
+    exact Module.IsFree.of_basis hs
   · classical simp [LinearMap.coe_det, H] at hf
 
 /-- If a linear map has determinant different from `1`, then the space is finite-dimensional. -/
@@ -337,7 +337,7 @@ theorem finite_of_det_ne_one {f : M →ₗ[R] M} (hf : f.det ≠ 1) : Module.Fin
   · classical simp [LinearMap.coe_det, H] at hf
 
 /-- If the determinant of a map vanishes, then the map is not injective. -/
-theorem bot_lt_ker_of_det_eq_zero [IsDomain R] [Free R M] {f : M →ₗ[R] M} (hf : f.det = 0) :
+theorem bot_lt_ker_of_det_eq_zero [IsDomain R] [IsFree R M] {f : M →ₗ[R] M} (hf : f.det = 0) :
     ⊥ < ker f := by
   have : Module.Finite R M := by simp [finite_of_det_ne_one (f := f), hf]
   let b := Module.finBasis R M
@@ -348,7 +348,7 @@ theorem bot_lt_ker_of_det_eq_zero [IsDomain R] [Free R M] {f : M →ₗ[R] M} (h
   simp_all [funext_iff, Matrix.mulVec, dotProduct, toMatrix_apply, mul_comm]
 
 /-- The determinant of a map vanishes iff the map is not injective. -/
-theorem det_eq_zero_iff_ker_ne_bot [IsDomain R] [Free R M] [Module.Finite R M] {f : M →ₗ[R] M} :
+theorem det_eq_zero_iff_ker_ne_bot [IsDomain R] [IsFree R M] [Module.Finite R M] {f : M →ₗ[R] M} :
     f.det = 0 ↔ ker f ≠ ⊥ := by
   constructor <;> intro h
   · exact bot_lt_iff_ne_bot.mp (bot_lt_ker_of_det_eq_zero h)
@@ -359,7 +359,7 @@ theorem det_eq_zero_iff_ker_ne_bot [IsDomain R] [Free R M] [Module.Finite R M] {
 
 /--
 If the determinant of a map vanishes, then the map is not onto.
-TODO: This should only require `[IsDomain R] [Free R M]`, which we get if we generalize
+TODO: This should only require `[IsDomain R] [IsFree R M]`, which we get if we generalize
 `Mathlib/LinearAlgebra/FiniteDimensional/Basic.lean`, which includes
 `LinearMap.ker_eq_bot_iff_range_eq_top`.
 -/
@@ -376,19 +376,19 @@ theorem range_lt_top_of_det_eq_zero {𝕜 : Type*} [Field 𝕜] [Module 𝕜 M] 
 lemma det_mulLeft (a : R) : (mulLeft R a).det = a := by simp
 lemma det_mulRight (a : R) : (mulRight R a).det = a := by simp
 
-theorem det_prodMap [Module.Free R M] [Module.Free R M'] [Module.Finite R M] [Module.Finite R M']
+theorem det_prodMap [Module.IsFree R M] [Module.IsFree R M'] [Module.Finite R M] [Module.Finite R M']
     (f : Module.End R M) (f' : Module.End R M') :
     (prodMap f f').det = f.det * f'.det := by
-  let b := Module.Free.chooseBasis R M
-  let b' := Module.Free.chooseBasis R M'
+  let b := Module.IsFree.chooseBasis R M
+  let b' := Module.IsFree.chooseBasis R M'
   rw [← det_toMatrix (b.prod b'), ← det_toMatrix b, ← det_toMatrix b', toMatrix_prodMap,
     det_fromBlocks_zero₂₁, det_toMatrix]
 
 omit [DecidableEq ι] in
-theorem det_pi [Module.Free R M] [Module.Finite R M] (f : ι → M →ₗ[R] M) :
+theorem det_pi [Module.IsFree R M] [Module.Finite R M] (f : ι → M →ₗ[R] M) :
     (LinearMap.pi (fun i ↦ (f i).comp (LinearMap.proj i))).det = ∏ i, (f i).det := by
   classical
-  let b := Module.Free.chooseBasis R M
+  let b := Module.IsFree.chooseBasis R M
   let B := (Pi.basis (fun _ : ι ↦ b)).reindex <|
     (Equiv.sigmaEquivProd _ _).trans (Equiv.prodComm _ _)
   simp_rw [← LinearMap.det_toMatrix B, ← LinearMap.det_toMatrix b]
@@ -524,11 +524,11 @@ theorem LinearEquiv.coe_ofIsUnitDet {f : M →ₗ[R] M'} {v : Basis ι R M} {v' 
 
 /-- Builds a linear equivalence from an endomorphism whose determinant is a unit. -/
 noncomputable def LinearMap.equivOfIsUnitDet
-    [Module.Free R M] [Module.Finite R M]
+    [Module.IsFree R M] [Module.Finite R M]
     {f : M →ₗ[R] M} (h : IsUnit f.det) :
     M ≃ₗ[R] M := by
   by_cases hR : Nontrivial R
-  · let ⟨ι, b⟩ := (Module.Free.exists_basis R M).some
+  · let ⟨ι, b⟩ := (Module.IsFree.exists_basis R M).some
     have : Finite ι := Module.Finite.finite_basis b
     have : Fintype ι := Fintype.ofFinite ι
     have : DecidableEq ι := Classical.typeDecidableEq ι
@@ -537,7 +537,7 @@ noncomputable def LinearMap.equivOfIsUnitDet
 
 @[simp]
 theorem LinearMap.equivOfIsUnitDet_apply
-    [Module.Free R M] [Module.Finite R M]
+    [Module.IsFree R M] [Module.Finite R M]
     {f : M →ₗ[R] M} (h : IsUnit f.det) (x : M) :
     (LinearMap.equivOfIsUnitDet h) x = f x := by
   nontriviality M
@@ -545,7 +545,7 @@ theorem LinearMap.equivOfIsUnitDet_apply
 
 @[simp]
 theorem LinearMap.coe_equivOfIsUnitDet
-    [Module.Free R M] [Module.Finite R M]
+    [Module.IsFree R M] [Module.Finite R M]
     {f : M →ₗ[R] M} (h : IsUnit f.det) :
     (LinearMap.equivOfIsUnitDet h : M →ₗ[R] M) = f := by
   ext
@@ -775,11 +775,11 @@ section Dual
 
 /-- The determinant of the transpose of an endomorphism coincides with its determinant. -/
 theorem _root_.LinearMap.det_dualMap
-    [Module.Free R M] [Module.Finite R M] (f : M →ₗ[R] M) :
+    [Module.IsFree R M] [Module.Finite R M] (f : M →ₗ[R] M) :
     f.dualMap.det = f.det := by
-  set b := Module.Free.chooseBasis R M
-  have : Fintype (Module.Free.ChooseBasisIndex R M) :=
-    Module.Free.ChooseBasisIndex.fintype R M
+  set b := Module.IsFree.chooseBasis R M
+  have : Fintype (Module.IsFree.ChooseBasisIndex R M) :=
+    Module.IsFree.ChooseBasisIndex.fintype R M
   rw [← LinearMap.det_toMatrix b, ← LinearMap.det_toMatrix b.dualBasis]
   simp [LinearMap.dualMap_def, LinearMap.toMatrix_transpose]
 
@@ -789,15 +789,15 @@ section
 
 variable {R V : Type*} [CommRing R] [AddCommGroup V]
     [Module R V] [Module.Finite R V]
-    (W : Submodule R V) [Module.Free R W] [Module.Finite R W] [Module.Free R (V ⧸ W)]
+    (W : Submodule R V) [Module.IsFree R W] [Module.Finite R W] [Module.IsFree R (V ⧸ W)]
 
 open Module.Basis in
 theorem LinearMap.det_eq_det_mul_det (e : V →ₗ[R] V) (he : W ≤ W.comap e) :
     e.det = (e.restrict he).det * (W.mapQ W e he).det := by
-  let m := Module.Free.ChooseBasisIndex R W
-  let bW : Basis m R W := Module.Free.chooseBasis R W
-  let n := Module.Free.ChooseBasisIndex R (V ⧸ W)
-  let bQ : Basis n R (V ⧸ W) := Module.Free.chooseBasis R (V ⧸ W)
+  let m := Module.IsFree.ChooseBasisIndex R W
+  let bW : Basis m R W := Module.IsFree.chooseBasis R W
+  let n := Module.IsFree.ChooseBasisIndex R (V ⧸ W)
+  let bQ : Basis n R (V ⧸ W) := Module.IsFree.chooseBasis R (V ⧸ W)
   let b := sumQuot bW bQ
   let A : Matrix m m R := LinearMap.toMatrix bW bW (e.restrict he)
   let B : Matrix m n R := Matrix.of fun i l ↦

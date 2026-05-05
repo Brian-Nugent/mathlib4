@@ -73,7 +73,7 @@ theorem intNorm_mem_spanNorm {I : Ideal S} {x : S} (hx : x ∈ I) :
     Algebra.intNorm R S x ∈ I.spanNorm R :=
   subset_span (Set.mem_image_of_mem _ hx)
 
-theorem norm_mem_spanNorm [Module.Free R S] {I : Ideal S} (x : S) (hx : x ∈ I) :
+theorem norm_mem_spanNorm [Module.IsFree R S] {I : Ideal S} (x : S) (hx : x ∈ I) :
     Algebra.norm R x ∈ I.spanNorm R := by
   refine subset_span ⟨x, hx, ?_⟩
   rw [Algebra.intNorm_eq_norm]
@@ -290,7 +290,7 @@ variable {R} in
 theorem relNorm_eq_bot_iff {I : Ideal S} : relNorm R I = ⊥ ↔ I = ⊥ :=
   spanNorm_eq_bot_iff
 
-theorem norm_mem_relNorm [Module.Free R S] (I : Ideal S) {x : S} (hx : x ∈ I) :
+theorem norm_mem_relNorm [Module.IsFree R S] (I : Ideal S) {x : S} (hx : x ∈ I) :
     Algebra.norm R x ∈ relNorm R I :=
   norm_mem_spanNorm R x hx
 
@@ -448,7 +448,7 @@ end relNorm_prime
 
 section absNorm
 
-variable [Module.Free ℤ R] [Module.Free ℤ S] [Module.Finite ℤ S]
+variable [Module.IsFree ℤ R] [Module.IsFree ℤ S] [Module.Finite ℤ S]
 
 open UniqueFactorizationMonoid in
 theorem absNorm_relNorm [PerfectField (FractionRing R)] (I : Ideal S) :

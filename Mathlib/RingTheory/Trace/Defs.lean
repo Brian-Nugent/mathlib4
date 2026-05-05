@@ -108,7 +108,7 @@ theorem trace_self_apply (a) : trace R R a = a := by simp
 (If `L` is not finite-dimensional over `K`, then `trace` and `finrank` return `0`.)
 -/
 @[simp]
-theorem trace_algebraMap [StrongRankCondition R] [Module.Free R S] (x : R) :
+theorem trace_algebraMap [StrongRankCondition R] [Module.IsFree R S] (x : R) :
     trace R S (algebraMap R S x) = finrank R S • x := by
   by_cases H : ∃ s : Finset S, Nonempty (Basis s R S)
   · rw [trace_algebraMap_of_basis H.choose_spec.some, finrank_eq_card_basis H.choose_spec.some]
@@ -136,20 +136,20 @@ theorem trace_comp_trace_of_basis [Algebra S T] [IsScalarTower R S T] {ι κ : T
 
 @[simp]
 theorem trace_trace [Algebra S T] [IsScalarTower R S T]
-    [Module.Free R S] [Module.Finite R S] [Module.Free S T] [Module.Finite S T] (x : T) :
+    [Module.IsFree R S] [Module.Finite R S] [Module.IsFree S T] [Module.Finite S T] (x : T) :
     trace R S (trace S T x) = trace R T x :=
-  trace_trace_of_basis (Module.Free.chooseBasis R S) (Module.Free.chooseBasis S T) x
+  trace_trace_of_basis (Module.IsFree.chooseBasis R S) (Module.IsFree.chooseBasis S T) x
 
 /-- Let `T / S / R` be a tower of finite extensions of fields. Then
 $\text{Trace}_{T/R} = \text{Trace}_{S/R} \circ \text{Trace}_{T/S}$. -/
 @[simp, stacks 0BIJ "Trace"]
 theorem trace_comp_trace [Algebra S T] [IsScalarTower R S T]
-    [Module.Free R S] [Module.Finite R S] [Module.Free S T] [Module.Finite S T] :
+    [Module.IsFree R S] [Module.Finite R S] [Module.IsFree S T] [Module.Finite S T] :
     (trace R S).comp ((trace S T).restrictScalars R) = trace R T :=
   LinearMap.ext trace_trace
 
 @[simp]
-theorem trace_prod_apply [Module.Free R S] [Module.Free R T] [Module.Finite R S] [Module.Finite R T]
+theorem trace_prod_apply [Module.IsFree R S] [Module.IsFree R T] [Module.Finite R S] [Module.Finite R T]
     (x : S × T) : trace R (S × T) x = trace R S x.fst + trace R T x.snd := by
   let f := (lmul R S).toLinearMap.prodMap (lmul R T).toLinearMap
   have : (lmul R (S × T)).toLinearMap = (prodMapLinear R S T S T R).comp f :=
@@ -157,7 +157,7 @@ theorem trace_prod_apply [Module.Free R S] [Module.Free R T] [Module.Finite R S]
   simp_rw [trace, this]
   exact trace_prodMap' _ _
 
-theorem trace_prod [Module.Free R S] [Module.Free R T] [Module.Finite R S] [Module.Finite R T] :
+theorem trace_prod [Module.IsFree R S] [Module.IsFree R T] [Module.Finite R S] [Module.Finite R T] :
     trace R (S × T) = (trace R S).coprod (trace R T) :=
   LinearMap.ext fun p => by rw [coprod_apply, trace_prod_apply]
 

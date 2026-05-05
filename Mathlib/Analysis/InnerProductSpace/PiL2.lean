@@ -191,7 +191,7 @@ theorem EuclideanSpace.sphere_zero_eq {n : Type*} [Fintype n] (r : ℝ) (hr : 0 
 section
 
 instance EuclideanSpace.infinite [Nonempty ι] : Infinite (EuclideanSpace 𝕜 ι) :=
-  Module.Free.infinite 𝕜 _
+  Module.IsFree.infinite 𝕜 _
 
 variable [Fintype ι]
 

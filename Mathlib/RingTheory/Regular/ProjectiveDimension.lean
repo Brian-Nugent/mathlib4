@@ -100,7 +100,7 @@ lemma projectiveDimension_quotSMulTop_eq_succ_of_isSMulRegular (M : ModuleCat.{v
         CharP.cast_eq_zero, ENat.WithBot.add_one_le_zero_iff, projectiveDimension_eq_bot_iff,
         ModuleCat.isZero_iff_subsingleton, sub, ← IsProjective.iff_projective]
       refine ⟨fun h ↦ ?_, fun h ↦ Projective.of_free⟩
-      have : Module.Free R (QuotSMulTop x M) := Module.free_of_flat_of_isLocalRing
+      have : Module.IsFree R (QuotSMulTop x M) := Module.IsFree_of_flat_of_isLocalRing
       by_contra! ntr
       have := QuotSMulTop.mem_annihilator M x
       simp only [annihilator_eq_bot.mpr inferInstance, Submodule.mem_bot] at this

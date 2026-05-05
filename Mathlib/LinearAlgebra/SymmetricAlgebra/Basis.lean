@@ -74,15 +74,15 @@ noncomputable def _root_.Module.Basis.symmetricAlgebra (b : Basis κ R M) :
   (MvPolynomial.basisMonomials κ R).map <| (SymmetricAlgebra.equivMvPolynomial b).symm.toLinearEquiv
 
 /-- `SymmetricAlgebra R M` is free when `M` is. -/
-instance instModuleFree [Module.Free R M] : Module.Free R (SymmetricAlgebra R M) :=
-  let ⟨⟨_I, b⟩⟩ := Module.Free.exists_basis (R := R) (M := M)
+instance instModuleFree [Module.IsFree R M] : Module.IsFree R (SymmetricAlgebra R M) :=
+  let ⟨⟨_I, b⟩⟩ := Module.IsFree.exists_basis (R := R) (M := M)
   .of_basis b.symmetricAlgebra
 
 /-- The `SymmetricAlgebra` of a free module over a commutative semiring with no zero-divisors has
 no zero-divisors. -/
-instance instNoZeroDivisors [NoZeroDivisors R] [Module.Free R M] :
+instance instNoZeroDivisors [NoZeroDivisors R] [Module.IsFree R M] :
     NoZeroDivisors (SymmetricAlgebra R M) :=
-  have ⟨⟨_, b⟩⟩ := ‹Module.Free R M›
+  have ⟨⟨_, b⟩⟩ := ‹Module.IsFree R M›
   (equivMvPolynomial b).toMulEquiv.noZeroDivisors
 
 end CommSemiring
@@ -91,15 +91,15 @@ section CommRing
 variable [CommRing R] [AddCommGroup M] [Module R M]
 
 /-- The `TensorAlgebra` of a free module over an integral domain is a domain. -/
-instance instIsDomain [IsDomain R] [Module.Free R M] : IsDomain (SymmetricAlgebra R M) :=
+instance instIsDomain [IsDomain R] [Module.IsFree R M] : IsDomain (SymmetricAlgebra R M) :=
   NoZeroDivisors.to_isDomain _
 
 attribute [pp_with_univ] Cardinal.lift
 
 open Cardinal in
-lemma rank_eq [Nontrivial M] [Module.Free R M] :
+lemma rank_eq [Nontrivial M] [Module.IsFree R M] :
     Module.rank R (SymmetricAlgebra R M) = Cardinal.lift.{uR} (max (Module.rank R M) ℵ₀) := by
-  let ⟨⟨κ, b⟩⟩ := Module.Free.exists_basis (R := R) (M := M)
+  let ⟨⟨κ, b⟩⟩ := Module.IsFree.exists_basis (R := R) (M := M)
   have : Nonempty κ := Basis.index_nonempty b
   have : Nontrivial R := Module.nontrivial R M
   rw [(equivMvPolynomial b).toLinearEquiv.rank_eq, MvPolynomial.rank_eq_lift,

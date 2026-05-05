@@ -96,7 +96,7 @@ theorem Module.FinitePresentation.exists_fin [fp : Module.FinitePresentation R M
 generated submodule. -/
 theorem Module.FinitePresentation.equiv_quotient [Module.FinitePresentation R M] [Small.{v} R] :
     ∃ (L : Type v) (_ : AddCommGroup L) (_ : Module R L) (K : Submodule R L)
-      (_ : M ≃ₗ[R] L ⧸ K), Module.Free R L ∧ Module.Finite R L ∧ K.FG :=
+      (_ : M ≃ₗ[R] L ⧸ K), Module.IsFree R L ∧ Module.Finite R L ∧ K.FG :=
   have ⟨_n, _K, e, fg⟩ := Module.FinitePresentation.exists_fin R M
   let es := Shrink.linearEquiv
   ⟨_, inferInstance, inferInstance, _, e ≪≫ₗ Submodule.Quotient.equiv _ _ (es ..).symm rfl,
@@ -118,13 +118,13 @@ lemma Module.finitePresentation_iff_finite [IsNoetherianRing R] :
 
 variable {R M N}
 
-lemma Module.finitePresentation_of_free_of_surjective [Module.Free R M] [Module.Finite R M]
+lemma Module.finitePresentation_of_free_of_surjective [Module.IsFree R M] [Module.Finite R M]
     (l : M →ₗ[R] N)
     (hl : Function.Surjective l) (hl' : (LinearMap.ker l).FG) :
     Module.FinitePresentation R N := by
   classical
-  let b := Module.Free.chooseBasis R M
-  let π : Free.ChooseBasisIndex R M → (Set.finite_range (l ∘ b)).toFinset :=
+  let b := Module.IsFree.chooseBasis R M
+  let π : IsFree.ChooseBasisIndex R M → (Set.finite_range (l ∘ b)).toFinset :=
     fun i ↦ ⟨l (b i), by simp⟩
   have : π.Surjective := fun ⟨x, hx⟩ ↦ by
     obtain ⟨y, rfl⟩ : ∃ a, l (b a) = x := by simpa using hx

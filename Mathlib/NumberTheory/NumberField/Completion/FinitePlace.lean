@@ -21,7 +21,7 @@ This file defines finite places of a number field `K` as absolute values coming 
 into a completion of `K` associated to a non-zero prime ideal of `𝓞 K`.
 
 Many of the results in this file are expressed in the generality of: `R` is a Dedekind domain
-with field of fractions `K` such that `Module.Finite ℤ R` and `Module.Free ℤ R`. If `K` is
+with field of fractions `K` such that `Module.Finite ℤ R` and `Module.IsFree ℤ R`. If `K` is
 a number field, then this characterises `R` as being isomorphic to `𝓞 K` without explicitly
 requiring `𝓞 K`. This is so that `ℤ` and `𝓞 ℚ` can be used interchangeably.
 
@@ -105,11 +105,11 @@ noncomputable instance : ((Valued.v : Valuation (v.adicCompletion K) ℤᵐ⁰))
 
 section FiniteFree
 
-/-! In this section we assume further that `Module.Finite ℤ R` and `Module.Free ℤ R`.
+/-! In this section we assume further that `Module.Finite ℤ R` and `Module.IsFree ℤ R`.
 This characterises `R` as being isomorphic to `𝓞 K` without explicitly requiring that type.
 As a result, if `F = ℚ`, then we can use `ℤ` and `𝓞 ℚ` interchangeably. -/
 
-variable [Module.Finite ℤ R] [Module.Free ℤ R]
+variable [Module.Finite ℤ R] [Module.IsFree ℤ R]
 
 namespace HeightOneSpectrum
 

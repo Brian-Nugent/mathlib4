@@ -198,20 +198,20 @@ lemma piEquiv_apply_apply (ι R M : Type*) [Fintype ι] [CommSemiring R]
 
 end Module
 
-namespace Module.Free
+namespace Module.IsFree
 
 variable {ι : Type*} (R : Type*) (M : Type*) [Semiring R] [AddCommMonoid M] [Module R M]
 
 /-- The product of finitely many free modules is free. -/
-instance _root_.Module.Free.pi (M : ι → Type*) [Finite ι] [∀ i : ι, AddCommMonoid (M i)]
-    [∀ i : ι, Module R (M i)] [∀ i : ι, Module.Free R (M i)] : Module.Free R (∀ i, M i) :=
+instance _root_.Module.IsFree.pi (M : ι → Type*) [Finite ι] [∀ i : ι, AddCommMonoid (M i)]
+    [∀ i : ι, Module R (M i)] [∀ i : ι, Module.IsFree R (M i)] : Module.IsFree R (∀ i, M i) :=
   let ⟨_⟩ := nonempty_fintype ι
-  .of_basis <| Pi.basis fun i => Module.Free.chooseBasis R (M i)
+  .of_basis <| Pi.basis fun i => Module.IsFree.chooseBasis R (M i)
 
 variable (ι) in
 /-- The product of finitely many free modules is free (non-dependent version to help with typeclass
 search). -/
-instance _root_.Module.Free.function [Finite ι] [Module.Free R M] : Module.Free R (ι → M) :=
-  Free.pi _ _
+instance _root_.Module.IsFree.function [Finite ι] [Module.IsFree R M] : Module.IsFree R (ι → M) :=
+  IsFree.pi _ _
 
-end Module.Free
+end Module.IsFree

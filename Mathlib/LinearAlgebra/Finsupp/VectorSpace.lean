@@ -45,8 +45,8 @@ noncomputable def basis {η : ι → Type*} (b : ∀ i, Basis (η i) R (M i)) :
     ((mapRange.linearEquiv fun i => (b i).repr).trans (sigmaFinsuppLequivDFinsupp R).symm)
 
 variable (R M) in
-instance _root_.Module.Free.dfinsupp [∀ i : ι, Module.Free R (M i)] : Module.Free R (Π₀ i, M i) :=
-  .of_basis <| DFinsupp.basis fun i => Module.Free.chooseBasis R (M i)
+instance _root_.Module.IsFree.dfinsupp [∀ i : ι, Module.IsFree R (M i)] : Module.IsFree R (Π₀ i, M i) :=
+  .of_basis <| DFinsupp.basis fun i => Module.IsFree.chooseBasis R (M i)
 
 variable [DecidableEq ι] {φ : ι → Type*} (f : ∀ i, φ i → M i)
 
@@ -113,8 +113,8 @@ theorem coe_basis {φ : ι → Type*} (b : ∀ i, Basis (φ i) R M) :
       · simp_all
 
 variable (ι R M) in
-instance _root_.Module.Free.finsupp [Module.Free R M] : Module.Free R (ι →₀ M) :=
-  .of_basis (Finsupp.basis fun _ => Module.Free.chooseBasis R M)
+instance _root_.Module.IsFree.finsupp [Module.IsFree R M] : Module.IsFree R (ι →₀ M) :=
+  .of_basis (Finsupp.basis fun _ => Module.IsFree.chooseBasis R M)
 
 /-- The basis on `ι →₀ R` with basis vectors `fun i ↦ single i 1`. -/
 @[simps]
@@ -170,9 +170,9 @@ end Ring
 
 end Finsupp
 
-lemma Module.Free.trans {R S M : Type*} [CommSemiring R] [Semiring S] [Algebra R S]
-    [AddCommMonoid M] [Module R M] [Module S M] [IsScalarTower R S M] [Module.Free S M]
-    [Module.Free R S] : Module.Free R M :=
+lemma Module.IsFree.trans {R S M : Type*} [CommSemiring R] [Semiring S] [Algebra R S]
+    [AddCommMonoid M] [Module R M] [Module S M] [IsScalarTower R S M] [Module.IsFree S M]
+    [Module.IsFree R S] : Module.IsFree R M :=
   let e : (ChooseBasisIndex S M →₀ S) ≃ₗ[R] ChooseBasisIndex S M →₀ (ChooseBasisIndex R S →₀ R) :=
     Finsupp.mapRange.linearEquiv (chooseBasis R S).repr
   let e : M ≃ₗ[R] ChooseBasisIndex S M →₀ (ChooseBasisIndex R S →₀ R) :=
@@ -215,28 +215,28 @@ end Algebra
 
 namespace FreeAbelianGroup
 
-instance {σ : Type*} : Module.Free ℤ (FreeAbelianGroup σ) where
+instance {σ : Type*} : Module.IsFree ℤ (FreeAbelianGroup σ) where
   exists_basis := ⟨σ, ⟨(FreeAbelianGroup.equivFinsupp _).toIntLinearEquiv⟩⟩
 
 end FreeAbelianGroup
 
 namespace AddMonoidAlgebra
-variable {M R S : Type*} [Semiring R] [Semiring S] [Module R S] [Module.Free R S]
+variable {M R S : Type*} [Semiring R] [Semiring S] [Module R S] [Module.IsFree R S]
 
-instance : Module.Free R S[M] := .finsupp ..
+instance : Module.IsFree R S[M] := .finsupp ..
 
 end AddMonoidAlgebra
 
 namespace MonoidAlgebra
-variable {M R S : Type*} [Semiring R] [Semiring S] [Module R S] [Module.Free R S]
+variable {M R S : Type*} [Semiring R] [Semiring S] [Module R S] [Module.IsFree R S]
 
-instance : Module.Free R S[M] := .finsupp ..
+instance : Module.IsFree R S[M] := .finsupp ..
 
 end MonoidAlgebra
 
 namespace Polynomial
-variable {R S : Type*} [Semiring R] [Semiring S] [Module R S] [Module.Free R S]
+variable {R S : Type*} [Semiring R] [Semiring S] [Module R S] [Module.IsFree R S]
 
-instance : Module.Free R R[X] := .of_equiv (Polynomial.toFinsuppIsoLinear _).symm
+instance : Module.IsFree R R[X] := .of_equiv (Polynomial.toFinsuppIsoLinear _).symm
 
 end Polynomial

@@ -110,7 +110,7 @@ theorem finite_cardQuot_le (B : ℕ) : {I : Ideal R | I.cardQuot ≤ B}.Finite :
   rwa [Finset.notMem_singleton, sub_ne_zero]
 
 /-- A ring with finite quotients has only finitely many ideals of bounded norm. -/
-theorem finite_absNorm_le [IsDedekindDomain R] [Module.Free ℤ R] (B : ℕ) :
+theorem finite_absNorm_le [IsDedekindDomain R] [Module.IsFree ℤ R] (B : ℕ) :
     {I : Ideal R | I.absNorm ≤ B}.Finite :=
   finite_cardQuot_le B
 
@@ -121,14 +121,14 @@ theorem finite_cardQuot_heightOneSpectrum_le (B : ℕ) :
     (Function.Injective.injOn fun _ _ ↦ IsDedekindDomain.HeightOneSpectrum.ext)
 
 /-- A ring with finite quotients has only finitely many nonzero prime ideals of bounded norm. -/
-theorem finite_absNorm_heightOneSpectrum_le [IsDedekindDomain R] [Module.Free ℤ R] (B : ℕ) :
+theorem finite_absNorm_heightOneSpectrum_le [IsDedekindDomain R] [Module.IsFree ℤ R] (B : ℕ) :
     {p : IsDedekindDomain.HeightOneSpectrum R | p.asIdeal.absNorm ≤ B}.Finite :=
   finite_cardQuot_heightOneSpectrum_le B
 
 instance : Northcott fun p : Ideal R ↦ p.cardQuot :=
   ⟨Ring.HasFiniteQuotients.finite_cardQuot_le⟩
 
-instance [IsDedekindDomain R] [Module.Free ℤ R] :
+instance [IsDedekindDomain R] [Module.IsFree ℤ R] :
     Northcott fun p : IsDedekindDomain.HeightOneSpectrum R ↦ p.asIdeal.absNorm :=
   ⟨Ring.HasFiniteQuotients.finite_absNorm_heightOneSpectrum_le⟩
 

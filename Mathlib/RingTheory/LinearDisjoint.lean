@@ -314,8 +314,8 @@ theorem basisOfBasisLeft_repr_apply (H' : A ⊔ B = ⊤) {ι : Type*} (b : Basis
 include H in
 /-- If `A` and `B` are subalgebras in a commutative algebra `S` over `R`, and if they are
 linearly disjoint, and if they are free `R`-modules, then `A ⊔ B` is also a free `R`-module. -/
-theorem sup_free_of_free [Module.Free R A] [Module.Free R B] : Module.Free R ↥(A ⊔ B) :=
-  Module.Free.of_equiv H.mulMap.toLinearEquiv
+theorem sup_free_of_free [Module.IsFree R A] [Module.IsFree R B] : Module.IsFree R ↥(A ⊔ B) :=
+  Module.IsFree.of_equiv H.mulMap.toLinearEquiv
 
 include H in
 /-- If `A` and `B` are subalgebras in a domain `S` over `R`, and if they are
@@ -536,11 +536,11 @@ variable {A B : Subalgebra R S}
 If `A` and `B` are subalgebras in a commutative algebra `S` over `R`, and if they are
 linearly disjoint and such that `A ⊔ B = S`, then `trace` and `algebraMap` commutes.
 -/
-theorem trace_algebraMap (H : A.LinearDisjoint B) (H' : A ⊔ B = ⊤) [Module.Free R B]
+theorem trace_algebraMap (H : A.LinearDisjoint B) (H' : A ⊔ B = ⊤) [Module.IsFree R B]
     [Module.Finite R B] (x : B) :
     Algebra.trace A S (algebraMap B S x) = algebraMap R A (Algebra.trace R B x) := by
-  simp_rw [Algebra.trace_eq_matrix_trace (Module.Free.chooseBasis R B),
-    Algebra.trace_eq_matrix_trace (H.basisOfBasisRight H' (Module.Free.chooseBasis R B)),
+  simp_rw [Algebra.trace_eq_matrix_trace (Module.IsFree.chooseBasis R B),
+    Algebra.trace_eq_matrix_trace (H.basisOfBasisRight H' (Module.IsFree.chooseBasis R B)),
     Matrix.trace, map_sum, leftMulMatrix_basisOfBasisRight_algebraMap, RingHom.mapMatrix_apply,
     Matrix.diag_apply, Matrix.map_apply]
 
@@ -548,11 +548,11 @@ theorem trace_algebraMap (H : A.LinearDisjoint B) (H' : A ⊔ B = ⊤) [Module.F
 If `A` and `B` are subalgebras in a commutative algebra `S` over `R`, and if they are
 linearly disjoint and such that `A ⊔ B = S`, then `norm` and `algebraMap` commutes.
 -/
-theorem norm_algebraMap (H : A.LinearDisjoint B) (H' : A ⊔ B = ⊤) [Module.Free R B]
+theorem norm_algebraMap (H : A.LinearDisjoint B) (H' : A ⊔ B = ⊤) [Module.IsFree R B]
     [Module.Finite R B] (x : B) :
     Algebra.norm A (algebraMap B S x) = algebraMap R A (Algebra.norm R x) := by
-  simp_rw [Algebra.norm_eq_matrix_det (Module.Free.chooseBasis R B),
-    Algebra.norm_eq_matrix_det (H.basisOfBasisRight H' (Module.Free.chooseBasis R B)),
+  simp_rw [Algebra.norm_eq_matrix_det (Module.IsFree.chooseBasis R B),
+    Algebra.norm_eq_matrix_det (H.basisOfBasisRight H' (Module.IsFree.chooseBasis R B)),
     leftMulMatrix_basisOfBasisRight_algebraMap, RingHom.map_det]
 
 /-- In a commutative ring, if `A` and `B` are linearly disjoint, if `B` is a flat `R`-module,
@@ -696,7 +696,7 @@ theorem rank_eq_one_of_flat_of_self_of_inj (H : A.LinearDisjoint A) [Module.Flat
 include H in
 /-- In a commutative ring, if subalgebras `A` and `B` are linearly disjoint and they are
 free modules, then the rank of `A ⊔ B` is equal to the product of the rank of `A` and `B`. -/
-theorem rank_sup_of_free [Module.Free R A] [Module.Free R B] :
+theorem rank_sup_of_free [Module.IsFree R A] [Module.IsFree R B] :
     Module.rank R ↥(A ⊔ B) = Module.rank R A * Module.rank R B := by
   nontriviality R
   rw [← rank_tensorProduct', H.mulMap.toLinearEquiv.rank_eq]
@@ -704,14 +704,14 @@ theorem rank_sup_of_free [Module.Free R A] [Module.Free R B] :
 include H in
 /-- In a commutative ring, if subalgebras `A` and `B` are linearly disjoint and they are
 free modules, then the rank of `A ⊔ B` is equal to the product of the rank of `A` and `B`. -/
-theorem finrank_sup_of_free [Module.Free R A] [Module.Free R B] :
+theorem finrank_sup_of_free [Module.IsFree R A] [Module.IsFree R B] :
     Module.finrank R ↥(A ⊔ B) = Module.finrank R A * Module.finrank R B := by
   simpa only [map_mul] using congr(Cardinal.toNat $(H.rank_sup_of_free))
 
 /-- In a commutative ring, if `A` and `B` are subalgebras which are free modules of finite rank,
 such that rank of `A ⊔ B` is equal to the product of the rank of `A` and `B`,
 then `A` and `B` are linearly disjoint. -/
-theorem of_finrank_sup_of_free [Module.Free R A] [Module.Free R B]
+theorem of_finrank_sup_of_free [Module.IsFree R A] [Module.IsFree R B]
     [Module.Finite R A] [Module.Finite R B]
     (H : Module.finrank R ↥(A ⊔ B) = Module.finrank R A * Module.finrank R B) :
     A.LinearDisjoint B := by
@@ -730,27 +730,27 @@ theorem of_finrank_sup_of_free [Module.Free R A] [Module.Free R B]
 include H in
 /-- If `A` and `B` are linearly disjoint, if `A` is free and `B` is flat,
 then `[B[A] : B] = [A : R]`. See also `Subalgebra.adjoin_rank_le`. -/
-theorem adjoin_rank_eq_rank_left [Module.Free R A] [Module.Flat R B]
+theorem adjoin_rank_eq_rank_left [Module.IsFree R A] [Module.Flat R B]
     [Nontrivial R] [Nontrivial S] :
     Module.rank B (Algebra.adjoin B (A : Set S)) = Module.rank R A := by
-  rw [← rank_toSubmodule, Module.Free.rank_eq_card_chooseBasisIndex R A,
-    A.adjoin_eq_span_basis B (Module.Free.chooseBasis R A)]
-  change Module.rank B (Submodule.span B (Set.range (A.val ∘ Module.Free.chooseBasis R A))) = _
-  have := H.linearIndependent_left_of_flat (Module.Free.chooseBasis R A).linearIndependent
+  rw [← rank_toSubmodule, Module.IsFree.rank_eq_card_chooseBasisIndex R A,
+    A.adjoin_eq_span_basis B (Module.IsFree.chooseBasis R A)]
+  change Module.rank B (Submodule.span B (Set.range (A.val ∘ Module.IsFree.chooseBasis R A))) = _
+  have := H.linearIndependent_left_of_flat (Module.IsFree.chooseBasis R A).linearIndependent
   rw [rank_span this, Cardinal.mk_range_eq _ this.injective]
 
 include H in
 /-- If `A` and `B` are linearly disjoint, if `B` is free and `A` is flat,
 then `[A[B] : A] = [B : R]`. See also `Subalgebra.adjoin_rank_le`. -/
-theorem adjoin_rank_eq_rank_right [Module.Free R B] [Module.Flat R A]
+theorem adjoin_rank_eq_rank_right [Module.IsFree R B] [Module.Flat R A]
     [Nontrivial R] [Nontrivial S] :
     Module.rank A (Algebra.adjoin A (B : Set S)) = Module.rank R B :=
   H.symm.adjoin_rank_eq_rank_left
 
 /-- If the rank of `A` and `B` are coprime, and they satisfy some freeness condition,
 then `A` and `B` are linearly disjoint. -/
-theorem of_finrank_coprime_of_free [Module.Free R A] [Module.Free R B]
-    [Module.Free A (Algebra.adjoin A (B : Set S))] [Module.Free B (Algebra.adjoin B (A : Set S))]
+theorem of_finrank_coprime_of_free [Module.IsFree R A] [Module.IsFree R B]
+    [Module.IsFree A (Algebra.adjoin A (B : Set S))] [Module.IsFree B (Algebra.adjoin B (A : Set S))]
     (H : (Module.finrank R A).Coprime (Module.finrank R B)) : A.LinearDisjoint B := by
   nontriviality R
   by_cases h1 : Module.finrank R A = 0

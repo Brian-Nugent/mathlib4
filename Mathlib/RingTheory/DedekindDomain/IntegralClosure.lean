@@ -180,7 +180,7 @@ theorem IsIntegralClosure.finite [IsIntegrallyClosed A] [IsNoetherianRing A] :
 and `L` has no zero smul divisors by `A`, the integral closure `C` of `A` in `L` is
 a free `A`-module. -/
 theorem IsIntegralClosure.module_free [IsTorsionFree A L] [IsPrincipalIdealRing A] :
-    Module.Free A C :=
+    Module.IsFree A C :=
   haveI : IsTorsionFree A C := IsIntegralClosure.isTorsionFree A L
   haveI : IsNoetherian A C := IsIntegralClosure.isNoetherian A K L _
   inferInstance
@@ -190,11 +190,11 @@ and `L` has no zero smul divisors by `A`, the `A`-rank of the integral closure `
 is equal to the `K`-rank of `L`. -/
 theorem IsIntegralClosure.rank [IsPrincipalIdealRing A] [IsTorsionFree A L] :
     Module.finrank A C = Module.finrank K L := by
-  haveI : Module.Free A C := IsIntegralClosure.module_free A K L C
+  haveI : Module.IsFree A C := IsIntegralClosure.module_free A K L C
   haveI : IsNoetherian A C := IsIntegralClosure.isNoetherian A K L C
   haveI : IsLocalization (Algebra.algebraMapSubmonoid C A⁰) L :=
     IsIntegralClosure.isLocalization A K L C
-  let b := Basis.localizationLocalization K A⁰ L (Module.Free.chooseBasis A C)
+  let b := Basis.localizationLocalization K A⁰ L (Module.IsFree.chooseBasis A C)
   rw [Module.finrank_eq_card_chooseBasisIndex, Module.finrank_eq_card_basis b]
 
 variable {A K}

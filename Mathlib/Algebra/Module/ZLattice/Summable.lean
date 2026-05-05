@@ -166,9 +166,9 @@ lemma exists_finsetSum_norm_rpow_le_tsum :
     have hr : r ≠ 0 := by linarith
     simpa [Subsingleton.elim _ (0 : L), Real.zero_rpow hr] using tsum_nonneg fun _ ↦ by positivity
   classical
-  let I : Type _ := Module.Free.ChooseBasisIndex ℤ L
+  let I : Type _ := Module.IsFree.ChooseBasisIndex ℤ L
   have : Fintype I := inferInstance
-  let b : Basis I ℤ L := Module.Free.chooseBasis ℤ L
+  let b : Basis I ℤ L := Module.IsFree.chooseBasis ℤ L
   simp_rw [Module.finrank_eq_card_basis b]
   set d := Fintype.card I
   have hd : d ≠ 0 := by simp [d]

@@ -636,7 +636,7 @@ def powerBasis' (hg : g.Monic) : PowerBasis R (AdjoinRoot g) where
       have := Finset.mem_univ i
       contradiction
 
-lemma _root_.Polynomial.Monic.free_adjoinRoot (hg : g.Monic) : Module.Free R (AdjoinRoot g) :=
+lemma _root_.Polynomial.Monic.free_adjoinRoot (hg : g.Monic) : Module.IsFree R (AdjoinRoot g) :=
   .of_basis (powerBasis' hg).basis
 
 lemma _root_.Polynomial.Monic.finite_adjoinRoot (hg : g.Monic) : Module.Finite R (AdjoinRoot g) :=
@@ -644,7 +644,7 @@ lemma _root_.Polynomial.Monic.finite_adjoinRoot (hg : g.Monic) : Module.Finite R
 
 /-- An unwrapped version of `AdjoinRoot.free_of_monic` for better discoverability. -/
 lemma _root_.Polynomial.Monic.free_quotient (hg : g.Monic) :
-    Module.Free R (R[X] ⧸ Ideal.span {g}) :=
+    Module.IsFree R (R[X] ⧸ Ideal.span {g}) :=
   hg.free_adjoinRoot
 
 /-- An unwrapped version of `AdjoinRoot.finite_of_monic` for better discoverability. -/
@@ -1037,7 +1037,7 @@ theorem Irreducible.exists_dvd_monic_irreducible_of_isIntegral {K L : Type*}
 /-- If `p : R[X]` is monic, then there exists a finite free extension of `R` that splits `p`. -/
 lemma Polynomial.Monic.exists_splits_map.{u}
     {R : Type u} [CommRing R] [Nontrivial R] {p : R[X]} (hp : p.Monic) :
-    ∃ (S : Type u) (_ : CommRing S) (_ : Algebra R S) (_ : Module.Finite R S) (_ : Module.Free R S)
+    ∃ (S : Type u) (_ : CommRing S) (_ : Algebra R S) (_ : Module.Finite R S) (_ : Module.IsFree R S)
       (_ : Nontrivial S), (p.map (algebraMap R S)).Splits := by
   induction hn : p.natDegree using Nat.strong_induction_on generalizing R with | h n IH =>
   by_cases hpu : IsUnit p

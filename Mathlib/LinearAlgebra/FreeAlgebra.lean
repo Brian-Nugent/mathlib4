@@ -39,7 +39,7 @@ mapping `[x₁, x₂, ..., xₙ]` to the "monomial" `1 • x₁ * x₂ * ⋯ * x
 noncomputable def basisFreeMonoid : Basis (FreeMonoid X) R (FreeAlgebra R X) :=
   Finsupp.basisSingleOne.map equivMonoidAlgebraFreeMonoid.symm.toLinearEquiv
 
-instance : Module.Free R (FreeAlgebra R X) :=
+instance : Module.IsFree R (FreeAlgebra R X) :=
   .of_equiv equivMonoidAlgebraFreeMonoid.symm.toLinearEquiv
 
 end

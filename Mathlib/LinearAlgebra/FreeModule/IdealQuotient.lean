@@ -43,9 +43,9 @@ noncomputable def quotientEquivPiZMod (I : Ideal S) (b : Basis ι ℤ S) (hI : I
 A nonzero ideal over a free finite extension of `ℤ` has a finite quotient.
 It can't be an instance because of the side condition `I ≠ ⊥`.
 -/
-theorem finiteQuotientOfFreeOfNeBot [Module.Free ℤ S] [Module.Finite ℤ S]
+theorem finiteQuotientOfFreeOfNeBot [Module.IsFree ℤ S] [Module.Finite ℤ S]
     (I : Ideal S) (hI : I ≠ ⊥) : Finite (S ⧸ I) :=
-  let b := Module.Free.chooseBasis ℤ S
+  let b := Module.IsFree.chooseBasis ℤ S
   Submodule.finiteQuotientOfFreeOfRankEq (I.restrictScalars ℤ) <| finrank_eq_finrank b I hI
 
 variable (F : Type*) [CommRing F] [Algebra F R] [Algebra F S] [IsScalarTower F R S]
@@ -58,7 +58,7 @@ noncomputable def quotientEquivDirectSum :
   Submodule.quotientEquivDirectSum F b (N := (I.restrictScalars R)) <| finrank_eq_finrank b I hI
 
 theorem finrank_quotient_eq_sum {ι} [Fintype ι] (b : Basis ι R S) [Nontrivial F]
-    [∀ i, Module.Free F (R ⧸ span ({I.smithCoeffs b hI i} : Set R))]
+    [∀ i, Module.IsFree F (R ⧸ span ({I.smithCoeffs b hI i} : Set R))]
     [∀ i, Module.Finite F (R ⧸ span ({I.smithCoeffs b hI i} : Set R))] :
     Module.finrank F (S ⧸ I) =
       ∑ i, Module.finrank F (R ⧸ span ({I.smithCoeffs b hI i} : Set R)) := by

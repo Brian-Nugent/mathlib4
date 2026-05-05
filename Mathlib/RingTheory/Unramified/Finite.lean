@@ -155,11 +155,11 @@ lemma lmul_elem :
 variable (R S)
 
 /-- An unramified free algebra is finitely generated. Iversen I.2.8 -/
-lemma finite_of_free [Module.Free R S] : Module.Finite R S := by
+lemma finite_of_free [Module.IsFree R S] : Module.Finite R S := by
   classical
-  let I := Module.Free.ChooseBasisIndex R S
+  let I := Module.IsFree.ChooseBasisIndex R S
   -- Let `bᵢ` be an `R`-basis of `S`.
-  let b : Basis I R S := Module.Free.chooseBasis R S
+  let b : Basis I R S := Module.IsFree.chooseBasis R S
   -- Let `∑ₛ fᵢ ⊗ bᵢ : S ⊗[R] S` (summing over some finite `s`) be an element such that
   -- `∑ₛ fᵢbᵢ = 1` and `∀ x : S, xfᵢ ⊗ bᵢ = aᵢ ⊗ xfᵢ` which exists since `S` is unramified over `R`.
   have ⟨f, hf⟩ : ∃ (a : I →₀ S), elem R S = a.sum (fun i x ↦ x ⊗ₜ b i) := by

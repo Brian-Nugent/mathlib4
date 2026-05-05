@@ -140,9 +140,9 @@ theorem lift_rank_add_lift_rank_le_rank_prod [Nontrivial R] :
     (ULift.moduleEquiv.prodCongr ULift.moduleEquiv).rank_eq
 
 variable {R M M'}
-variable [StrongRankCondition R] [Module.Free R M] [Module.Free R M'] [Module.Free R M₁]
+variable [StrongRankCondition R] [Module.IsFree R M] [Module.IsFree R M'] [Module.IsFree R M₁]
 
-open Module.Free
+open Module.IsFree
 
 /-- If `M` and `M'` are free, then the rank of `M × M'` is
 `(Module.rank R M).lift + (Module.rank R M').lift`. -/
@@ -167,14 +167,14 @@ end Prod
 section Finsupp
 
 variable (R M M')
-variable [StrongRankCondition R] [Module.Free R M] [Module R M'] [Module.Free R M']
+variable [StrongRankCondition R] [Module.IsFree R M] [Module R M'] [Module.IsFree R M']
 
-open Module.Free
+open Module.IsFree
 
 @[simp]
 theorem rank_finsupp (ι : Type w) :
     Module.rank R (ι →₀ M) = Cardinal.lift.{v} #ι * Cardinal.lift.{w} (Module.rank R M) := by
-  obtain ⟨⟨_, bs⟩⟩ := Module.Free.exists_basis (R := R) (M := M)
+  obtain ⟨⟨_, bs⟩⟩ := Module.IsFree.exists_basis (R := R) (M := M)
   rw [← bs.mk_eq_rank'', ← (Finsupp.basis fun _ : ι => bs).mk_eq_rank'', Cardinal.mk_sigma,
     Cardinal.sum_const]
 
@@ -191,7 +191,7 @@ theorem rank_finsupp_self' {ι : Type u} : Module.rank R (ι →₀ R) = #ι := 
 /-- The rank of the direct sum is the sum of the ranks. -/
 @[simp]
 theorem rank_directSum {ι : Type v} (M : ι → Type w) [∀ i : ι, AddCommMonoid (M i)]
-    [∀ i : ι, Module R (M i)] [∀ i : ι, Module.Free R (M i)] :
+    [∀ i : ι, Module R (M i)] [∀ i : ι, Module.IsFree R (M i)] :
     Module.rank R (⨁ i, M i) = Cardinal.sum fun i => Module.rank R (M i) := by
   let B i := chooseBasis R (M i)
   let b : Basis _ R (⨁ i, M i) := DFinsupp.basis fun i => B i
@@ -205,7 +205,7 @@ theorem rank_matrix_module (m : Type w) (n : Type w') [Finite m] [Finite n] :
       lift.{max v w'} #m * lift.{max v w} #n * lift.{max w w'} (Module.rank R M) := by
   cases nonempty_fintype m
   cases nonempty_fintype n
-  obtain ⟨I, b⟩ := Module.Free.exists_basis (R := R) (M := M)
+  obtain ⟨I, b⟩ := Module.IsFree.exists_basis (R := R) (M := M)
   rw [← (b.matrix m n).mk_eq_rank'']
   simp only [mk_prod, lift_mul, lift_lift, ← mul_assoc, b.mk_eq_rank'']
 
@@ -252,7 +252,7 @@ theorem finrank_finsupp_self {ι : Type v} [Fintype ι] : finrank R (ι →₀ R
 /-- The `finrank` of the direct sum is the sum of the `finrank`s. -/
 @[simp]
 theorem finrank_directSum {ι : Type v} [Fintype ι] (M : ι → Type w) [∀ i : ι, AddCommMonoid (M i)]
-    [∀ i : ι, Module R (M i)] [∀ i : ι, Module.Free R (M i)] [∀ i : ι, Module.Finite R (M i)] :
+    [∀ i : ι, Module R (M i)] [∀ i : ι, Module.IsFree R (M i)] [∀ i : ι, Module.Finite R (M i)] :
     finrank R (⨁ i, M i) = ∑ i, finrank R (M i) := by
   simp only [finrank, fun i => rank_eq_card_chooseBasisIndex R (M i), rank_directSum, ← mk_sigma,
     mk_toNat_eq_card, card_sigma]
@@ -268,10 +268,10 @@ end Finsupp
 
 section Pi
 
-variable [StrongRankCondition R] [Module.Free R M]
-variable [∀ i, AddCommMonoid (φ i)] [∀ i, Module R (φ i)] [∀ i, Module.Free R (φ i)]
+variable [StrongRankCondition R] [Module.IsFree R M]
+variable [∀ i, AddCommMonoid (φ i)] [∀ i, Module R (φ i)] [∀ i, Module.IsFree R (φ i)]
 
-open Module.Free
+open Module.IsFree
 
 open LinearMap
 
@@ -296,7 +296,7 @@ theorem Module.finrank_pi {ι : Type v} [Fintype ι] :
 /-- The `finrank` of a finite product is the sum of the `finrank`s. -/
 theorem Module.finrank_pi_fintype
     {ι : Type v} [Fintype ι] {M : ι → Type w} [∀ i : ι, AddCommMonoid (M i)]
-    [∀ i : ι, Module R (M i)] [∀ i : ι, Module.Free R (M i)] [∀ i : ι, Module.Finite R (M i)] :
+    [∀ i : ι, Module R (M i)] [∀ i : ι, Module.IsFree R (M i)] [∀ i : ι, Module.Finite R (M i)] :
     finrank R (∀ i, M i) = ∑ i, finrank R (M i) := by
   simp only [finrank, fun i => rank_eq_card_chooseBasisIndex R (M i), rank_pi, ← mk_sigma,
     mk_toNat_eq_card, Fintype.card_sigma]
@@ -304,7 +304,7 @@ theorem Module.finrank_pi_fintype
 variable {R}
 variable [Fintype η]
 
-theorem rank_fun {M η : Type u} [Fintype η] [AddCommMonoid M] [Module R M] [Module.Free R M] :
+theorem rank_fun {M η : Type u} [Fintype η] [AddCommMonoid M] [Module R M] [Module.IsFree R M] :
     Module.rank R (η → M) = Fintype.card η * Module.rank R M := by
   rw [rank_pi, Cardinal.sum_const', Cardinal.mk_fintype]
 
@@ -337,7 +337,7 @@ def finDimVectorspaceEquiv (n : ℕ) (hn : Module.rank R M = n) : M ≃ₗ[R] Fi
   have hn := Cardinal.lift_inj.{v, u}.2 hn
   rw [this] at hn
   rw [← @rank_fin_fun R _ _ n] at hn
-  haveI : Module.Free R (Fin n → R) := Module.Free.pi _ _
+  haveI : Module.IsFree R (Fin n → R) := Module.IsFree.pi _ _
   exact Classical.choice (nonempty_linearEquiv_of_lift_rank_eq hn)
 
 end Pi
@@ -347,19 +347,19 @@ section TensorProduct
 open TensorProduct
 
 variable [StrongRankCondition R] [StrongRankCondition S]
-variable [Module S M] [Module S M'] [Module.Free S M']
-variable [Module S M₁] [Module.Free S M₁]
-variable [Algebra S R] [IsScalarTower S R M] [Module.Free R M]
+variable [Module S M] [Module S M'] [Module.IsFree S M']
+variable [Module S M₁] [Module.IsFree S M₁]
+variable [Algebra S R] [IsScalarTower S R M] [Module.IsFree R M]
 
-open Module.Free
+open Module.IsFree
 
 /-- The `S`-rank of `M ⊗[R] M'` is `(Module.rank S M).lift * (Module.rank R M').lift`. -/
 @[simp]
 theorem rank_tensorProduct :
     Module.rank R (M ⊗[S] M') =
       Cardinal.lift.{v'} (Module.rank R M) * Cardinal.lift.{v} (Module.rank S M') := by
-  obtain ⟨⟨_, bM⟩⟩ := Module.Free.exists_basis (R := R) (M := M)
-  obtain ⟨⟨_, bN⟩⟩ := Module.Free.exists_basis (R := S) (M := M')
+  obtain ⟨⟨_, bM⟩⟩ := Module.IsFree.exists_basis (R := R) (M := M)
+  obtain ⟨⟨_, bN⟩⟩ := Module.IsFree.exists_basis (R := S) (M := M')
   rw [← bM.mk_eq_rank'', ← bN.mk_eq_rank'', ← (bM.tensorProduct bN).mk_eq_rank'', Cardinal.mk_prod]
 
 /-- If `M` and `M'` lie in the same universe, the `S`-rank of `M ⊗[R] M'` is

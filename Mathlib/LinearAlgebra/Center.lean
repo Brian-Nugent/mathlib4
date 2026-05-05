@@ -189,7 +189,7 @@ then any `f` is *right*-multiplication by some `a : R`,
 but not necessarily *left*-multiplication by an element of the center of `R`. -/
 theorem exists_mem_center_apply_eq_smul_of_forall_notLinearIndependent
     [Ring R] [IsDomain R] [StrongRankCondition R]
-    [AddCommGroup V] [Module R V] [Free R V]
+    [AddCommGroup V] [Module R V] [IsFree R V]
     {f : V →ₗ[R] V}
     (hV1 : finrank R V ≠ 1)
     (h : ∀ v, ¬ LinearIndependent R ![v, f v]) :
@@ -198,10 +198,10 @@ theorem exists_mem_center_apply_eq_smul_of_forall_notLinearIndependent
   · use 1
     ext x
     apply hV.allEq
-  let ι := Free.ChooseBasisIndex R V
-  let b : Basis ι R V := Free.chooseBasis R V
+  let ι := IsFree.ChooseBasisIndex R V
+  let b : Basis ι R V := IsFree.chooseBasis R V
   rcases subsingleton_or_nontrivial ι with hι | hι
-  · have : Nonempty ι := Free.instNonemptyChooseBasisIndexOfNontrivial R V
+  · have : Nonempty ι := IsFree.instNonemptyChooseBasisIndexOfNontrivial R V
     have : Fintype ι := Fintype.ofFinite ι
     simp_all [finrank_eq_card_basis b, ← Nat.card_eq_fintype_card]
   exact exists_mem_center_apply_eq_smul_of_forall_notLinearIndependent_of_basis b h
@@ -210,7 +210,7 @@ theorem exists_mem_center_apply_eq_smul_of_forall_notLinearIndependent
 such that `f v` and `v` are collinear, for all `v : V`,
 consists of homotheties. -/
 theorem exists_eq_smul_id_of_forall_notLinearIndependent
-    [CommRing R] [IsDomain R] [AddCommGroup V] [Module R V] [Free R V] {f : V →ₗ[R] V}
+    [CommRing R] [IsDomain R] [AddCommGroup V] [Module R V] [IsFree R V] {f : V →ₗ[R] V}
     (h : ∀ v, ¬ LinearIndependent R ![v, f v]) :
     ∃ a : R, f = a • 1 := by
   by_cases hV1 : finrank R V = 1

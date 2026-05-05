@@ -33,7 +33,7 @@ section IsLocalRing
 local notation "p" => maximalIdeal R
 local notation "pS" => Ideal.map (algebraMap R S) p
 
-variable [Module.Free R S] [Module.Finite R S]
+variable [Module.IsFree R S] [Module.Finite R S]
 
 attribute [local instance] Ideal.Quotient.field
 
@@ -41,8 +41,8 @@ lemma Algebra.trace_quotient_mk [IsLocalRing R] (x : S) :
     Algebra.trace (R ⧸ p) (S ⧸ pS) (Ideal.Quotient.mk pS x) =
       Ideal.Quotient.mk p (Algebra.trace R S x) := by
   classical
-  let ι := Module.Free.ChooseBasisIndex R S
-  let b : Module.Basis ι R S := Module.Free.chooseBasis R S
+  let ι := Module.IsFree.ChooseBasisIndex R S
+  let b : Module.Basis ι R S := Module.IsFree.chooseBasis R S
   rw [trace_eq_matrix_trace b, trace_eq_matrix_trace (basisQuotient b), AddMonoidHom.map_trace]
   congr 1
   ext i j
@@ -114,7 +114,7 @@ lemma Algebra.trace_quotient_eq_of_isDedekindDomain (x) [IsDedekindDomain R] [Is
     · infer_instance
     · have := (IsDedekindDomain.isDedekindDomainDvr R).2 p hp inferInstance
       infer_instance
-  haveI : Module.Free Rₚ Sₚ := Module.free_of_finite_type_torsion_free'
+  haveI : Module.IsFree Rₚ Sₚ := Module.IsFree_of_finite_type_torsion_free'
   apply (equivQuotMaximalIdeal p Rₚ).injective
   rw [trace_quotient_eq_trace_localization_quotient S p Rₚ Sₚ, IsScalarTower.algebraMap_eq S Sₚ,
     RingHom.comp_apply, Ideal.Quotient.algebraMap_eq, Algebra.trace_quotient_mk,

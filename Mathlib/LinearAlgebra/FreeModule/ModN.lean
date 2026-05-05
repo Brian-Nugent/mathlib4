@@ -97,16 +97,16 @@ set_option backward.isDefEq.respectTransparency false in
 lemma basis_apply_eq_mkQ {ι : Type*} (b : Basis ι ℤ G) (i : ι) : basis b i = mkQ n (b i) := by
   rw [Basis.apply_eq_iff]; simp [basis, mkQ]
 
-variable [Module.Free ℤ G] [Module.Finite ℤ G]
+variable [Module.IsFree ℤ G] [Module.Finite ℤ G]
 
 instance instModuleFinite : Module.Finite (ZMod n) (ModN G n) :=
-  .of_basis <| basis <| Module.Free.chooseBasis ℤ G
+  .of_basis <| basis <| Module.IsFree.chooseBasis ℤ G
 
 instance instFinite : Finite (ModN G n) := Module.finite_of_finite (ZMod n)
 
 variable (G n)
 @[simp] lemma natCard_eq : Nat.card (ModN G n) = n ^ Module.finrank ℤ G := by
-  simp [Nat.card_congr (basis <| Module.Free.chooseBasis ℤ G).repr.toEquiv,
+  simp [Nat.card_congr (basis <| Module.IsFree.chooseBasis ℤ G).repr.toEquiv,
     Nat.card_eq_fintype_card, Module.finrank_eq_card_chooseBasisIndex]
 
 end ModN

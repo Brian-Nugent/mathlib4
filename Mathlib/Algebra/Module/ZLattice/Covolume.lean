@@ -89,7 +89,7 @@ theorem covolume_eq_measure_fundamentalDomain {F : Set E} (h : IsAddFundamentalD
 
 set_option backward.privateInPublic true in
 theorem covolume_ne_zero : covolume L μ ≠ 0 := by
-  rw [covolume_eq_measure_fundamentalDomain L μ (isAddFundamentalDomain (Free.chooseBasis ℤ L) μ),
+  rw [covolume_eq_measure_fundamentalDomain L μ (isAddFundamentalDomain (IsFree.chooseBasis ℤ L) μ),
     measureReal_ne_zero_iff (ne_of_lt _)]
   · exact measure_fundamentalDomain_ne_zero _
   · exact Bornology.IsBounded.measure_lt_top (fundamentalDomain_isBounded _)
@@ -103,9 +103,9 @@ theorem covolume_comap {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F] [F
     [MeasurableSpace F] [BorelSpace F] (ν : Measure F := by volume_tac) [Measure.IsAddHaarMeasure ν]
     {e : F ≃L[ℝ] E} (he : MeasurePreserving e ν μ) :
     covolume (ZLattice.comap ℝ L e.toLinearMap) ν = covolume L μ := by
-  rw [covolume_eq_measure_fundamentalDomain _ _ (isAddFundamentalDomain (Free.chooseBasis ℤ L) μ),
+  rw [covolume_eq_measure_fundamentalDomain _ _ (isAddFundamentalDomain (IsFree.chooseBasis ℤ L) μ),
     covolume_eq_measure_fundamentalDomain _ _ ((isAddFundamentalDomain
-    ((Free.chooseBasis ℤ L).ofZLatticeComap ℝ L e.toLinearEquiv) ν)), ← he.measureReal_preimage
+    ((IsFree.chooseBasis ℤ L).ofZLatticeComap ℝ L e.toLinearEquiv) ν)), ← he.measureReal_preimage
     (fundamentalDomain_measurableSet _).nullMeasurableSet, ← e.image_symm_eq_preimage,
     ← e.symm.coe_toLinearEquiv, map_fundamentalDomain]
   congr!
@@ -327,10 +327,10 @@ theorem tendsto_card_le_div {X : Set (ι → ℝ)} (hX : ∀ ⦃x⦄ ⦃r : ℝ�
       Nat.card ({x ∈ X | F x ≤ c} ∩ L : Set (ι → ℝ)) / (c : ℝ))
         atTop (𝓝 (volume.real {x ∈ X | F x ≤ 1} / covolume L)) := by
   classical
-  let e : Free.ChooseBasisIndex ℤ ↥L ≃ ι := by
+  let e : IsFree.ChooseBasisIndex ℤ ↥L ≃ ι := by
     refine Fintype.equivOfCardEq ?_
     rw [← finrank_eq_card_chooseBasisIndex, ZLattice.rank ℝ, finrank_fintype_fun_eq_card]
-  let b := (Module.Free.chooseBasis ℤ L).reindex e
+  let b := (Module.IsFree.chooseBasis ℤ L).reindex e
   convert tendsto_card_le_div'' b hX h₁ h₂ h₃ ?_
   · simp only [measureReal_def]
     rw [volume_image_eq_volume_div_covolume L b, ENNReal.toReal_div,
@@ -353,7 +353,7 @@ theorem tendsto_card_div_pow' {s : Set E} (hs₁ : IsBounded s) (hs₂ : Measura
     (hs₃ : volume (frontier s) = 0) :
     Tendsto (fun n : ℕ ↦ (Nat.card (s ∩ (n : ℝ)⁻¹ • L : Set E) : ℝ) / n ^ finrank ℝ E)
       atTop (𝓝 (volume.real s / covolume L)) := by
-  let b := Module.Free.chooseBasis ℤ L
+  let b := Module.IsFree.chooseBasis ℤ L
   convert tendsto_card_div_pow'' b hs₁ hs₂ ?_
   · rw [← finrank_eq_card_chooseBasisIndex, ZLattice.rank ℝ L]
   · simp only [measureReal_def]
@@ -372,7 +372,7 @@ theorem tendsto_card_le_div' [Nontrivial E] {X : Set E} {F : E → ℝ}
     Tendsto (fun c : ℝ ↦
       Nat.card ({x ∈ X | F x ≤ c} ∩ L : Set E) / (c : ℝ))
         atTop (𝓝 (volume.real {x ∈ X | F x ≤ 1} / covolume L)) := by
-  let b := Module.Free.chooseBasis ℤ L
+  let b := Module.IsFree.chooseBasis ℤ L
   convert tendsto_card_le_div'' b hX ?_ h₂ h₃ ?_
   · simp only [measureReal_def]
     rw [volume_image_eq_volume_div_covolume' L b h₃.nullMeasurableSet, ENNReal.toReal_div,

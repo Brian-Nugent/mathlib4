@@ -23,7 +23,7 @@ import cycle.
 ## Main statements
 
 * `Basis.ofVectorSpace` states that every vector space has a basis.
-* `Module.Free.of_divisionRing` states that every vector space is a free module.
+* `Module.IsFree.of_divisionRing` states that every vector space is a free module.
 
 ## Tags
 
@@ -151,8 +151,8 @@ noncomputable def ofVectorSpace : Basis (ofVectorSpaceIndex K V) K V :=
   Basis.extend (linearIndependent_empty K V)
 
 @[stacks 09FN "Generalized from fields to division rings."]
-instance (priority := 100) _root_.Module.Free.of_divisionRing : Module.Free K V :=
-  Module.Free.of_basis (ofVectorSpace K V)
+instance (priority := 100) _root_.Module.IsFree.of_divisionRing : Module.IsFree K V :=
+  Module.IsFree.of_basis (ofVectorSpace K V)
 
 theorem ofVectorSpace_apply_self (x : ofVectorSpaceIndex K V) : ofVectorSpace K V x = x := by
   unfold ofVectorSpace

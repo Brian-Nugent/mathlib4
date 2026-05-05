@@ -44,7 +44,7 @@ The following isDefEq checks are the root causes of the failure:
 ```
 #defeq_abuse in
 instance {V : Type} [AddCommGroup V] [Module ℝ V] {l : Submodule ℝ V} :
-    Module.Free ℝ l := Module.Free.of_divisionRing ℝ l
+    Module.IsFree ℝ l := Module.IsFree.of_divisionRing ℝ l
 ```
 
 will report the synthesis failures grouped by instance application.

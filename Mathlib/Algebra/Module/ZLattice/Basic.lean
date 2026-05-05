@@ -509,7 +509,7 @@ instance instModuleFinite_of_discrete_submodule {E : Type*} [NormedAddCommGroup 
       Submodule.map_top, range_subtype, h_img]⟩
   exact ZLattice.module_finite ℝ L₀
 
-theorem ZLattice.module_free [IsZLattice K L] : Module.Free ℤ L := by
+theorem ZLattice.module_free [IsZLattice K L] : Module.IsFree ℤ L := by
   have : Module.Finite ℤ L := module_finite K L
   have : Module ℚ E := Module.compHom E (algebraMap ℚ K)
   have : IsAddTorsionFree E := .of_module_rat _
@@ -517,7 +517,7 @@ theorem ZLattice.module_free [IsZLattice K L] : Module.Free ℤ L := by
 
 instance instModuleFree_of_discrete_submodule {E : Type*} [NormedAddCommGroup E]
     [NormedSpace ℝ E] [FiniteDimensional ℝ E] (L : Submodule ℤ E) [DiscreteTopology L] :
-    Module.Free ℤ L := by
+    Module.IsFree ℤ L := by
   have : Module ℚ E := Module.compHom E (algebraMap ℚ ℝ)
   have : IsAddTorsionFree E := .of_module_rat _
   infer_instance
@@ -527,7 +527,7 @@ theorem ZLattice.rank [hs : IsZLattice K L] : finrank ℤ L = finrank K E := by
   have : Module.Finite ℤ L := module_finite K L
   have : Module ℚ E := Module.compHom E (algebraMap ℚ K)
   have : IsAddTorsionFree E := .of_module_rat _
-  let b₀ := Module.Free.chooseBasis ℤ L
+  let b₀ := Module.IsFree.chooseBasis ℤ L
   -- Let `b` be a `ℤ`-basis of `L` formed of vectors of `E`
   let b := Subtype.val ∘ b₀
   have : LinearIndependent ℤ b :=
@@ -541,7 +541,7 @@ theorem ZLattice.rank [hs : IsZLattice K L] : finrank ℤ L = finrank K E := by
   have h_spanE : span K (Set.range b) = ⊤ := by
     rw [← span_span_of_tower (R := ℤ), h_spanL]
     exact hs.span_top
-  have h_card : Fintype.card (Module.Free.ChooseBasisIndex ℤ L) =
+  have h_card : Fintype.card (Module.IsFree.ChooseBasisIndex ℤ L) =
       (Set.range b).toFinset.card := by
     rw [Set.toFinset_range, Finset.univ.card_image_of_injective]
     · rfl
@@ -611,8 +611,8 @@ namespace Module.Basis
 /-- Any `ℤ`-basis of `L` is also a `K`-basis of `E`. -/
 def ofZLatticeBasis : Basis ι K E := by
   have : Module.Finite ℤ L := ZLattice.module_finite K L
-  have : Free ℤ L := ZLattice.module_free K L
-  let e := (Free.chooseBasis ℤ L).indexEquiv b
+  have : IsFree ℤ L := ZLattice.module_free K L
+  let e := (IsFree.chooseBasis ℤ L).indexEquiv b
   have : Fintype ι := Fintype.ofEquiv _ e
   refine basisOfTopLeSpanOfCardEqFinrank (L.subtype ∘ b) ?_ ?_
   · rw [← span_span_of_tower ℤ, Set.range_comp, ← map_span, Basis.span_eq, Submodule.map_top,
@@ -653,7 +653,7 @@ theorem ZLattice.isAddFundamentalDomain {E : Type*} [NormedAddCommGroup E] [Norm
 instance instCountable_of_discrete_submodule {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
     [FiniteDimensional ℝ E] (L : Submodule ℤ E) [DiscreteTopology L] [IsZLattice ℝ L] :
     Countable L := by
-  simp_rw [← (Module.Free.chooseBasis ℤ L).ofZLatticeBasis_span ℝ]
+  simp_rw [← (Module.IsFree.chooseBasis ℤ L).ofZLatticeBasis_span ℝ]
   infer_instance
 
 /--
@@ -684,7 +684,7 @@ variable {ι : Type*} [Fintype ι] (L : Submodule ℤ (ι → ℝ)) [DiscreteTop
 Return an arbitrary `ℤ`-basis of a lattice `L` of `ι → ℝ` indexed by `ι`.
 -/
 def IsZLattice.basis : Basis ι ℤ L :=
-  (Free.chooseBasis ℤ L).reindex (Fintype.equivOfCardEq
+  (IsFree.chooseBasis ℤ L).reindex (Fintype.equivOfCardEq
     (by rw [← finrank_eq_card_chooseBasisIndex, ZLattice.rank ℝ, finrank_fintype_fun_eq_card]))
 
 end Basis
@@ -794,7 +794,7 @@ lemma IsZLattice.isCompact_range_of_periodic
     (L : Submodule ℤ E) [DiscreteTopology L] [IsZLattice ℝ L] (f : E → F) (hf : Continuous f)
     (hf' : ∀ z w, w ∈ L → f (z + w) = f z) : IsCompact (Set.range f) := by
   have := ZLattice.module_free ℝ L
-  let b := Module.Free.chooseBasis ℤ L
+  let b := Module.IsFree.chooseBasis ℤ L
   convert (b.ofZLatticeBasis ℝ).parallelepiped.isCompact.image hf
   refine le_antisymm ?_ (Set.image_subset_range _ _)
   rintro _ ⟨x, rfl⟩

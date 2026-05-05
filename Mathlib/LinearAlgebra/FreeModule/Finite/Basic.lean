@@ -16,7 +16,7 @@ We provide some instances for finite and free modules.
 
 ## Main results
 
-* `Module.Free.ChooseBasisIndex.fintype` : If a free module is finite, then any basis is finite.
+* `Module.IsFree.ChooseBasisIndex.fintype` : If a free module is finite, then any basis is finite.
 * `Module.Finite.of_basis` : A free module with a basis indexed by a `Fintype` is finite.
 -/
 
@@ -25,9 +25,9 @@ public section
 universe u v w
 
 /-- If a free module is finite, then the arbitrary basis is finite. -/
-noncomputable instance Module.Free.ChooseBasisIndex.fintype (R : Type u) (M : Type v)
-    [Semiring R] [AddCommMonoid M] [Module R M] [Module.Free R M] [Module.Finite R M] :
-    Fintype (Module.Free.ChooseBasisIndex R M) := by
+noncomputable instance Module.IsFree.ChooseBasisIndex.fintype (R : Type u) (M : Type v)
+    [Semiring R] [AddCommMonoid M] [Module R M] [Module.IsFree R M] [Module.Finite R M] :
+    Fintype (Module.IsFree.ChooseBasisIndex R M) := by
   refine @Fintype.ofFinite _ ?_
   cases subsingleton_or_nontrivial R
   · have := Module.subsingleton R M
@@ -44,12 +44,12 @@ theorem Module.Finite.of_basis {R M ι : Type*} [Semiring R] [AddCommMonoid M] [
     simp only [Set.image_univ, Finset.coe_univ, Finset.coe_image, Basis.span_eq]
 
 instance Module.Finite.matrix {R ι₁ ι₂ M : Type*}
-    [Semiring R] [AddCommMonoid M] [Module R M] [Module.Free R M] [Module.Finite R M]
+    [Semiring R] [AddCommMonoid M] [Module R M] [Module.IsFree R M] [Module.Finite R M]
     [_root_.Finite ι₁] [_root_.Finite ι₂] :
     Module.Finite R (Matrix ι₁ ι₂ M) := by
   cases nonempty_fintype ι₁
   cases nonempty_fintype ι₂
-  exact Module.Finite.of_basis <| (Free.chooseBasis _ _).matrix _ _
+  exact Module.Finite.of_basis <| (IsFree.chooseBasis _ _).matrix _ _
 
 example {ι₁ ι₂ R : Type*} [Semiring R] [Finite ι₁] [Finite ι₂] :
     Module.Finite R (Matrix ι₁ ι₂ R) := inferInstance

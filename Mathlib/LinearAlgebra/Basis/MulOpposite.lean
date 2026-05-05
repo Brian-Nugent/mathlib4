@@ -52,12 +52,12 @@ instance [DivisionRing R] [AddCommGroup H] [Module R H]
   (Basis.ofVectorSpace R H).mulOpposite (Basis.ofVectorSpaceIndex R H).toFinite
 
 instance [Semiring R] [AddCommMonoid H] [Module R H]
-    [Module.Free R H] : Module.Free R Hᵐᵒᵖ :=
-  let ⟨b⟩ := Module.Free.exists_basis (R := R) (M := H)
-  Module.Free.of_basis b.2.mulOpposite
+    [Module.IsFree R H] : Module.IsFree R Hᵐᵒᵖ :=
+  let ⟨b⟩ := Module.IsFree.exists_basis (R := R) (M := H)
+  Module.IsFree.of_basis b.2.mulOpposite
 
 theorem rank [Semiring R] [StrongRankCondition R] [AddCommMonoid H] [Module R H]
-    [Module.Free R H] : Module.rank R Hᵐᵒᵖ = Module.rank R H :=
+    [Module.IsFree R H] : Module.rank R Hᵐᵒᵖ = Module.rank R H :=
   LinearEquiv.nonempty_equiv_iff_rank_eq.mp ⟨(opLinearEquiv R).symm⟩
 
 theorem finrank [DivisionRing R] [AddCommGroup H] [Module R H] :

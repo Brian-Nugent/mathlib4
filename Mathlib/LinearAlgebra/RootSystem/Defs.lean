@@ -104,7 +104,7 @@ coroot spaces are finitely-generated free Abelian groups.
 Note that the latter assumptions `[Finite ℤ X₁] [Finite ℤ X₂]` should be supplied as mixins, and
 that freeness follows automatically since two finitely-generated Abelian groups in perfect pairing
 are necessarily free. Moreover Lean knows this, e.g., via `PerfectPairing.reflexive_left`,
-`IsReflexive.to_isTorsionFree`, `Module.free_of_finite_type_torsion_free'`. -/
+`IsReflexive.to_isTorsionFree`, `Module.IsFree_of_finite_type_torsion_free'`. -/
 abbrev RootDatum (X₁ X₂ : Type*) [AddCommGroup X₁] [AddCommGroup X₂] := RootPairing ι ℤ X₁ X₂
 
 namespace RootPairing

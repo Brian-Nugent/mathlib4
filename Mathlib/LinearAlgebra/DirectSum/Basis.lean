@@ -11,7 +11,7 @@ public import Mathlib.LinearAlgebra.Finsupp.VectorSpace
 /-!
 # Bases for direct sum of modules
 
-This file defines a `Module.Free` instance for the direct sum of modules.
+This file defines a `Module.IsFree` instance for the direct sum of modules.
 
 ## Implementation notes
 
@@ -28,7 +28,7 @@ section Semiring
 variable (R : Type*) [Semiring R] {ι : Type*} (M : ι → Type*) [∀ i : ι, AddCommMonoid (M i)]
 variable [∀ i : ι, Module R (M i)]
 
-instance Module.Free.directSum [∀ i : ι, Module.Free R (M i)] : Module.Free R (⨁ i, M i) :=
-  Module.Free.dfinsupp R M
+instance Module.IsFree.directSum [∀ i : ι, Module.IsFree R (M i)] : Module.IsFree R (⨁ i, M i) :=
+  Module.IsFree.dfinsupp R M
 
 end Semiring

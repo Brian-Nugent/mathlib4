@@ -76,9 +76,9 @@ lemma _root_.Module.IsReflexive.of_isPerfPair : IsReflexive R M where
     simp
 
 include p in
-lemma _root_.Module.finrank_of_isPerfPair [Module.Finite R M] [Module.Free R M] :
+lemma _root_.Module.finrank_of_isPerfPair [Module.Finite R M] [Module.IsFree R M] :
     finrank R M = finrank R N :=
-  ((Module.Free.chooseBasis R M).toDualEquiv.trans p.flip.toPerfPair.symm).finrank_eq
+  ((Module.IsFree.chooseBasis R M).toDualEquiv.trans p.flip.toPerfPair.symm).finrank_eq
 
 /-- A reflexive module has a perfect pairing with its dual. -/
 protected instance IsPerfPair.id [IsReflexive R M] : IsPerfPair (.id (R := R) (M := Dual R M)) where

@@ -47,7 +47,7 @@ assert_not_exists RatFunc
 open TensorProduct
 
 -- for performance reasons
-attribute [-instance] Module.Free.instFaithfulSMulOfNontrivial Algebra.IsIntegral.isLocalHom
+attribute [-instance] Module.IsFree.instFaithfulSMulOfNontrivial Algebra.IsIntegral.isLocalHom
 
 namespace Algebra
 

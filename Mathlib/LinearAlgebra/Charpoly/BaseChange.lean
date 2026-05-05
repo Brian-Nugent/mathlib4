@@ -16,7 +16,7 @@ public import Mathlib.LinearAlgebra.TensorProduct.Tower
 public section
 
 variable {R M} [CommRing R] [AddCommGroup M] [Module R M]
-    [Module.Free R M] [Module.Finite R M] (f : M →ₗ[R] M)
+    [Module.IsFree R M] [Module.Finite R M] (f : M →ₗ[R] M)
     (A) [CommRing A] [Algebra R A]
 
 @[simp]
@@ -24,8 +24,8 @@ lemma LinearMap.charpoly_baseChange :
     (f.baseChange A).charpoly = f.charpoly.map (algebraMap R A) := by
   nontriviality A
   have := (algebraMap R A).domain_nontrivial
-  let I := Module.Free.ChooseBasisIndex R M
-  let b : Module.Basis I R M := Module.Free.chooseBasis R M
+  let I := Module.IsFree.ChooseBasisIndex R M
+  let b : Module.Basis I R M := Module.IsFree.chooseBasis R M
   rw [← f.charpoly_toMatrix b, ← (f.baseChange A).charpoly_toMatrix (b.baseChange A),
     ← Matrix.charpoly_map]
   congr 1
@@ -35,7 +35,7 @@ lemma LinearMap.charpoly_baseChange :
 lemma LinearMap.det_eq_sign_charpoly_coeff :
     LinearMap.det f = (-1) ^ Module.finrank R M * f.charpoly.coeff 0 := by
   nontriviality R
-  rw [← LinearMap.det_toMatrix (Module.Free.chooseBasis R M), Matrix.det_eq_sign_charpoly_coeff,
+  rw [← LinearMap.det_toMatrix (Module.IsFree.chooseBasis R M), Matrix.det_eq_sign_charpoly_coeff,
     ← Module.finrank_eq_card_chooseBasisIndex, charpoly_def]
 
 variable {A} in

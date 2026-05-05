@@ -106,8 +106,8 @@ include hι
 Given a profinite set `S` and a closed embedding `S → (I → Bool)`, the `ℤ`-module
 `LocallyConstant C ℤ` is free.
 -/
-theorem Nobeling_aux : Module.Free ℤ (LocallyConstant S ℤ) := Module.Free.of_equiv'
-  (Module.Free.of_basis <| GoodProducts.Basis _ hι.isClosed_range) (LocallyConstant.congrLeftₗ ℤ
+theorem Nobeling_aux : Module.IsFree ℤ (LocallyConstant S ℤ) := Module.IsFree.of_equiv'
+  (Module.IsFree.of_basis <| GoodProducts.Basis _ hι.isClosed_range) (LocallyConstant.congrLeftₗ ℤ
     hι.isEmbedding.toHomeomorph).symm
 
 end NobelingProof
@@ -152,6 +152,6 @@ open Profinite NobelingProof
 /-- **Nöbeling's theorem**. The `ℤ`-module `LocallyConstant S ℤ` is free for every
 `S : Profinite`. -/
 instance LocallyConstant.freeOfProfinite (S : Profinite.{u}) :
-    Module.Free ℤ (LocallyConstant S ℤ) := by
+    Module.IsFree ℤ (LocallyConstant S ℤ) := by
   obtain ⟨_, _⟩ := exists_wellFoundedLT {C : Set S // IsClopen C}
   exact @Nobeling_aux {C : Set S // IsClopen C} _ _ S (Nobeling.ι S) (Nobeling.isClosedEmbedding S)

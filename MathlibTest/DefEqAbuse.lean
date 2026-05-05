@@ -88,7 +88,7 @@ looked like:
 ```lean
 #defeq_abuse in
 instance {V : Type} [AddCommGroup V] [Module ℝ V] {l : Submodule ℝ V} :
-    Module.Free ℝ l := Module.Free.of_divisionRing ℝ l
+    Module.IsFree ℝ l := Module.IsFree.of_divisionRing ℝ l
 -- reported:
 --   ❌️ apply @Submodule.module to Module ℝ ↥l
 --     ❌️ l.toAddSubgroup =?= l.toAddSubmonoid

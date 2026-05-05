@@ -31,12 +31,12 @@ open Matrix Polynomial
 
 noncomputable section
 
-open Module.Free Polynomial Matrix
+open Module.IsFree Polynomial Matrix
 
 namespace LinearMap
 
 variable {R : Type u} {M : Type v} [CommRing R]
-variable [AddCommGroup M] [Module R M] [Module.Free R M] [Module.Finite R M] (f : M →ₗ[R] M)
+variable [AddCommGroup M] [Module R M] [Module.IsFree R M] [Module.Finite R M] (f : M →ₗ[R] M)
 
 section Basic
 
@@ -135,7 +135,7 @@ end LinearMap
 
 section Algebra
 variable {R M} [CommRing R] [Ring M] [Algebra R M]
-  [Module.Finite R M] [Module.Free R M]
+  [Module.Finite R M] [Module.IsFree R M]
 
 theorem Algebra.aeval_self_charpoly_lmul (α : M) :
     aeval α (Algebra.lmul R M α).charpoly = 0 :=

@@ -322,7 +322,7 @@ private lemma exists_hasStandardEtaleSurjectionOn_of_finite
     ((Localization.awayMapₐ (IsScalarTower.toAlgHom _ _ S) (f * r)).comp φ)
     (by exact (H _ (by simp)).surjective.comp hP)⟩
 
-attribute [local instance high] Module.Free.of_divisionRing in
+attribute [local instance high] Module.IsFree.of_divisionRing in
 instance (priority := low)
     [EssFiniteType R S] [FormallyUnramified R S] : QuasiFinite R S where
   finite_fiber _ _ := FormallyUnramified.finite_of_free _ _

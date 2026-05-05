@@ -30,7 +30,7 @@ variable {R S : Type*} [CommRing R] [CommRing S] [Algebra R S]
   (A B : Subalgebra R S)
 
 section
-variable [Module.Free R A] [Module.Free A (Algebra.adjoin A (B : Set S))]
+variable [Module.IsFree R A] [Module.IsFree A (Algebra.adjoin A (B : Set S))]
 
 theorem rank_sup_eq_rank_left_mul_rank_of_free :
     Module.rank R ↥(A ⊔ B) = Module.rank R A * Module.rank A (Algebra.adjoin A (B : Set S)) := by
@@ -55,7 +55,7 @@ theorem finrank_left_dvd_finrank_sup_of_free :
 end
 
 section
-variable [Module.Free R B] [Module.Free B (Algebra.adjoin B (A : Set S))]
+variable [Module.IsFree R B] [Module.IsFree B (Algebra.adjoin B (A : Set S))]
 
 theorem rank_sup_eq_rank_right_mul_rank_of_free :
     Module.rank R ↥(A ⊔ B) = Module.rank R B * Module.rank B (Algebra.adjoin B (A : Set S)) := by

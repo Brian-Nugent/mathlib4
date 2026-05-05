@@ -173,7 +173,7 @@ theorem isNilpotent_derivedSeries_of_traceForm_eq_zero_aux {K : Type*}
 
 /-- If the trace form of `M` is zero, then the `⁅L, L⁆`-module `M` is nilpotent. -/
 public theorem isNilpotent_derivedSeries_of_traceForm_eq_zero
-    [Module R M] [LieModule R L M] [IsNoetherian R M] [Module.Free R M]
+    [Module R M] [LieModule R L M] [IsNoetherian R M] [Module.IsFree R M]
     (h : traceForm R L M = 0) :
     IsNilpotent (derivedSeries R L 1) M := by
   set A := AlgebraicClosure (FractionRing R)
@@ -194,7 +194,7 @@ public theorem isNilpotent_derivedSeries_of_traceForm_eq_zero
 
 end LieModule
 
-variable [IsNoetherian R L] [Module.Free R L]
+variable [IsNoetherian R L] [Module.IsFree R L]
 
 open LieAlgebra in
 /-- A convenience variation of `LieAlgebra.isSolvable_of_forall_derived_killingForm_eq_zero` for
@@ -261,7 +261,7 @@ lemma hasTrivialRadical_iff_isKilling [IsPrincipalIdealRing R] :
     HasTrivialRadical R L ↔ IsKilling R L :=
   ⟨fun _ ↦ inferInstance, fun _ ↦ inferInstance⟩
 
-example (A : Type*) [LieRing A] [Module.Finite ℤ A] [Module.Free ℤ A] :
+example (A : Type*) [LieRing A] [Module.Finite ℤ A] [Module.IsFree ℤ A] :
     HasTrivialRadical ℤ A ↔ IsKilling ℤ A :=
   hasTrivialRadical_iff_isKilling ℤ A
 

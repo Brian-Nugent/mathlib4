@@ -68,7 +68,7 @@ between `E⟮<i⟯ →ₐ[F] Ē` and the inverse limit of `E⟮<j⟯ →ₐ[F] �
 
 @[expose] public section
 
-open Cardinal Module Free Set Order IntermediateField InverseSystem
+open Cardinal Module IsFree Set Order IntermediateField InverseSystem
 
 universe u v
 

@@ -161,8 +161,8 @@ then `[E[L] : E] ≤ [L : F]`. -/
 lemma Subalgebra.adjoin_rank_le {F : Type*} (E : Type*) {K : Type*}
     [CommSemiring F] [StrongRankCondition F] [CommSemiring E] [StrongRankCondition E] [Semiring K]
     [SMul F E] [Algebra E K] [Algebra F K] [IsScalarTower F E K]
-    (L : Subalgebra F K) [Module.Free F L] :
+    (L : Subalgebra F K) [Module.IsFree F L] :
     Module.rank E (Algebra.adjoin E (L : Set K)) ≤ Module.rank F L := by
-  rw [← rank_toSubmodule, Module.Free.rank_eq_card_chooseBasisIndex F L,
-    L.adjoin_eq_span_basis E (Module.Free.chooseBasis F L)]
+  rw [← rank_toSubmodule, Module.IsFree.rank_eq_card_chooseBasisIndex F L,
+    L.adjoin_eq_span_basis E (Module.IsFree.chooseBasis F L)]
   exact rank_span_le _ |>.trans Cardinal.mk_range_le

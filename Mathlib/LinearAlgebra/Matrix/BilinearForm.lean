@@ -541,10 +541,10 @@ end Det
 
 section LeftRight
 
-variable [IsDomain R₂] [Module.Free R₂ M₂] [Module.Finite R₂ M₂] {B : BilinForm R₂ M₂}
+variable [IsDomain R₂] [Module.IsFree R₂ M₂] [Module.Finite R₂ M₂] {B : BilinForm R₂ M₂}
 
 lemma Nondegenerate.ofSeparatingLeft (hB : SeparatingLeft B) : B.Nondegenerate := by
-  obtain ⟨ι, b⟩ := Module.Free.exists_basis R₂ M₂
+  obtain ⟨ι, b⟩ := Module.IsFree.exists_basis R₂ M₂
   have : Finite ι := Module.Finite.finite_basis b
   have : Fintype ι := Fintype.ofFinite ι
   have : DecidableEq ι := Classical.decEq ι

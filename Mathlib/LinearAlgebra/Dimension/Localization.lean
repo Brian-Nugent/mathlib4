@@ -79,11 +79,11 @@ theorem exists_set_linearIndependent_of_isDomain [IsDomain R] :
     ∃ s : Set M, #s = Module.rank R M ∧ LinearIndepOn R id s := by
   obtain ⟨w, hw⟩ :=
     IsLocalizedModule.linearIndependent_lift R⁰ (LocalizedModule.mkLinearMap R⁰ M) <|
-      Module.Free.chooseBasis (FractionRing R) (LocalizedModule R⁰ M)
+      Module.IsFree.chooseBasis (FractionRing R) (LocalizedModule R⁰ M)
         |>.linearIndependent.restrict_scalars' _
   refine ⟨Set.range w, ?_, (linearIndepOn_id_range_iff hw.injective).mpr hw⟩
   apply Cardinal.lift_injective.{max uR uM}
-  rw [Cardinal.mk_range_eq_of_injective hw.injective, ← Module.Free.rank_eq_card_chooseBasisIndex,
+  rw [Cardinal.mk_range_eq_of_injective hw.injective, ← Module.IsFree.rank_eq_card_chooseBasisIndex,
     IsLocalization.rank_eq (FractionRing R) R⁰ le_rfl,
     IsLocalizedModule.lift_rank_eq R⁰ (LocalizedModule.mkLinearMap R⁰ M) le_rfl]
 
@@ -108,7 +108,7 @@ open Cardinal TensorProduct
 
 section
 
-variable {p} [Free S N] [StrongRankCondition S] {T : Type uT} [CommRing T] [Algebra R T]
+variable {p} [IsFree S N] [StrongRankCondition S] {T : Type uT} [CommRing T] [Algebra R T]
   (hpT : Algebra.algebraMapSubmonoid T p ≤ T⁰) [StrongRankCondition (S ⊗[R] T)]
   {P : Type uP} [AddCommGroup P] [Module R P] [Module T P] [IsScalarTower R T P]
   {g : M →ₗ[R] P} (bc : IsBaseChange T g)

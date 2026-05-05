@@ -107,7 +107,7 @@ lemma traceForm_lieInvariant : (traceForm R L M).lieInvariant L := by
   exact isNilpotent_toEnd_of_isNilpotent₂ R L M x y
 
 open scoped TensorProduct in
-@[simp] lemma traceForm_baseChange [Module.Free R M] [Module.Finite R M]
+@[simp] lemma traceForm_baseChange [Module.IsFree R M] [Module.Finite R M]
     (A : Type*) [CommRing A] [Algebra R A] :
     traceForm A (A ⊗[R] L) (A ⊗[R] M) = (traceForm R L M).baseChange A := by
   ext; simp [traceForm_apply_apply, ← LinearMap.baseChange_comp, Algebra.algebraMap_eq_smul_one]
@@ -133,7 +133,7 @@ lemma trace_toEnd_mul_eq_zero_of_traceForm_eq_zero (h : traceForm R L M = 0)
   | smul t u _ hu => simp [hu]
 
 @[simp]
-lemma traceForm_genWeightSpace_eq [Module.Free R M]
+lemma traceForm_genWeightSpace_eq [Module.IsFree R M]
     [IsDomain R] [IsPrincipalIdealRing R]
     [LieRing.IsNilpotent L] [IsNoetherian R M] [LinearWeights R L M] (χ : L → R) (x y : L) :
     traceForm R L (genWeightSpace M χ) x y = finrank R (genWeightSpace M χ) • (χ x * χ y) := by
@@ -266,7 +266,7 @@ lemma traceForm_eq_sum_genWeightSpaceOf [IsPrincipalIdealRing R]
 
 -- In characteristic zero (or even just `LinearWeights R L M`) a stronger result holds (no
 -- `⊓ LieAlgebra.center R L`) TODO prove this using `LieModule.traceForm_eq_sum_finrank_nsmul_mul`.
-lemma lowerCentralSeries_one_inf_center_le_ker_traceForm [Module.Free R M] [Module.Finite R M] :
+lemma lowerCentralSeries_one_inf_center_le_ker_traceForm [Module.IsFree R M] [Module.Finite R M] :
     lowerCentralSeries R L L 1 ⊓ LieAlgebra.center R L ≤ LinearMap.ker (traceForm R L M) := by
   /- Sketch of proof (due to Zassenhaus):
 
@@ -314,7 +314,7 @@ lemma lowerCentralSeries_one_inf_center_le_ker_traceForm [Module.Free R M] [Modu
   · exact commute_toEnd_of_mem_center_right (A ⊗[R] M) hzc (1 ⊗ₜ x)
 
 /-- A nilpotent Lie algebra with a representation whose trace form is non-singular is Abelian. -/
-lemma isLieAbelian_of_ker_traceForm_eq_bot [Module.Free R M] [Module.Finite R M]
+lemma isLieAbelian_of_ker_traceForm_eq_bot [Module.IsFree R M] [Module.Finite R M]
     (h : LinearMap.ker (traceForm R L M) = ⊥) : IsLieAbelian L := by
   simpa only [← disjoint_lowerCentralSeries_maxTrivSubmodule_iff R L L, disjoint_iff_inf_le,
     LieIdeal.toLieSubalgebra_toSubmodule, LieSubmodule.toSubmodule_eq_bot, h]
@@ -327,7 +327,7 @@ namespace LieSubmodule
 open LieModule (traceForm)
 
 variable {R L M}
-variable [Module.Free R M] [Module.Finite R M]
+variable [Module.IsFree R M] [Module.Finite R M]
 variable [IsDomain R] [IsPrincipalIdealRing R]
   (N : LieSubmodule R L M) (I : LieIdeal R L) (h : I ≤ N.idealizer) (x : L) {y : L} (hy : y ∈ I)
 
@@ -408,7 +408,7 @@ lemma restrict_killingForm :
     (killingForm R L).restrict I = LieModule.traceForm R I L :=
   rfl
 
-variable [Module.Free R L] [Module.Finite R L] [IsDomain R] [IsPrincipalIdealRing R]
+variable [Module.IsFree R L] [Module.Finite R L] [IsDomain R] [IsPrincipalIdealRing R]
 
 lemma killingForm_eq :
     killingForm R I = (killingForm R L).restrict I :=

@@ -420,7 +420,7 @@ theorem basis_repr_apply (x : QuadraticAlgebra R a b) :
 
 instance : Module.Finite R (QuadraticAlgebra R a b) := .of_basis (basis a b)
 
-instance : Module.Free R (QuadraticAlgebra R a b) := .of_basis (basis a b)
+instance : Module.IsFree R (QuadraticAlgebra R a b) := .of_basis (basis a b)
 
 theorem rank_eq_two [StrongRankCondition R] : Module.rank R (QuadraticAlgebra R a b) = 2 := by
   simp [rank_eq_card_basis (basis a b)]

@@ -227,8 +227,8 @@ theorem finrank_quotient_map [IsDomain S] [IsDedekindDomain R] [Algebra K L]
     finrank (R ⧸ p) (S ⧸ map (algebraMap R S) p) = finrank K L := by
   -- Choose an arbitrary basis `b` for `[S/pS : R/p]`.
   -- We'll use the previous results to turn it into a basis on `[Frac(S) : Frac(R)]`.
-  let ι := Module.Free.ChooseBasisIndex (R ⧸ p) (S ⧸ map (algebraMap R S) p)
-  let b : Basis ι (R ⧸ p) (S ⧸ map (algebraMap R S) p) := Module.Free.chooseBasis _ _
+  let ι := Module.IsFree.ChooseBasisIndex (R ⧸ p) (S ⧸ map (algebraMap R S) p)
+  let b : Basis ι (R ⧸ p) (S ⧸ map (algebraMap R S) p) := Module.IsFree.chooseBasis _ _
   -- Namely, choose a representative `b' i : S` for each `b i : S / pS`.
   let b' : ι → S := fun i => (Ideal.Quotient.mk_surjective (b i)).choose
   have b_eq_b' : ⇑b = (Submodule.mkQ (map (algebraMap R S) p)).restrictScalars R ∘ b' :=

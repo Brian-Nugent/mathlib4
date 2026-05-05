@@ -93,16 +93,16 @@ noncomputable def quotientEquivPiZMod (N : Submodule ℤ M) (b : Basis ι ℤ M)
 A submodule of full rank of a free finite `ℤ`-module has a finite quotient.
 It can't be an instance because of the side condition `Module.finrank ℤ N = Module.finrank ℤ M`.
 -/
-theorem finiteQuotientOfFreeOfRankEq [Module.Free ℤ M] [Module.Finite ℤ M]
+theorem finiteQuotientOfFreeOfRankEq [Module.IsFree ℤ M] [Module.Finite ℤ M]
     (N : Submodule ℤ M) (h : Module.finrank ℤ N = Module.finrank ℤ M) : Finite (M ⧸ N) := by
-  let b := Module.Free.chooseBasis ℤ M
+  let b := Module.IsFree.chooseBasis ℤ M
   let a := smithNormalFormCoeffs b h
   let e := N.quotientEquivPiZMod b h
   have : ∀ i, NeZero (a i).natAbs := fun i ↦
     ⟨Int.natAbs_ne_zero.mpr (smithNormalFormCoeffs_ne_zero b h i)⟩
   exact Finite.of_equiv (Π i, ZMod (a i).natAbs) e.symm
 
-theorem finiteQuotient_iff [Module.Free ℤ M] [Module.Finite ℤ M] (N : Submodule ℤ M) :
+theorem finiteQuotient_iff [Module.IsFree ℤ M] [Module.Finite ℤ M] (N : Submodule ℤ M) :
     Finite (M ⧸ N) ↔ Module.finrank ℤ N = Module.finrank ℤ M := by
   refine ⟨fun h ↦ le_antisymm (finrank_le N) <|
     ((LinearMap.lsmul ℤ M (Nat.card (M ⧸ N))).codRestrict N
@@ -125,7 +125,7 @@ noncomputable def quotientEquivDirectSum (h : Module.finrank R N = Module.finran
 
 theorem finrank_quotient_eq_sum {ι} [Fintype ι] (b : Basis ι R M) [Nontrivial F]
     (h : Module.finrank R N = Module.finrank R M)
-    [∀ i, Module.Free F (R ⧸ Ideal.span ({smithNormalFormCoeffs b h i} : Set R))]
+    [∀ i, Module.IsFree F (R ⧸ Ideal.span ({smithNormalFormCoeffs b h i} : Set R))]
     [∀ i, Module.Finite F (R ⧸ Ideal.span ({smithNormalFormCoeffs b h i} : Set R))] :
     Module.finrank F (M ⧸ N) =
       ∑ i, Module.finrank F (R ⧸ Ideal.span ({smithNormalFormCoeffs b h i} : Set R)) := by

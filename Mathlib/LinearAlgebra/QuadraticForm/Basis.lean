@@ -112,10 +112,10 @@ theorem toQuadraticMap_toBilin (Q : QuadraticMap R M N) (bm : Basis ι R M) :
 
 See `BilinMap.not_forall_toQuadraticMap_surjective` for a counterexample when the module is
 not free. -/
-theorem _root_.LinearMap.BilinMap.toQuadraticMap_surjective [Module.Free R M] :
+theorem _root_.LinearMap.BilinMap.toQuadraticMap_surjective [Module.IsFree R M] :
     Function.Surjective (LinearMap.BilinMap.toQuadraticMap : LinearMap.BilinMap R M N → _) := by
   intro Q
-  obtain ⟨ι, b⟩ := Module.Free.exists_basis (R := R) (M := M)
+  obtain ⟨ι, b⟩ := Module.IsFree.exists_basis (R := R) (M := M)
   letI : LinearOrder ι := IsWellOrder.linearOrder WellOrderingRel
   exact ⟨_, toQuadraticMap_toBilin _ b⟩
 

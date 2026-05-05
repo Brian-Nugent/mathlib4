@@ -95,7 +95,7 @@ lemma KaehlerDifferential.mvPolynomialBasis_apply (σ) (i) :
     mvPolynomialBasis R σ i = D R (MvPolynomial σ R) (.X i) :=
   (mvPolynomialBasis_repr_symm_single R σ i 1).trans (one_smul _ _)
 
-instance (σ) : Module.Free (MvPolynomial σ R) Ω[MvPolynomial σ R⁄R] :=
+instance (σ) : Module.IsFree (MvPolynomial σ R) Ω[MvPolynomial σ R⁄R] :=
   .of_basis (KaehlerDifferential.mvPolynomialBasis R σ)
 
 end MvPolynomial

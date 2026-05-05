@@ -35,7 +35,7 @@ open QuotientAddGroup in
 variable (M) in
 /-- The index of the image of the multiplication-by-`n` map on an additive group `M` that is free
 and finitely generated as a `ℤ`-module is `n ^ finrank ℤ M`. -/
-lemma index_range_nsmul [Free ℤ M] [Module.Finite ℤ M] (n : ℕ) :
+lemma index_range_nsmul [IsFree ℤ M] [Module.Finite ℤ M] (n : ℕ) :
     (nsmulAddMonoidHom (α := M) n).range.index = n ^ finrank ℤ M :=
   calc
     _ = (nsmulAddMonoidHom (α := (Fin (finrank ℤ M) → ℤ)) n).range.index := by
@@ -50,7 +50,7 @@ lemma index_range_nsmul [Free ℤ M] [Module.Finite ℤ M] (n : ℕ) :
 /-- The relative index in `S` of the image of the multiplication-by-`n` map
 on an additive subgroup `S` of an additive group such that `S` is free
 and finitely generated as a `ℤ`-module is `n ^ finrank ℤ S`. -/
-lemma relIndex_map_nsmul (n : ℕ) (S : AddSubgroup M) [Free ℤ ↥S.toIntSubmodule]
+lemma relIndex_map_nsmul (n : ℕ) (S : AddSubgroup M) [IsFree ℤ ↥S.toIntSubmodule]
     [Module.Finite ℤ ↥S.toIntSubmodule] :
     (S.map (nsmulAddMonoidHom (α := M) n)).relIndex S = n ^ finrank ℤ S := by
   simpa only [relIndex, addSubgroupOf_map_nsmulAddMonoidHom_eq_range]

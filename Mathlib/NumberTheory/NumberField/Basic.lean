@@ -317,15 +317,15 @@ instance {I : Ideal (𝓞 K)} [hI : I.IsMaximal] : NeZero I :=
 instance : IsDedekindDomain (𝓞 K) :=
   IsIntegralClosure.isDedekindDomain ℤ ℚ K _
 
-instance : Free ℤ (𝓞 K) :=
+instance : IsFree ℤ (𝓞 K) :=
   IsIntegralClosure.module_free ℤ ℚ K (𝓞 K)
 
 instance : IsLocalization (Algebra.algebraMapSubmonoid (𝓞 K) ℤ⁰) K :=
   IsIntegralClosure.isLocalization_of_isSeparable ℤ ℚ K (𝓞 K)
 
 /-- A ℤ-basis of the ring of integers of `K`. -/
-noncomputable def basis : Basis (Free.ChooseBasisIndex ℤ (𝓞 K)) ℤ (𝓞 K) :=
-  Free.chooseBasis ℤ (𝓞 K)
+noncomputable def basis : Basis (IsFree.ChooseBasisIndex ℤ (𝓞 K)) ℤ (𝓞 K) :=
+  IsFree.chooseBasis ℤ (𝓞 K)
 
 variable {K} {M : Type*}
 
@@ -395,16 +395,16 @@ end RingOfIntegers
 variable [NumberField K]
 
 /-- A basis of `K` over `ℚ` that is also a basis of `𝓞 K` over `ℤ`. -/
-noncomputable def integralBasis : Basis (Free.ChooseBasisIndex ℤ (𝓞 K)) ℚ K :=
+noncomputable def integralBasis : Basis (IsFree.ChooseBasisIndex ℤ (𝓞 K)) ℚ K :=
   Basis.localizationLocalization ℚ (nonZeroDivisors ℤ) K (RingOfIntegers.basis K)
 
 @[simp]
-theorem integralBasis_apply (i : Free.ChooseBasisIndex ℤ (𝓞 K)) :
+theorem integralBasis_apply (i : IsFree.ChooseBasisIndex ℤ (𝓞 K)) :
     integralBasis K i = algebraMap (𝓞 K) K (RingOfIntegers.basis K i) :=
   Basis.localizationLocalization_apply ℚ (nonZeroDivisors ℤ) K (RingOfIntegers.basis K) i
 
 @[simp]
-theorem integralBasis_repr_apply (x : (𝓞 K)) (i : Free.ChooseBasisIndex ℤ (𝓞 K)) :
+theorem integralBasis_repr_apply (x : (𝓞 K)) (i : IsFree.ChooseBasisIndex ℤ (𝓞 K)) :
     (integralBasis K).repr (algebraMap _ _ x) i =
       (algebraMap ℤ ℚ) ((RingOfIntegers.basis K).repr x i) :=
   Basis.localizationLocalization_repr_algebraMap ℚ (nonZeroDivisors ℤ) K _ x i

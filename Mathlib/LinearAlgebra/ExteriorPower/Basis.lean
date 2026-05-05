@@ -146,22 +146,22 @@ lemma basis_repr {I : Type*} [LinearOrder I] (b : Basis I R M) (s : powersetCard
 /-! ### Freeness and dimension of `⋀[R]^n M`. -/
 
 /-- If `M` is a free module, then so is its `n`th exterior power. -/
-instance instFree [Module.Free R M] : Module.Free R (⋀[R]^n M) := by
+instance instFree [Module.IsFree R M] : Module.IsFree R (⋀[R]^n M) := by
   classical
-  have ⟨I, b⟩ := Module.Free.exists_basis R M
+  have ⟨I, b⟩ := Module.IsFree.exists_basis R M
   letI : LinearOrder I := linearOrderOfSTO WellOrderingRel
-  exact Module.Free.of_basis (b.exteriorPower n)
+  exact Module.IsFree.of_basis (b.exteriorPower n)
 
 variable [Nontrivial R]
 
 /-- If `R` is non-trivial and `M` is finite free of rank `r`, then
 the `n`th exterior power of `M` is of finrank `Nat.choose r n`. -/
-lemma finrank_eq [Module.Free R M] [Module.Finite R M] :
+lemma finrank_eq [Module.IsFree R M] [Module.Finite R M] :
     Module.finrank R (⋀[R]^n M) = Nat.choose (Module.finrank R M) n := by
   classical
-  let : LinearOrder (Module.Free.ChooseBasisIndex R M) := linearOrderOfSTO WellOrderingRel
-  let B := (Module.Free.chooseBasis R M).exteriorPower n
-  rw [Module.finrank_eq_card_basis (Module.Free.chooseBasis R M), Module.finrank_eq_card_basis B,
+  let : LinearOrder (Module.IsFree.ChooseBasisIndex R M) := linearOrderOfSTO WellOrderingRel
+  let B := (Module.IsFree.chooseBasis R M).exteriorPower n
+  rw [Module.finrank_eq_card_basis (Module.IsFree.chooseBasis R M), Module.finrank_eq_card_basis B,
     Fintype.card_eq_nat_card, powersetCard.card, Fintype.card_eq_nat_card]
 
 /-! Results that only hold over a field. -/

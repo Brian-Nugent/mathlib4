@@ -175,17 +175,17 @@ theorem Matrix.det_det [Fintype m] [Fintype n] (f : S →+* Matrix n n R) :
       exact (Matrix.charpoly_monic _).mem_nonZeroDivisors
     rw [← eval_zero_det_det, congr_arg (eval 0) this, eval_zero_comp_det]
 
-variable [Algebra R S] [Module.Free R S]
+variable [Algebra R S] [Module.IsFree R S]
 
 theorem LinearMap.det_restrictScalars [AddCommGroup A] [Module R A] [Module S A]
-    [IsScalarTower R S A] [Module.Free S A] {f : A →ₗ[S] A} :
+    [IsScalarTower R S A] [Module.IsFree S A] {f : A →ₗ[S] A} :
     (f.restrictScalars R).det = Algebra.norm R f.det := by
   classical
   nontriviality R
   nontriviality A
   have := Module.nontrivial S A
-  let ⟨ιS, bS⟩ := Module.Free.exists_basis (R := R) (M := S)
-  let ⟨ιA, bA⟩ := Module.Free.exists_basis (R := S) (M := A)
+  let ⟨ιS, bS⟩ := Module.IsFree.exists_basis (R := R) (M := S)
+  let ⟨ιA, bA⟩ := Module.IsFree.exists_basis (R := S) (M := A)
   have := bS.index_nonempty
   have := bA.index_nonempty
   cases fintypeOrInfinite ιS; swap
@@ -200,7 +200,7 @@ theorem LinearMap.det_restrictScalars [AddCommGroup A] [Module R A] [Module S A]
 /-- Let A/S/R be a tower of finite free tower of rings (with R and S commutative).
 Then $\text{Norm}_{A/R} = \text{Norm}_{A/S} \circ \text{Norm}_{S/R}$. -/
 theorem Algebra.norm_norm {A} [Ring A] [Algebra R A] [Algebra S A]
-    [IsScalarTower R S A] [Module.Free S A] {a : A} :
+    [IsScalarTower R S A] [Module.IsFree S A] {a : A} :
     norm R (norm S a) = norm R a := by
   rw [norm_apply S, norm_apply R a, ← LinearMap.det_restrictScalars]; rfl
 
@@ -217,7 +217,7 @@ theorem isIntegral_norm [Algebra R L] [Algebra R K] [IsScalarTower R K L] {x : L
   · simpa [norm_eq_one_of_not_module_finite h] using isIntegral_one
   let F := K⟮x⟯
   rw [← norm_norm (S := F), ← coe_gen K x, ← IntermediateField.algebraMap_apply,
-    norm_algebraMap_of_basis (Module.Free.chooseBasis F L) (gen K x), map_pow]
+    norm_algebraMap_of_basis (Module.IsFree.chooseBasis F L) (gen K x), map_pow]
   apply IsIntegral.pow
   rw [← isIntegral_algebraMap_iff (algebraMap K (AlgebraicClosure F)).injective,
     norm_gen_eq_prod_roots _ (IsAlgClosed.splits _)]
@@ -244,7 +244,7 @@ theorem norm_eq_norm_adjoin (x : L) :
   let F := K⟮x⟯
   nth_rw 1 [← coe_gen K x]
   rw [← norm_norm (S := F), ← IntermediateField.algebraMap_apply,
-    norm_algebraMap_of_basis (Module.Free.chooseBasis F L) (gen K x), map_pow,
+    norm_algebraMap_of_basis (Module.IsFree.chooseBasis F L) (gen K x), map_pow,
     finrank_eq_card_chooseBasisIndex]
 
 variable (F E : Type*) [Field F] [Algebra K F] [Field E] [Algebra K E]

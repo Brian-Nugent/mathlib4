@@ -86,6 +86,6 @@ end IsAzumaya
 
 /-- An Azumaya algebra is a central algebra. -/
 instance Algebra.IsCentral.instIsAzumaya {R A : Type*} [CommSemiring R] [Semiring A]
-    [Algebra R A] [Module.Free R A] [IsAzumaya R A] : IsCentral R A :=
+    [Algebra R A] [Module.IsFree R A] [IsAzumaya R A] : IsCentral R A :=
   have := of_algEquiv R _ _ (AlgEquiv.ofBijective (.mulLeftRight R A) IsAzumaya.bij).symm
   left_of_tensor R A Aᵐᵒᵖ <| FaithfulSMul.algebraMap_injective _ _

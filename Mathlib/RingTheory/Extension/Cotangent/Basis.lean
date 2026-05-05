@@ -270,7 +270,7 @@ set_option backward.isDefEq.respectTransparency false in
 open PresentationOfFreeCotangent in
 /--
 Version of `Algebra.Generators.exists_presentation_of_free_cotangent` taking a basis instead
-of a `Module.Free` assumption.
+of a `Module.IsFree` assumption.
 Note that the basis `b₀` only serves as a way of saying
 that `I/I²` is free of rank `σ`, which gives more definitional control over `σ`.
 If this does not matter, use `Algebra.Generators.exists_presentation_of_free_cotangent` instead.
@@ -330,7 +330,7 @@ a basis of `I/I²` instead. -/
 @[stacks 07CF]
 public lemma exists_presentation_of_free_cotangent [Algebra.FinitePresentation R S]
     {α : Type*} (P : Generators R S α) [Finite α]
-    [Module.Free S P.toExtension.Cotangent] :
+    [Module.IsFree S P.toExtension.Cotangent] :
     ∃ (P' : Presentation R S (Unit ⊕ α) (Unit ⊕ Fin (Module.finrank S P.toExtension.Cotangent)))
       (b : Module.Basis (Unit ⊕ Fin (Module.finrank S P.toExtension.Cotangent))
         S P'.toExtension.Cotangent),

@@ -220,9 +220,9 @@ finite free module $R^k$ and linear maps $a \colon N \to R^k$ and
 $y \colon R^k \to M$ such that $x = y \circ a$ and $a(f) = 0$. -/
 @[stacks 058D "(1) → (2)"]
 theorem exists_factorization_of_apply_eq_zero_of_free [Flat R M] {N : Type*} [AddCommGroup N]
-    [Module R N] [Free R N] [Module.Finite R N] {f : N} {x : N →ₗ[R] M} (h : x f = 0) :
+    [Module R N] [IsFree R N] [Module.Finite R N] {f : N} {x : N →ₗ[R] M} (h : x f = 0) :
     ∃ (k : ℕ) (a : N →ₗ[R] (Fin k →₀ R)) (y : (Fin k →₀ R) →ₗ[R] M), x = y ∘ₗ a ∧ a f = 0 :=
-  have e := ((Module.Free.chooseBasis R N).reindex (Fintype.equivFin _)).repr.symm
+  have e := ((Module.IsFree.chooseBasis R N).reindex (Fintype.equivFin _)).repr.symm
   have ⟨k, a, y, hya, haf⟩ := iff_forall_exists_factorization.mp ‹Flat R M›
     (f := e.symm f) (x := x ∘ₗ e) (by simpa using h)
   ⟨k, a ∘ₗ e.symm, y, by rwa [← comp_assoc, LinearEquiv.eq_comp_toLinearMap_symm], haf⟩
@@ -255,11 +255,11 @@ $a \colon N \to R^k$ and $y \colon R^k \to M$ such that $x = y \circ a$ and
 $a \circ f = 0$. -/
 @[stacks 058D "(1) → (4)"]
 theorem exists_factorization_of_comp_eq_zero_of_free [Flat R M] {K N : Type*} [AddCommGroup K]
-    [Module R K] [Module.Finite R K] [AddCommGroup N] [Module R N] [Free R N] [Module.Finite R N]
+    [Module R K] [Module.Finite R K] [AddCommGroup N] [Module R N] [IsFree R N] [Module.Finite R N]
     {f : K →ₗ[R] N} {x : N →ₗ[R] M} (h : x ∘ₗ f = 0) :
     ∃ (k : ℕ) (a : N →ₗ[R] (Fin k →₀ R)) (y : (Fin k →₀ R) →ₗ[R] M),
       x = y ∘ₗ a ∧ a ∘ₗ f = 0 :=
-  have e := ((Module.Free.chooseBasis R N).reindex (Fintype.equivFin _)).repr.symm
+  have e := ((Module.IsFree.chooseBasis R N).reindex (Fintype.equivFin _)).repr.symm
   have ⟨k, a, y, hya, haf⟩ := exists_factorization_of_comp_eq_zero_of_free_aux
     (f := e.symm ∘ₗ f) (x := x ∘ₗ e.toLinearMap) (by ext; simpa [comp_assoc] using congr($h _))
   ⟨k, a ∘ₗ e.symm, y, by rwa [← comp_assoc, LinearEquiv.eq_comp_toLinearMap_symm], by

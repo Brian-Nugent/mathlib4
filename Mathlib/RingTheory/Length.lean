@@ -258,9 +258,9 @@ lemma Module.length_pi {ι : Type*} :
 attribute [nontriviality] rank_subsingleton'
 
 variable (R M) in
-lemma Module.length_of_free [Module.Free R M] :
+lemma Module.length_of_free [Module.IsFree R M] :
     Module.length R M = (Module.rank R M).toENat * Module.length R R := by
-  let b := Module.Free.chooseBasis R M
+  let b := Module.IsFree.chooseBasis R M
   nontriviality R
   nontriviality M
   by_cases H : Module.length R R = ⊤
@@ -269,12 +269,12 @@ lemma Module.length_of_free [Module.Free R M] :
     simp [ENat.card_eq_zero_iff_empty, rank_pos_of_free.ne']
   rw [← ne_eq, Module.length_ne_top_iff, isFiniteLength_iff_isNoetherian_isArtinian] at H
   cases H
-  let b := Module.Free.chooseBasis R M
-  rw [b.repr.length_eq, Module.length_finsupp, Free.rank_eq_card_chooseBasisIndex, ENat.card]
+  let b := Module.IsFree.chooseBasis R M
+  rw [b.repr.length_eq, Module.length_finsupp, IsFree.rank_eq_card_chooseBasisIndex, ENat.card]
 
 variable (R M) in
 lemma Module.length_of_free_of_finite
-    [StrongRankCondition R] [Module.Free R M] [Module.Finite R M] :
+    [StrongRankCondition R] [Module.IsFree R M] [Module.Finite R M] :
     Module.length R M = Module.finrank R M * Module.length R R := by
   rw [length_of_free, Cardinal.toENat_eq_natCast.mpr (finrank_eq_rank _ _).symm]
 

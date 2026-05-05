@@ -34,7 +34,7 @@ where `k` is the residue field of `S`.
 theorem FormallySmooth.iff_injective_lTensor_residueField.{u}
     (P : Algebra.Extension.{u} R S)
     [FormallySmooth R P.Ring]
-    [Module.Free P.Ring Ω[P.Ring⁄R]] [Module.Finite P.Ring Ω[P.Ring⁄R]]
+    [Module.IsFree P.Ring Ω[P.Ring⁄R]] [Module.Finite P.Ring Ω[P.Ring⁄R]]
     (h' : P.ker.FG) :
     Algebra.FormallySmooth R S ↔
       Function.Injective (P.cotangentComplex.lTensor (ResidueField S)) := by
@@ -47,7 +47,7 @@ theorem FormallySmooth.iff_injective_lTensor_residueField.{u}
 
 theorem FormallySmooth.iff_injective_cotangentComplexBaseChange_residueField
     (P : Type*) [CommRing P] [Algebra R P] [Algebra P S]
-    [IsScalarTower R P S] [FormallySmooth R P] [Module.Free P Ω[P⁄R]] [Module.Finite P Ω[P⁄R]]
+    [IsScalarTower R P S] [FormallySmooth R P] [Module.IsFree P Ω[P⁄R]] [Module.Finite P Ω[P⁄R]]
     (h₁ : Function.Surjective (algebraMap P S)) (h₂ : (RingHom.ker (algebraMap P S)).FG) :
     Algebra.FormallySmooth R S ↔
       Function.Injective (cotangentComplexBaseChange R S P (ResidueField S)) := by
@@ -71,7 +71,7 @@ where `k` any field extension of the residue field of `S`.
 theorem FormallySmooth.iff_injective_cotangentComplexBaseChange
     (P K : Type*) [Field K] [CommRing P] [Algebra R P] [Algebra P S]
     [IsScalarTower R P S] [Algebra S K] [Algebra P K] [IsScalarTower P S K]
-    [FormallySmooth R P] [Module.Free P Ω[P⁄R]] [Module.Finite P Ω[P⁄R]]
+    [FormallySmooth R P] [Module.IsFree P Ω[P⁄R]] [Module.Finite P Ω[P⁄R]]
     (h₁ : Function.Surjective (algebraMap P S)) (h₂ : (RingHom.ker (algebraMap P S)).FG)
     (h₃ : maximalIdeal S ≤ RingHom.ker (algebraMap S K)) :
     Algebra.FormallySmooth R S ↔ Function.Injective (cotangentComplexBaseChange R S P K) := by

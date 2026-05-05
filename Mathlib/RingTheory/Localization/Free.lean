@@ -77,13 +77,13 @@ then `Mᵣ` is already free over `Rᵣ` for some `r ∈ S`.
 -/
 lemma Module.FinitePresentation.exists_free_localizedModule_powers
     (Rₛ) [CommRing Rₛ] [Algebra R Rₛ] [Module Rₛ M'] [IsScalarTower R Rₛ M'] [Nontrivial Rₛ]
-    [IsLocalization S Rₛ] [Module.FinitePresentation R M] [Module.Free Rₛ M'] :
+    [IsLocalization S Rₛ] [Module.FinitePresentation R M] [Module.IsFree Rₛ M'] :
     ∃ r, r ∈ S ∧
-      Module.Free (Localization (.powers r)) (LocalizedModule (.powers r) M) ∧
+      Module.IsFree (Localization (.powers r)) (LocalizedModule (.powers r) M) ∧
       Module.finrank (Localization (.powers r)) (LocalizedModule (.powers r) M) =
         Module.finrank Rₛ M' := by
-  let I := Module.Free.ChooseBasisIndex Rₛ M'
-  let b : Basis I Rₛ M' := Module.Free.chooseBasis Rₛ M'
+  let I := Module.IsFree.ChooseBasisIndex Rₛ M'
+  let b : Basis I Rₛ M' := Module.IsFree.chooseBasis Rₛ M'
   have : Module.Finite Rₛ M' := Module.Finite.of_isLocalizedModule S (Rₚ := Rₛ) f
   obtain ⟨r, hr, b', _⟩ := Module.FinitePresentation.exists_basis_localizedModule_powers S f Rₛ b
   have := (show Localization (.powers r) →+* Rₛ from IsLocalization.map (M := .powers r) (T := S) _

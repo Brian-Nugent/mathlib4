@@ -118,7 +118,7 @@ section FiniteDimensional
 
 open Module
 
-variable [IsDomain R] [IsPrincipalIdealRing R] [Module.Free R M] [Module.Finite R M]
+variable [IsDomain R] [IsPrincipalIdealRing R] [Module.IsFree R M] [Module.Finite R M]
   [LieRing.IsNilpotent L]
 
 lemma trace_comp_toEnd_genWeightSpace_eq (χ : L → R) :

@@ -98,13 +98,13 @@ open Module
 variable [CommRing R] [CommRing A] [Nontrivial A]
   [Algebra R A] [Algebra.IsEpi R A] [Module.Flat R A]
   [AddCommGroup M] [Module R M] [Module A M] [IsScalarTower R A M]
-  (p : Submodule R M) [Free R p] [Module.Finite R p]
+  (p : Submodule R M) [IsFree R p] [Module.Finite R p]
 
 @[simp] lemma finrank_span_eq_finrank :
     finrank A (span A (p : Set M)) = finrank R p := by
   rcases subsingleton_or_nontrivial R; · simp [Algebra.subsingleton R A]
-  let ι := Free.ChooseBasisIndex R p
-  let b₁ : Basis ι R p := Free.chooseBasis R p
+  let ι := IsFree.ChooseBasisIndex R p
+  let b₁ : Basis ι R p := IsFree.chooseBasis R p
   let b₂ : Basis ι A (span A (p : Set M)) := (b₁.baseChange A).map <| p.tensorEquivSpan A
   rw [finrank_eq_card_basis b₁, finrank_eq_card_basis b₂]
 

@@ -116,15 +116,15 @@ end RankZero
 
 section Finite
 
-theorem Module.finite_of_rank_eq_nat [Module.Free R M] {n : ℕ} (h : Module.rank R M = n) :
+theorem Module.finite_of_rank_eq_nat [Module.IsFree R M] {n : ℕ} (h : Module.rank R M = n) :
     Module.Finite R M := by
   nontriviality R
-  obtain ⟨⟨ι, b⟩⟩ := Module.Free.exists_basis (R := R) (M := M)
+  obtain ⟨⟨ι, b⟩⟩ := Module.IsFree.exists_basis (R := R) (M := M)
   have := mk_lt_aleph0_iff.mp <|
     b.linearIndependent.cardinal_le_rank |>.trans_eq h |>.trans_lt natCast_lt_aleph0
   exact Module.Finite.of_basis b
 
-theorem Module.finite_of_rank_eq_one [Module.Free R M] (h : Module.rank R M = 1) :
+theorem Module.finite_of_rank_eq_one [Module.IsFree R M] (h : Module.rank R M = 1) :
     Module.Finite R M :=
   Module.finite_of_rank_eq_nat <| h.trans Nat.cast_one.symm
 
@@ -460,14 +460,14 @@ theorem Set.finrank_empty [Nontrivial R] :
     Set.finrank R (∅ : Set M) = 0 := by
   rw [Set.finrank, span_empty, finrank_bot]
 
-variable [Module.Free R M]
+variable [Module.IsFree R M]
 
 theorem finrank_eq_zero_of_basis_imp_not_finite
     (h : ∀ s : Set M, Basis.{v} (s : Set M) R M → ¬s.Finite) : finrank R M = 0 := by
   cases subsingleton_or_nontrivial R
   · have := Module.subsingleton R M
     exact (h ∅ ⟨LinearEquiv.ofSubsingleton _ _⟩ Set.finite_empty).elim
-  obtain ⟨_, ⟨b⟩⟩ := (Module.free_iff_set R M).mp ‹_›
+  obtain ⟨_, ⟨b⟩⟩ := (Module.isFree_iff_set R M).mp ‹_›
   have := Set.Infinite.to_subtype (h _ b)
   exact b.linearIndependent.finrank_eq_zero_of_infinite
 

@@ -39,7 +39,7 @@ variable {R M A} [CommRing R] [AddCommGroup M] [Module R M] [CommRing A] [Algebr
 /-- If `A` is a finite free `R`-algebra, then `f : A` is nilpotent on `κ(𝔭) ⊗ A` for some
 prime `𝔭 ◃ R` if and only if every non-leading coefficient of `charpoly(f)` is in `𝔭`. -/
 lemma isNilpotent_tensor_residueField_iff
-    [Module.Free R A] [Module.Finite R A] (f : A) (I : Ideal R) [I.IsPrime] :
+    [Module.IsFree R A] [Module.Finite R A] (f : A) (I : Ideal R) [I.IsPrime] :
     IsNilpotent (algebraMap A (A ⊗[R] I.ResidueField) f) ↔
       ∀ i < Module.finrank R A, (Algebra.lmul R A f).charpoly.coeff i ∈ I := by
   cases subsingleton_or_nontrivial R
@@ -123,7 +123,7 @@ lemma mem_image_comap_basicOpen (f : A) (x) :
 /-- Let `A` be an `R`-algebra. If `A ⧸ I` is finite free over `R`,
 then the image of `Z(I) ∩ D(f) ⊆ Spec S` in `Spec R` is compact open. -/
 lemma exists_image_comap_of_finite_of_free (f : A) (s : Set A)
-    [Module.Finite R (A ⧸ Ideal.span s)] [Module.Free R (A ⧸ Ideal.span s)] :
+    [Module.Finite R (A ⧸ Ideal.span s)] [Module.IsFree R (A ⧸ Ideal.span s)] :
     ∃ t : Finset R, comap (algebraMap R A) '' (zeroLocus s \ zeroLocus {f}) = (zeroLocus t)ᶜ := by
   classical
   use (Finset.range (Module.finrank R (A ⧸ Ideal.span s))).image

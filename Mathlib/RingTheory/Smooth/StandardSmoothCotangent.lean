@@ -152,8 +152,8 @@ lemma basisCotangent_apply (r : σ) :
   apply P.toPreSubmersivePresentation.cotangentComplexAux_apply _ _
 
 @[stacks 00T7 "(3)"]
-instance free_cotangent : Module.Free S P.toExtension.Cotangent :=
-  Module.Free.of_basis P.basisCotangent
+instance free_cotangent : Module.IsFree S P.toExtension.Cotangent :=
+  Module.IsFree.of_basis P.basisCotangent
 
 /--
 If `P` is a submersive presentation, this is the section of the map
@@ -236,8 +236,8 @@ lemma basisKaehler_apply (k : ((Set.range P.map)ᶜ : Set _)) :
 /-- If `P` is a submersive presentation of `S` as an `R`-algebra, `Ω[S⁄R]` is free. -/
 @[stacks 00T7 "(2)"]
 theorem free_kaehlerDifferential (P : SubmersivePresentation R S ι σ) :
-    Module.Free S Ω[S⁄R] :=
-  Module.Free.of_basis P.basisKaehler
+    Module.IsFree S Ω[S⁄R] :=
+  Module.IsFree.of_basis P.basisKaehler
 
 attribute [local instance] Fintype.ofFinite in
 /-- If `P` is a submersive presentation of `S` as an `R`-algebra and `S` is nontrivial,
@@ -254,9 +254,9 @@ section LocalizationAway
 
 variable (r : R) [IsLocalization.Away r S]
 
-instance : Module.Free S (Generators.localizationAway S r).toExtension.Cotangent :=
+instance : Module.IsFree S (Generators.localizationAway S r).toExtension.Cotangent :=
   inferInstanceAs <|
-    Module.Free S ((SubmersivePresentation.localizationAway S r).toExtension.Cotangent)
+    Module.IsFree S ((SubmersivePresentation.localizationAway S r).toExtension.Cotangent)
 
 variable (S) in
 /-- The image of `g * X - 1` in `I/I²` if `I` is the kernel of the canonical presentation
@@ -299,7 +299,7 @@ end LocalizationAway
 
 /-- If `S` is `R`-standard smooth, `Ω[S⁄R]` is a free `S`-module. -/
 instance IsStandardSmooth.free_kaehlerDifferential [IsStandardSmooth R S] :
-    Module.Free S Ω[S⁄R] := by
+    Module.IsFree S Ω[S⁄R] := by
   obtain ⟨_, _, _, _, ⟨P⟩⟩ := ‹IsStandardSmooth R S›
   exact P.free_kaehlerDifferential
 

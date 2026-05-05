@@ -33,7 +33,7 @@ invertible `R`-modules (in the sense that `M` is invertible if there exists anot
 
 - An invertible module is finite and projective (provided as instances).
 
-- `Module.Invertible.free_iff_linearEquiv`: an invertible module is free iff it is isomorphic to
+- `Module.Invertible.isFree_iff_linearEquiv`: an invertible module is free iff it is isomorphic to
   the ring, i.e. its class is trivial in the Picard group.
 
 - `Submodule.ker_unitsToPic`, `Submodule.range_unitsToPic`: exactness of the sequence
@@ -234,15 +234,15 @@ open Finsupp in
 variable {R M} in
 /-- An invertible module is free iff it is isomorphic to the ring, i.e. its class is trivial in
 the Picard group. -/
-theorem free_iff_linearEquiv : Free R M ↔ Nonempty (M ≃ₗ[R] R) := by
+theorem isFree_iff_linearEquiv : IsFree R M ↔ Nonempty (M ≃ₗ[R] R) := by
   refine ⟨fun _ ↦ ?_, fun ⟨e⟩ ↦ .of_equiv e.symm⟩
   nontriviality R
-  have e := (Free.chooseBasis R M).repr
+  have e := (IsFree.chooseBasis R M).repr
   have := card_eq_of_linearEquiv R <|
     (finsuppTensorFinsupp' .. ≪≫ₗ linearEquivFunOnFinite R R _).symm ≪≫ₗ TensorProduct.congr
       (linearEquivFunOnFinite R R _ ≪≫ₗ llift R R R _ ≪≫ₗ e.dualMap)
       e.symm ≪≫ₗ linearEquiv R M ≪≫ₗ (.symm <| .funUnique Unit R R)
-  have : Unique (Free.ChooseBasisIndex R M) :=
+  have : Unique (IsFree.ChooseBasisIndex R M) :=
     (Fintype.card_eq_one_iff_nonempty_unique.mp (by simpa using this)).some
   exact ⟨e ≪≫ₗ LinearEquiv.finsuppUnique R R _⟩
 
@@ -250,12 +250,12 @@ theorem free_iff_linearEquiv : Free R M ↔ Nonempty (M ≃ₗ[R] R) := by
 considering the localization at a prime (which is free of rank 1) using the strong rank condition.
 The ≥ direction fails in general but holds for domains and Noetherian rings,
 see https://math.stackexchange.com/q/5089900 and https://mathoverflow.net/a/499611. -/
-protected theorem finrank_eq_one [StrongRankCondition R] [Free R M] : finrank R M = 1 := by
+protected theorem finrank_eq_one [StrongRankCondition R] [IsFree R M] : finrank R M = 1 := by
   cases subsingleton_or_nontrivial R
   · rw [← rank_eq_one_iff_finrank_eq_one, rank_subsingleton]
-  · rw [(free_iff_linearEquiv.mp ‹_›).some.finrank_eq, finrank_self]
+  · rw [(isFree_iff_linearEquiv.mp ‹_›).some.finrank_eq, finrank_self]
 
-theorem rank_eq_one [StrongRankCondition R] [Free R M] : Module.rank R M = 1 :=
+theorem rank_eq_one [StrongRankCondition R] [IsFree R M] : Module.rank R M = 1 :=
   rank_eq_one_iff_finrank_eq_one.mpr (Invertible.finrank_eq_one R M)
 
 open TensorProduct (comm lid) in
@@ -469,13 +469,13 @@ theorem mk_self : Pic.mk R R = 1 :=
 theorem mk_eq_one_iff : Pic.mk R M = 1 ↔ Nonempty (M ≃ₗ[R] R) := by
   rw [← mk_self, mk_eq_mk_iff]
 
-theorem mk_eq_one_iff_free : Pic.mk R M = 1 ↔ Free R M :=
-  mk_eq_one_iff.trans Invertible.free_iff_linearEquiv.symm
+theorem mk_eq_one_iff_isFree : Pic.mk R M = 1 ↔ IsFree R M :=
+  mk_eq_one_iff.trans Invertible.isFree_iff_linearEquiv.symm
 
 variable (R M) in
-theorem mk_eq_one [Free R M] : Pic.mk R M = 1 := mk_eq_one_iff_free.mpr ‹_›
+theorem mk_eq_one [IsFree R M] : Pic.mk R M = 1 := mk_eq_one_iff_isFree.mpr ‹_›
 
-instance : Free R (1 : Pic R) := mk_eq_one_iff_free.mp mk_eq_self
+instance : IsFree R (1 : Pic R) := mk_eq_one_iff_isFree.mp mk_eq_self
 
 theorem mk_tensor : Pic.mk R (M ⊗[R] N) = Pic.mk R M * Pic.mk R N :=
   congr_arg (equivShrink _) <| Units.ext <| by
@@ -496,17 +496,17 @@ theorem mul_eq_tensor (M N : Pic R) : M * N = Pic.mk R (M ⊗[R] N) := by
   rw [mk_tensor, mk_eq_self, mk_eq_self]
 
 theorem subsingleton_iffₛ : Subsingleton (Pic R) ↔
-    ∀ (M : Type u) [AddCommMonoid M] [Module R M], Module.Invertible R M → Free R M :=
+    ∀ (M : Type u) [AddCommMonoid M] [Module R M], Module.Invertible R M → IsFree R M :=
   .trans ⟨fun _ M _ _ _ ↦ Subsingleton.elim ..,
       fun h ↦ ⟨fun M N ↦ by rw [← mk_eq_self (M := M), ← mk_eq_self (M := N), h, h]⟩⟩ <|
-    forall₄_congr fun _ _ _ _ ↦ mk_eq_one_iff_free
+    forall₄_congr fun _ _ _ _ ↦ mk_eq_one_iff_isFree
 
 theorem subsingleton_iff {R : Type u} [CommRing R] : Subsingleton (Pic R) ↔
-    ∀ (M : Type u) [AddCommGroup M] [Module R M], Module.Invertible R M → Free R M :=
+    ∀ (M : Type u) [AddCommGroup M] [Module R M], Module.Invertible R M → IsFree R M :=
   subsingleton_iffₛ.trans
     ⟨fun h M ↦ h M, fun h M ↦ let _ := @Module.addCommMonoidToAddCommGroup R; h M⟩
 
-instance [Subsingleton (Pic R)] : Free R M :=
+instance [Subsingleton (Pic R)] : IsFree R M :=
   have := subsingleton_iffₛ.mp ‹_› (Finite.reprₛ R M) inferInstance
   .of_equiv (Finite.reprEquivₛ R M)
 
@@ -514,7 +514,7 @@ instance [Subsingleton (Pic R)] : Free R M :=
 in fact invertible modules over a semiring are Zariski-locally free (but projective module may
 not be). See Remark 7.10, Example 9.6 and 9.8, and Theorem 11.7 in [BorgerJun2024]. -/
 instance (R) [CommRing R] [IsLocalRing R] : Subsingleton (Pic R) :=
-  subsingleton_iff.mpr fun _ _ _ _ ↦ free_of_flat_of_isLocalRing
+  subsingleton_iff.mpr fun _ _ _ _ ↦ isFree_of_flat_of_isLocalRing
 
 /-- The Picard group of a semilocal ring is trivial. -/
 instance (R) [CommRing R] [Finite (MaximalSpectrum R)] : Subsingleton (Pic R) :=
@@ -527,7 +527,7 @@ open AlgebraTensorModule in
 /-- Every `R`-algebra `A` gives rise to a homomorphism between Picard groups of `R` and `A`. -/
 @[simps] noncomputable def mapAlgebra : Pic R →* Pic A where
   toFun M := .mk A (A ⊗[R] M)
-  map_one' := mk_eq_one_iff.mpr (Invertible.free_iff_linearEquiv.mp inferInstance)
+  map_one' := mk_eq_one_iff.mpr (Invertible.isFree_iff_linearEquiv.mp inferInstance)
   map_mul' _ _ := by
     rw [← mk_tensor, mk_eq_mk_iff]
     refine ⟨congr (.refl ..) (.symm (mk_eq_iff.mp ?_).some) ≪≫ₗ distribBaseChange R A ..⟩
@@ -611,7 +611,8 @@ theorem tensorProductComm_eq_refl : TensorProduct.comm R M M = .refl .. := by
     ext; dsimp
     apply IsLocalizedModule.map_apply
   let Rp := Localization P.primeCompl
-  have ⟨e⟩ := free_iff_linearEquiv.mp (inferInstance : Free Rp (LocalizedModule P.primeCompl M))
+  have ⟨e⟩ := isFree_iff_linearEquiv.mp
+    (inferInstance : IsFree Rp (LocalizedModule P.primeCompl M))
   have e := e.restrictScalars R
   ext x y
   refine (congr e e ≪≫ₗ equivOfCompatibleSMul Rp ..).injective ?_

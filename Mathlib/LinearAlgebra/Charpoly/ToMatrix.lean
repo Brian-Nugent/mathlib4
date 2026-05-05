@@ -24,14 +24,14 @@ public section
 
 noncomputable section
 
-open Module Free Polynomial Matrix
+open Module IsFree Polynomial Matrix
 
 universe u v w
 
 variable {R M M₁ M₂ : Type*} [CommRing R]
-variable [AddCommGroup M] [Module R M] [Module.Free R M] [Module.Finite R M]
-variable [AddCommGroup M₁] [Module R M₁] [Module.Finite R M₁] [Module.Free R M₁]
-variable [AddCommGroup M₂] [Module R M₂] [Module.Finite R M₂] [Module.Free R M₂]
+variable [AddCommGroup M] [Module R M] [Module.IsFree R M] [Module.Finite R M]
+variable [AddCommGroup M₁] [Module R M₁] [Module.Finite R M₁] [Module.IsFree R M₁]
+variable [AddCommGroup M₂] [Module R M₂] [Module.Finite R M₂] [Module.IsFree R M₂]
 variable (f : M →ₗ[R] M)
 
 namespace LinearMap

@@ -87,18 +87,18 @@ section EqZeroIff
 variable [Finite ι]
 
 @[simp]
-theorem norm_zero [Nontrivial S] [Module.Free R S] [Module.Finite R S] : norm R (0 : S) = 0 := by
+theorem norm_zero [Nontrivial S] [Module.IsFree R S] [Module.Finite R S] : norm R (0 : S) = 0 := by
   nontriviality
-  rw [norm_apply, coe_lmul_eq_mul, map_zero, LinearMap.det_zero' (Module.Free.chooseBasis R S)]
+  rw [norm_apply, coe_lmul_eq_mul, map_zero, LinearMap.det_zero' (Module.IsFree.chooseBasis R S)]
 
 @[simp]
-theorem norm_eq_zero_iff [IsDomain R] [IsDomain S] [Module.Free R S] [Module.Finite R S] {x : S} :
+theorem norm_eq_zero_iff [IsDomain R] [IsDomain S] [Module.IsFree R S] [Module.Finite R S] {x : S} :
     norm R x = 0 ↔ x = 0 := by
   constructor
   swap
   · rintro rfl; exact norm_zero
-  · let b := Module.Free.chooseBasis R S
-    let decEq := Classical.decEq (Module.Free.ChooseBasisIndex R S)
+  · let b := Module.IsFree.chooseBasis R S
+    let decEq := Classical.decEq (Module.IsFree.ChooseBasisIndex R S)
     rw [norm_eq_matrix_det b, ← Matrix.exists_mulVec_eq_zero_iff]
     rintro ⟨v, v_ne, hv⟩
     rw [← b.equivFun.apply_symm_apply v, b.equivFun_symm_apply, b.equivFun_apply,
@@ -109,17 +109,17 @@ theorem norm_eq_zero_iff [IsDomain R] [IsDomain S] [Module.Free R S] [Module.Fin
       apply b.equivFun.symm.injective
       rw [b.equivFun_symm_apply, sum_eq, map_zero]
 
-theorem norm_ne_zero_iff [IsDomain R] [IsDomain S] [Module.Free R S] [Module.Finite R S] {x : S} :
+theorem norm_ne_zero_iff [IsDomain R] [IsDomain S] [Module.IsFree R S] [Module.Finite R S] {x : S} :
     norm R x ≠ 0 ↔ x ≠ 0 := not_iff_not.mpr norm_eq_zero_iff
 
 /-- This is `Algebra.norm_eq_zero_iff` composed with `Algebra.norm_apply`. -/
 @[simp]
-theorem norm_eq_zero_iff' [IsDomain R] [IsDomain S] [Module.Free R S] [Module.Finite R S] {x : S} :
+theorem norm_eq_zero_iff' [IsDomain R] [IsDomain S] [Module.IsFree R S] [Module.Finite R S] {x : S} :
     LinearMap.det (LinearMap.mul R S x) = 0 ↔ x = 0 := norm_eq_zero_iff
 
 theorem norm_eq_zero_iff_of_basis [IsDomain R] [IsDomain S] (b : Basis ι R S) {x : S} :
     Algebra.norm R x = 0 ↔ x = 0 := by
-  haveI : Module.Free R S := Module.Free.of_basis b
+  haveI : Module.IsFree R S := Module.IsFree.of_basis b
   haveI : Module.Finite R S := Module.Finite.of_basis b
   exact norm_eq_zero_iff
 

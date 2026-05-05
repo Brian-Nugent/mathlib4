@@ -69,9 +69,9 @@ lemma of_subsingleton [Subsingleton R] : IsFiniteSplit R S := by
   have : Subsingleton S := RingHom.codomain_trivial (algebraMap R S)
   exact of_subsingleton_top
 
-instance [IsFiniteSplit R S] : Module.Free R S := by
+instance [IsFiniteSplit R S] : Module.IsFree R S := by
   obtain ⟨n, ⟨e⟩⟩ := nonempty_algEquiv_fun R S
-  exact Module.Free.of_equiv e.symm.toLinearEquiv
+  exact Module.IsFree.of_equiv e.symm.toLinearEquiv
 
 instance [IsFiniteSplit R S] : Module.FinitePresentation R S := by
   obtain ⟨n, ⟨e⟩⟩ := nonempty_algEquiv_fun R S

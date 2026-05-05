@@ -103,7 +103,7 @@ private theorem toDualBaseChangeAux_tmul (a : A) (f : Dual R V) (v : V) :
     (ibc.toDualBaseChangeAux (a ⊗ₜ[R] f)) (j v) = a * algebraMap R A (f v) := by
   simp [toDualBaseChangeAux, toDual_comp_apply]
 
-variable [Free R V] [Module.Finite R V]
+variable [IsFree R V] [Module.Finite R V]
 
 set_option backward.privateInPublic true in
 set_option backward.privateInPublic.warn false in
@@ -111,8 +111,8 @@ set_option backward.privateInPublic.warn false in
 noncomputable def toDualBaseChange :
     A ⊗[R] Dual R V ≃ₗ[A] Dual A W := by
   apply LinearEquiv.ofBijective ibc.toDualBaseChangeAux
-  let b := Free.chooseBasis R V
-  set ι := Free.ChooseBasisIndex R V
+  let b := IsFree.chooseBasis R V
+  set ι := IsFree.ChooseBasisIndex R V
   have ibc_pow : IsBaseChange A ((Algebra.linearMap R A).compLeft ι) := (linearMap R A).finitePow ι
   suffices ibc.toDualBaseChangeAux =
       (((b.constr R).symm.baseChange ..).trans ibc_pow.equiv).trans ((ibc.basis b).constr A) from

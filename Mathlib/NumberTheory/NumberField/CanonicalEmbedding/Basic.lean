@@ -110,13 +110,13 @@ theorem integerLattice.inter_ball_finite [NumberField K] (r : ℝ) :
 
 /-- A `ℂ`-basis of `ℂ^n` that is also a `ℤ`-basis of the `integerLattice`. -/
 noncomputable def latticeBasis [NumberField K] :
-    Basis (Free.ChooseBasisIndex ℤ (𝓞 K)) ℂ ((K →+* ℂ) → ℂ) := by
+    Basis (IsFree.ChooseBasisIndex ℤ (𝓞 K)) ℂ ((K →+* ℂ) → ℂ) := by
   classical
   -- Let `B` be the canonical basis of `(K →+* ℂ) → ℂ`. We prove that the determinant of
   -- the image by `canonicalEmbedding` of the integral basis of `K` is nonzero. This
   -- will imply the result.
     let B := Pi.basisFun ℂ (K →+* ℂ)
-    let e : (K →+* ℂ) ≃ Free.ChooseBasisIndex ℤ (𝓞 K) :=
+    let e : (K →+* ℂ) ≃ IsFree.ChooseBasisIndex ℤ (𝓞 K) :=
       Fintype.equivOfCardEq ((Embeddings.card K ℂ).trans (finrank_eq_card_basis (integralBasis K)))
     let M := B.toMatrix (fun i => canonicalEmbedding K (integralBasis K (e i)))
     suffices M.det ≠ 0 by
@@ -135,7 +135,7 @@ noncomputable def latticeBasis [NumberField K] :
       (fun i => integralBasis K (e i)) RingHom.equivRatAlgHom).symm
 
 @[simp]
-theorem latticeBasis_apply [NumberField K] (i : Free.ChooseBasisIndex ℤ (𝓞 K)) :
+theorem latticeBasis_apply [NumberField K] (i : IsFree.ChooseBasisIndex ℤ (𝓞 K)) :
     latticeBasis K i = (canonicalEmbedding K) (integralBasis K i) := by
   simp [latticeBasis, integralBasis_apply, coe_basisOfPiSpaceOfLinearIndependent,
     Function.comp_apply, Equiv.apply_symm_apply]
@@ -159,7 +159,7 @@ theorem mem_rat_span_latticeBasis [NumberField K] (x : K) :
   rw [← latticeBasis_apply]
   exact Set.mem_range_self i
 
-theorem integralBasis_repr_apply [NumberField K] (x : K) (i : Free.ChooseBasisIndex ℤ (𝓞 K)) :
+theorem integralBasis_repr_apply [NumberField K] (x : K) (i : IsFree.ChooseBasisIndex ℤ (𝓞 K)) :
     (latticeBasis K).repr (canonicalEmbedding K x) i = (integralBasis K).repr x i := by
   rw [← Basis.restrictScalars_repr_apply ℚ _ ⟨_, mem_rat_span_latticeBasis K x⟩, eq_ratCast,
     Rat.cast_inj]
@@ -621,7 +621,7 @@ noncomputable section integerLattice
 
 variable [NumberField K]
 
-open Module.Free
+open Module.IsFree
 
 open scoped nonZeroDivisors
 

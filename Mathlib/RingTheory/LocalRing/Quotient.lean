@@ -60,19 +60,19 @@ theorem quotient_span_eq_top_iff_span_eq_top (s : Set S) :
 
 attribute [local instance] Ideal.Quotient.field
 
-variable [Module.Free R S] {ι : Type*}
+variable [Module.IsFree R S] {ι : Type*}
 
 theorem finrank_quotient_map :
     finrank (R ⧸ p) (S ⧸ pS) = finrank R S := by
   classical
   have : Module.Finite (R ⧸ p) (S ⧸ pS) := Module.Finite.of_restrictScalars_finite R _ _
   apply le_antisymm
-  · let b := Module.Free.chooseBasis R S
+  · let b := Module.IsFree.chooseBasis R S
     conv_rhs => rw [finrank_eq_card_chooseBasisIndex]
     apply finrank_le_of_span_eq_top
     rw [Set.range_comp]
     apply (quotient_span_eq_top_iff_span_eq_top _).mpr b.span_eq
-  · let b := Module.Free.chooseBasis (R ⧸ p) (S ⧸ pS)
+  · let b := Module.IsFree.chooseBasis (R ⧸ p) (S ⧸ pS)
     choose b' hb' using fun i ↦ Ideal.Quotient.mk_surjective (b i)
     conv_rhs => rw [finrank_eq_card_chooseBasisIndex]
     refine finrank_le_of_span_eq_top (v := b') ?_

@@ -169,7 +169,7 @@ variable [IsPrincipalIdealRing R]
 /-- Any lattice over a PID is a free `R`-module.
 Note that under our conditions, `Module.IsTorsionFree R K` simply says that `algebraMap R K` is
 injective. -/
-instance free [Module.IsTorsionFree R K] (M : Submodule R V) [IsLattice K M] : Module.Free R M := by
+instance free [Module.IsTorsionFree R K] (M : Submodule R V) [IsLattice K M] : Module.IsFree R M := by
   have := Module.IsTorsionFree.trans_faithfulSMul R K V
   -- any torsion free finite module over a PID is free
   infer_instance
@@ -177,7 +177,7 @@ instance free [Module.IsTorsionFree R K] (M : Submodule R V) [IsLattice K M] : M
 /-- Any lattice has `R`-rank equal to the `K`-rank of `V`. -/
 lemma rank' [IsFractionRing R K] (M : Submodule R V) [IsLattice K M] :
     Module.rank R M = Module.rank K V := by
-  let b := Module.Free.chooseBasis R M
+  let b := Module.IsFree.chooseBasis R M
   rw [rank_eq_card_basis b, ← rank_eq_card_basis (b.extendOfIsLattice K)]
 
 /-- Any `R`-lattice in `ι → K` has `#ι` as `R`-rank. -/

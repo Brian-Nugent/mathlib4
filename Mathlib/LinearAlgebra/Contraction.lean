@@ -162,13 +162,13 @@ theorem dualTensorHomEquivOfBasis_symm_cancel_right (x : M →ₗ[R] N) :
   rw [← dualTensorHomEquivOfBasis_apply b, LinearEquiv.apply_symm_apply]
 
 variable (R M N P Q)
-variable [Module.Free R M] [Module.Finite R M]
+variable [Module.IsFree R M] [Module.Finite R M]
 
 /-- If `M` is finite free, the natural map $M^* ⊗ N → Hom(M, N)$ is an
 equivalence. -/
 @[simp]
 noncomputable def dualTensorHomEquiv : Module.Dual R M ⊗[R] N ≃ₗ[R] M →ₗ[R] N :=
-  dualTensorHomEquivOfBasis (Module.Free.chooseBasis R M)
+  dualTensorHomEquivOfBasis (Module.IsFree.chooseBasis R M)
 
 end CommSemiring
 
@@ -184,7 +184,7 @@ section CommSemiring
 variable [CommSemiring R]
 variable [AddCommMonoid M] [AddCommMonoid N] [AddCommMonoid P] [AddCommMonoid Q]
 variable [Module R M] [Module R N] [Module R P] [Module R Q]
-variable [Free R M] [Module.Finite R M] [Free R N] [Module.Finite R N]
+variable [IsFree R M] [Module.Finite R M] [IsFree R N] [Module.Finite R N]
 
 /-- When `M` is a finite free module, the map `lTensorHomToHomLTensor` is an equivalence. Note
 that `lTensorHomEquivHomLTensor` is not defined directly in terms of

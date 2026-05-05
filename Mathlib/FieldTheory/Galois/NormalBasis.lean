@@ -63,7 +63,7 @@ theorem exists_linearIndependent_algEquiv_apply_of_infinite [Infinite K] :
   classical
   /- Choose a basis `e` of `L` over `K` and form the matrix `M` with entries
     `∑ₖ i⁻¹j(eₖ)Xₖ` where `i,j ∈ Gal(L/K)` and `Xₖ`s are independent variables. -/
-  have e := Module.Free.chooseBasis K L
+  have e := Module.IsFree.chooseBasis K L
   let M : Matrix Gal(L/K) Gal(L/K) (MvPolynomial _ L) :=
     .of fun i j ↦ ∑ k, i.symm (j (e k)) • .X k
   /- By [ConradLinearChar] Lemma 3.4, there exists `{xₖ} ⊆ L` such that `∑ₖ j(eₖ)xₖ = 1`

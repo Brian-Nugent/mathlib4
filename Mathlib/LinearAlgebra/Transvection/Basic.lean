@@ -104,7 +104,7 @@ theorem comp_smul_smul {f : Dual R V} {v : V} {r s : R} :
 
 theorem eq_id_of_finrank_le_one
     {R V : Type*} [CommSemiring R] [AddCommMonoid V] [Module R V]
-    [Free R V] [Module.Finite R V] [StrongRankCondition R]
+    [IsFree R V] [Module.Finite R V] [StrongRankCondition R]
     {f : Dual R V} {v : V} (hfv : f v = 0) (h1 : finrank R V ≤ 1) :
     transvection f v = id := by
   interval_cases h : finrank R V
@@ -621,7 +621,7 @@ variable {R V : Type*} [CommRing R] [AddCommGroup V] [Module R V]
 /-- Determinant of a transvection, over a domain.
 
 See `LinearMap.transvection.det` for the general case. -/
-private theorem det_ofDomain [Free R V] [Module.Finite R V] [IsDomain R] (f : Dual R V) (v : V) :
+private theorem det_ofDomain [IsFree R V] [Module.Finite R V] [IsDomain R] (f : Dual R V) (v : V) :
     (transvection f v).det = 1 + f v := by
   let K := FractionRing R
   let : Field K := inferInstance
@@ -633,7 +633,7 @@ private theorem det_ofDomain [Free R V] [Module.Finite R V] [IsDomain R] (f : Du
 
 open IsBaseChange
 
-@[simp] theorem det [Free R V] [Module.Finite R V] (f : Dual R V) (v : V) :
+@[simp] theorem det [IsFree R V] [Module.Finite R V] (f : Dual R V) (v : V) :
     (transvection f v).det = 1 + f v := by
   rcases subsingleton_or_nontrivial R with hR | hR
   · subsingleton
@@ -680,7 +680,7 @@ because `LinearMap.det` is identically 1 otherwise. -/
   rw [← Units.val_inj, LinearEquiv.coe_det,
     LinearEquiv.transvection.coe_toLinearMap hfv, Units.val_one]
   by_contra! h
-  have : Free R V := Free.of_det_ne_one h
+  have : IsFree R V := IsFree.of_det_ne_one h
   have : Module.Finite R V := finite_of_det_ne_one h
   apply h
   rw [transvection.det, hfv, add_zero]

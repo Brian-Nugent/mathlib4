@@ -465,7 +465,7 @@ lemma cotangentSpaceBasis_apply (i) :
     P.cotangentSpaceBasis i = ((1 : S) ⊗ₜ[P.Ring] D R P.Ring (.X i) :) := by
   simp [cotangentSpaceBasis, toExtension]
 
-instance (P : Generators R S ι) : Module.Free S P.toExtension.CotangentSpace :=
+instance (P : Generators R S ι) : Module.IsFree S P.toExtension.CotangentSpace :=
   .of_basis P.cotangentSpaceBasis
 
 /-- Given generators `R[xᵢ] → S` and an injective map `σ → ι`, this is the

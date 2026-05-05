@@ -164,13 +164,13 @@ theorem trace_eq_contract_of_basis' [Fintype ι] [DecidableEq ι] (b : Basis ι 
 
 section
 variable (R M)
-variable [Module.Free R M] [Module.Finite R M] [Module.Free R N] [Module.Finite R N]
+variable [Module.IsFree R M] [Module.Finite R M] [Module.IsFree R N] [Module.Finite R N]
 
 /-- When `M` is finite free, the trace of a linear map corresponds to the contraction pairing under
 the isomorphism `End(M) ≃ M* ⊗ M`. -/
 @[simp]
 theorem trace_eq_contract : LinearMap.trace R M ∘ₗ dualTensorHom R M M = contractLeft R M :=
-  trace_eq_contract_of_basis (Module.Free.chooseBasis R M)
+  trace_eq_contract_of_basis (Module.IsFree.chooseBasis R M)
 
 @[simp]
 theorem trace_eq_contract_apply (x : Module.Dual R M ⊗[R] M) :
@@ -181,14 +181,14 @@ theorem trace_eq_contract_apply (x : Module.Dual R M ⊗[R] M) :
 the isomorphism `End(M) ≃ M* ⊗ M`. -/
 theorem trace_eq_contract' :
     LinearMap.trace R M = contractLeft R M ∘ₗ (dualTensorHomEquiv R M M).symm.toLinearMap :=
-  trace_eq_contract_of_basis' (Module.Free.chooseBasis R M)
+  trace_eq_contract_of_basis' (Module.IsFree.chooseBasis R M)
 
 /-- The trace of the identity endomorphism is the dimension of the free module. -/
 @[simp]
 theorem trace_one : trace R M 1 = (finrank R M : R) := by
   cases subsingleton_or_nontrivial R
   · simp [eq_iff_true_of_subsingleton]
-  have b := Module.Free.chooseBasis R M
+  have b := Module.IsFree.chooseBasis R M
   rw [trace_eq_matrix_trace R b, toMatrix_one, finrank_eq_card_chooseBasisIndex]
   simp
 
@@ -279,19 +279,19 @@ theorem trace_comp_comm' (f : M →ₗ[R] N) (g : N →ₗ[R] M) :
 @[simp]
 lemma trace_smulRight (f : M →ₗ[R] R) (x : M) :
     trace R M (f.smulRight x) = f x := by
-  rw [trace_eq_matrix_trace _ (Free.chooseBasis R M), ← (Free.chooseBasis R M).sum_repr x]
+  rw [trace_eq_matrix_trace _ (IsFree.chooseBasis R M), ← (IsFree.chooseBasis R M).sum_repr x]
   simp [-Basis.sum_repr, dotProduct]
 
 end
 
 variable {N P}
 
-variable [Module.Free R N] [Module.Finite R N] [Module.Free R P] [Module.Finite R P] in
+variable [Module.IsFree R N] [Module.Finite R N] [Module.IsFree R P] [Module.Finite R P] in
 lemma trace_comp_cycle (f : M →ₗ[R] N) (g : N →ₗ[R] P) (h : P →ₗ[R] M) :
     trace R P (g ∘ₗ f ∘ₗ h) = trace R N (f ∘ₗ h ∘ₗ g) := by
   rw [trace_comp_comm', comp_assoc]
 
-variable [Module.Free R M] [Module.Finite R M] [Module.Free R P] [Module.Finite R P] in
+variable [Module.IsFree R M] [Module.Finite R M] [Module.IsFree R P] [Module.Finite R P] in
 lemma trace_comp_cycle' (f : M →ₗ[R] N) (g : N →ₗ[R] P) (h : P →ₗ[R] M) :
     trace R P ((g ∘ₗ f) ∘ₗ h) = trace R M ((h ∘ₗ g) ∘ₗ f) := by
   rw [trace_comp_comm', ← comp_assoc]
@@ -302,9 +302,9 @@ theorem trace_conj' (f : M →ₗ[R] M) (e : M ≃ₗ[R] N) : trace R N (e.conj 
   by_cases hM : ∃ s : Finset M, Nonempty (Basis s R M)
   · obtain ⟨s, ⟨b⟩⟩ := hM
     haveI := Module.Finite.of_basis b
-    haveI := (Module.free_def R M).mpr ⟨_, ⟨b⟩⟩
+    haveI := (Module.IsFree_def R M).mpr ⟨_, ⟨b⟩⟩
     haveI := Module.Finite.of_basis (b.map e)
-    haveI := (Module.free_def R N).mpr ⟨_, ⟨(b.map e).reindex (e.toEquiv.image _)⟩⟩
+    haveI := (Module.IsFree_def R N).mpr ⟨_, ⟨(b.map e).reindex (e.toEquiv.image _)⟩⟩
     rw [e.conj_apply, trace_comp_comm', ← comp_assoc, LinearEquiv.comp_coe,
       LinearEquiv.self_trans_symm, LinearEquiv.refl_toLinearMap, id_comp]
   · rw [trace, trace, dif_neg hM, dif_neg ?_, zero_apply, zero_apply]
@@ -331,8 +331,8 @@ proof_wanted _root_.Matrix.trace_map' {K m F : Type*} [Field K] [Fintype m] [Dec
     [FunLike F (Matrix m m K) (Matrix m m K)] [AlgHomClass F K _ _] (f : F) (x : Matrix m m K) :
     (f x).trace = x.trace
 
-theorem IsProj.trace {p : Submodule R M} {f : M →ₗ[R] M} (h : IsProj p f) [Module.Free R p]
-    [Module.Finite R p] [Module.Free R (ker f)] [Module.Finite R (ker f)] :
+theorem IsProj.trace {p : Submodule R M} {f : M →ₗ[R] M} (h : IsProj p f) [Module.IsFree R p]
+    [Module.Finite R p] [Module.IsFree R (ker f)] [Module.Finite R (ker f)] :
     trace R M f = (finrank R p : R) := by
   rw [h.eq_conj_prodMap, trace_conj', trace_prodMap', trace_id, map_zero, add_zero]
 
@@ -363,10 +363,10 @@ lemma trace_comp_eq_mul_of_commute_of_isNilpotent [IsReduced R] {f g : Module.En
 -- This result requires `Mathlib/RingTheory/TensorProduct/Free.lean`.
 -- Maybe it should move elsewhere?
 @[simp]
-lemma trace_baseChange [Module.Free R M] [Module.Finite R M]
+lemma trace_baseChange [Module.IsFree R M] [Module.Finite R M]
     (f : M →ₗ[R] M) (A : Type*) [CommRing A] [Algebra R A] :
     trace A _ (f.baseChange A) = algebraMap R A (trace R _ f) := by
-  let b := Module.Free.chooseBasis R M
+  let b := Module.IsFree.chooseBasis R M
   let b' := Algebra.TensorProduct.basis A b
   change _ = (algebraMap R A : R →+ A) _
   simp [b', trace_eq_matrix_trace R b, trace_eq_matrix_trace A b', AddMonoidHom.map_trace]
@@ -377,11 +377,11 @@ end LinearMap
 
 /-- If `S` is an `R-algebra that is free of rank `1` over `R`, the map `R →+* S` is an
 isomorphism. -/
-lemma Module.Free.bijective_algebraMap_of_finrank_eq_one {R S : Type*} [CommRing R] [Ring S]
-    [Algebra R S] [Nontrivial R] [Free R S] (h : finrank R S = 1) :
+lemma Module.IsFree.bijective_algebraMap_of_finrank_eq_one {R S : Type*} [CommRing R] [Ring S]
+    [Algebra R S] [Nontrivial R] [IsFree R S] (h : finrank R S = 1) :
     Function.Bijective (algebraMap R S) := by
   have : Module.Finite R S := finite_of_finrank_pos (by grind)
-  have : Free R (Module.End R S) := .of_equiv (dualTensorHomEquiv R S S)
+  have : IsFree R (Module.End R S) := .of_equiv (dualTensorHomEquiv R S S)
   let f : S →ₐ[R] (S →ₗ[R] S) := Algebra.lmul R S
   have h1 : LinearMap.trace R S ∘ₗ f ∘ₗ Algebra.linearMap R S = LinearMap.id := by ext; simp [h]
   let b : Basis (Unit × Unit) R (End R S) :=

@@ -67,7 +67,7 @@ Such `P` always exists when `S` is essentially of finite presentation over `R`.
 See `FormallySmooth.of_formallySmooth_residueField_tensor`.
 -/
 private lemma FormallySmooth.of_formallySmooth_residueField_tensor_aux
-    [FormallySmooth R P] [Module.Free P Ω[P⁄R]] [Module.Finite P Ω[P⁄R]]
+    [FormallySmooth R P] [Module.IsFree P Ω[P⁄R]] [Module.Finite P Ω[P⁄R]]
     (h₁ : Function.Surjective (algebraMap P S)) (h₂ : (RingHom.ker (algebraMap P S)).FG) :
     Algebra.FormallySmooth R S := by
   /-
@@ -92,7 +92,7 @@ private lemma FormallySmooth.of_formallySmooth_residueField_tensor_aux
   let ePp : Pp ≃ₐ[P] P ⊗[R] 𝓀[R] := { __ := TensorProduct.comm _ _ _, commutes' _ := rfl }
   let e₀ : Ω[Pp⁄𝓀[R]] ≃ₗ[Pp] Pp ⊗[P] Ω[P⁄R] :=
     (KaehlerDifferential.tensorKaehlerEquiv R 𝓀[R] P Pp).symm
-  have : Module.Free Pp Ω[Pp⁄𝓀[R]] := .of_equiv e₀.symm
+  have : Module.IsFree Pp Ω[Pp⁄𝓀[R]] := .of_equiv e₀.symm
   have : Module.Finite Pp Ω[Pp⁄𝓀[R]] := .of_surjective e₀.symm.toLinearMap e₀.symm.surjective
   let e₁ : RingHom.ker φ ≃ₗ[Pp] Pp ⊗[P] RingHom.ker (algebraMap P S) :=
     kerTensorProductMapIdToAlgHomEquiv _ _ _ _ h₁
@@ -181,7 +181,7 @@ lemma FormallySmooth.of_formallySmooth_residueField_tensor (M : Submonoid P)
   algebraize [fP.toRingHom]
   have : FormallyEtale (MvPolynomial (Fin n) R) P' := .of_isLocalization M'
   have : FormallySmooth R P' := .comp _ (MvPolynomial (Fin n) R) _
-  have : Module.Free P' Ω[P'⁄R] :=
+  have : Module.IsFree P' Ω[P'⁄R] :=
     .of_equiv (KaehlerDifferential.tensorKaehlerEquivOfFormallyEtale R (MvPolynomial (Fin n) R) P')
   exact FormallySmooth.of_formallySmooth_residueField_tensor_aux (R := R) (S := S) hf₁ hfP
 

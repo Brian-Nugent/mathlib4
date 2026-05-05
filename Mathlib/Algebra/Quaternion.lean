@@ -527,7 +527,7 @@ theorem coe_basisOneIJK_repr (q : ℍ[R,c₁,c₂,c₃]) :
 
 instance : Module.Finite R ℍ[R,c₁,c₂,c₃] := .of_basis (basisOneIJK c₁ c₂ c₃)
 
-instance : Module.Free R ℍ[R,c₁,c₂,c₃] := .of_basis (basisOneIJK c₁ c₂ c₃)
+instance : Module.IsFree R ℍ[R,c₁,c₂,c₃] := .of_basis (basisOneIJK c₁ c₂ c₃)
 
 theorem rank_eq_four [StrongRankCondition R] : Module.rank R ℍ[R,c₁,c₂,c₃] = 4 := by
   rw [rank_eq_card_basis (basisOneIJK c₁ c₂ c₃), Fintype.card_fin]
@@ -964,7 +964,7 @@ theorem smul_coe : x • (y : ℍ[R]) = ↑(x * y) :=
   QuaternionAlgebra.smul_coe x y
 
 instance : Module.Finite R ℍ[R] := inferInstanceAs <| Module.Finite R ℍ[R,-1,0,-1]
-instance : Module.Free R ℍ[R] := inferInstanceAs <| Module.Free R ℍ[R,-1,0,-1]
+instance : Module.IsFree R ℍ[R] := inferInstanceAs <| Module.IsFree R ℍ[R,-1,0,-1]
 
 theorem rank_eq_four [StrongRankCondition R] : Module.rank R ℍ[R] = 4 :=
   QuaternionAlgebra.rank_eq_four _ _ _

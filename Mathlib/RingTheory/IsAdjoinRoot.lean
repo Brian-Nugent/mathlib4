@@ -650,7 +650,7 @@ then `S` is given by adjoining a root of `minpoly R α`.
 Does not require that `R` is an integral domain, unlike `mkOfAdjoinEqTop`. -/
 @[simps]
 def mkOfAdjoinEqTop'
-    [Module.Finite R S] [Module.Free R S]
+    [Module.Finite R S] [Module.IsFree R S]
     {α : S} (hα : Algebra.adjoin R {α} = ⊤) :
     IsAdjoinRootMonic S (minpoly R α) where
   __ : IsAdjoinRoot S (minpoly R α) :=
@@ -678,7 +678,7 @@ def mkOfAdjoinEqTop'
 
 @[simp]
 theorem mkOfAdjoinEqTop'_root
-    [Module.Finite R S] [Module.Free R S]
+    [Module.Finite R S] [Module.IsFree R S]
     {α : S} (hα : Algebra.adjoin R {α} = ⊤) :
       (mkOfAdjoinEqTop' hα).root = α := by
   simp [IsAdjoinRoot.root]

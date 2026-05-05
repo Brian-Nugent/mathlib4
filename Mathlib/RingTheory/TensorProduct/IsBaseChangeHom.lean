@@ -59,7 +59,7 @@ def linearMapRightBaseChangeHom (ε : N →ₗ[R] P) :
     | add x y hx hy => simp [smul_add, hx, hy]
     | tmul t f => simp [TensorProduct.smul_tmul', mul_smul]
 
-variable [Free R M] [Module.Finite R M]
+variable [IsFree R M] [Module.Finite R M]
 
 variable {S}
 
@@ -68,9 +68,9 @@ noncomputable def linearMapRightBaseChangeEquiv
     {ε : N →ₗ[R] P} (ibc : IsBaseChange S ε) :
     S ⊗[R] (M →ₗ[R] N) ≃ₗ[S] (M →ₗ[R] P) := by
   apply LinearEquiv.ofBijective (linearMapRightBaseChangeHom S M ε)
-  let b := Free.chooseBasis R M
-  set ι := Free.ChooseBasisIndex R M
-  have := Free.ChooseBasisIndex.fintype R M
+  let b := IsFree.chooseBasis R M
+  set ι := IsFree.ChooseBasisIndex R M
+  have := IsFree.ChooseBasisIndex.fintype R M
   let e := (b.repr.congrLeft N R).trans (Finsupp.llift N R R ι).symm
   let f := (b.repr.congrLeft P S).trans (Finsupp.llift P R S ι).symm
   let h := linearMapRightBaseChangeHom S M ε
@@ -130,7 +130,7 @@ theorem linearMapLeftRightHom_apply
     (linearMapLeftRightHom j β f).restrictScalars R ∘ₗ α = β ∘ₗ f := by
   ext; simp [linearMapLeftRightHom_comp_apply]
 
-variable [Free R M] [Module.Finite R M]
+variable [IsFree R M] [Module.Finite R M]
 
 theorem linearMapLeftRight {α : M →ₗ[R] P} (j : IsBaseChange S α)
     {β : N →ₗ[R] Q} (k : IsBaseChange S β) :
@@ -180,7 +180,7 @@ theorem endHom_one {α : M →ₗ[R] P} (j : IsBaseChange S α) :
   | smul _ _ h => simp [h]
   | tmul m => simp [endHom_comp_apply]
 
-variable [Free R M] [Module.Finite R M]
+variable [IsFree R M] [Module.Finite R M]
 
 theorem _root_.IsBaseChange.end {α : M →ₗ[R] P} (j : IsBaseChange S α) :
     IsBaseChange S (endHom j) := by
@@ -225,7 +225,7 @@ variable {R : Type*} [CommRing R]
     (M : Type*) [AddCommGroup M] [Module R M]
     {P : Type*} [AddCommGroup P] [Module R P] [Module S P] [IsScalarTower R S P]
 
-variable [Free R M] [Module.Finite R M]
+variable [IsFree R M] [Module.Finite R M]
 
 theorem det_endHom {α : M →ₗ[R] P} (j : IsBaseChange S α) (f : M →ₗ[R] M) :
     LinearMap.det (endHom j f) = algebraMap R S (LinearMap.det f) := by

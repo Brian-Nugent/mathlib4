@@ -372,30 +372,30 @@ noncomputable def Module.basisOfFiniteTypeTorsionFree [Fintype ι] {s : ι → M
     -- hence `M` is free.
     exact ⟨n, b.map ψ.symm⟩
 
-theorem Module.free_of_finite_type_torsion_free [_root_.Finite ι] {s : ι → M}
-    (hs : span R (range s) = ⊤) [IsTorsionFree R M] : Module.Free R M := by
+theorem Module.IsFree_of_finite_type_torsion_free [_root_.Finite ι] {s : ι → M}
+    (hs : span R (range s) = ⊤) [IsTorsionFree R M] : Module.IsFree R M := by
   cases nonempty_fintype ι
   obtain ⟨n, b⟩ : Σ n, Basis (Fin n) R M := Module.basisOfFiniteTypeTorsionFree hs
-  exact Module.Free.of_basis b
+  exact Module.IsFree.of_basis b
 
 /-- A finite type torsion free module over a PID admits a basis. -/
 noncomputable def Module.basisOfFiniteTypeTorsionFree' [Module.Finite R M]
     [IsTorsionFree R M] : Σ n : ℕ, Basis (Fin n) R M :=
   Module.basisOfFiniteTypeTorsionFree Module.Finite.exists_fin.choose_spec.choose_spec
 
-instance Module.free_of_finite_type_torsion_free' [Module.Finite R M] [IsTorsionFree R M] :
-    Module.Free R M := by
+instance Module.IsFree_of_finite_type_torsion_free' [Module.Finite R M] [IsTorsionFree R M] :
+    Module.IsFree R M := by
   obtain ⟨n, b⟩ : Σ n, Basis (Fin n) R M := Module.basisOfFiniteTypeTorsionFree'
-  exact Module.Free.of_basis b
+  exact Module.IsFree.of_basis b
 
 instance {S : Type*} [CommRing S] [Algebra R S] {I : Ideal S} [hI₁ : Module.Finite R I]
-    [hI₂ : IsTorsionFree R I] : Free R I := by
+    [hI₂ : IsTorsionFree R I] : IsFree R I := by
   have : Module.Finite R (restrictScalars R I) := hI₁
   have : IsTorsionFree R (restrictScalars R I) := hI₂
-  change Module.Free R (restrictScalars R I)
-  exact Module.free_of_finite_type_torsion_free'
+  change Module.IsFree R (restrictScalars R I)
+  exact Module.IsFree_of_finite_type_torsion_free'
 
-theorem Module.free_iff_isTorsionFree [Module.Finite R M] : Free R M ↔ IsTorsionFree R M :=
+theorem Module.isFree_iff_isTorsionFree [Module.Finite R M] : IsFree R M ↔ IsTorsionFree R M :=
   ⟨fun _ ↦ inferInstance, fun _ ↦ inferInstance⟩
 
 end StrongRankCondition

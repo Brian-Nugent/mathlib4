@@ -35,10 +35,10 @@ such as being nilpotent, having determinant equal to 0, having a non-trivial ker
 public section
 
 variable {R K M : Type*} [CommRing R] [IsDomain R] [Field K] [AddCommGroup M]
-variable [Module R M] [Module.Finite R M] [Module.Free R M]
+variable [Module R M] [Module.Finite R M] [Module.IsFree R M]
 variable [Module K M] [Module.Finite K M]
 
-open Module Module.Free Polynomial
+open Module Module.IsFree Polynomial
 
 lemma IsNilpotent.charpoly_eq_X_pow_finrank {φ : Module.End R M} (h : IsNilpotent φ) :
     φ.charpoly = X ^ finrank R M := by
@@ -55,7 +55,7 @@ lemma isNilpotent_iff_charpoly (φ : End R M) :
   ⟨IsNilpotent.charpoly_eq_X_pow_finrank,
     fun h ↦ ⟨finrank R M, by rw [← @aeval_X_pow R, ← h, aeval_self_charpoly φ]⟩⟩
 
-open Module.Free in
+open Module.IsFree in
 lemma charpoly_nilpotent_tfae [IsNoetherian R M] (φ : Module.End R M) :
     List.TFAE [
       IsNilpotent φ,
@@ -85,7 +85,7 @@ lemma charpoly_eq_X_pow_iff [IsNoetherian R M] (φ : Module.End R M) :
     φ.charpoly = X ^ finrank R M ↔ ∀ m : M, ∃ (n : ℕ), (φ ^ n) m = 0 :=
   (charpoly_nilpotent_tfae φ).out 1 2
 
-open Module.Free in
+open Module.IsFree in
 lemma hasEigenvalue_zero_tfae (φ : Module.End K M) :
     List.TFAE [
       Module.End.HasEigenvalue φ 0,
@@ -121,7 +121,7 @@ lemma charpoly_constantCoeff_eq_zero_iff (φ : Module.End K M) :
     constantCoeff φ.charpoly = 0 ↔ ∃ (m : M), m ≠ 0 ∧ φ m = 0 :=
   (hasEigenvalue_zero_tfae φ).out 2 5
 
-open Module.Free in
+open Module.IsFree in
 lemma not_hasEigenvalue_zero_tfae (φ : Module.End K M) :
     List.TFAE [
       ¬ Module.End.HasEigenvalue φ 0,
@@ -137,7 +137,7 @@ lemma not_hasEigenvalue_zero_tfae (φ : Module.End K M) :
   have aux₂ : ker φ = ⊥ ↔ ¬ ⊥ < ker φ := by rw [bot_lt_iff_ne_bot, not_not]
   simpa only [aux₁, aux₂] using this
 
-open Module.Free in
+open Module.IsFree in
 lemma finrank_maxGenEigenspace_zero_eq (φ : Module.End K M) :
     finrank K (φ.maxGenEigenspace 0) = natTrailingDegree (φ.charpoly) := by
   set V := φ.maxGenEigenspace 0

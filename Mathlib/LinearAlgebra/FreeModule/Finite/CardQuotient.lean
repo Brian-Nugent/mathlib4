@@ -26,7 +26,7 @@ open Module Submodule
 
 section Submodule
 
-variable {M : Type*} [AddCommGroup M] [Module.Free ℤ M] [Module.Finite ℤ M]
+variable {M : Type*} [AddCommGroup M] [Module.IsFree ℤ M] [Module.Finite ℤ M]
 
 /-- Let `e : M ≃ N` be an additive isomorphism (therefore a `ℤ`-linear equiv).
 Then an alternative way to compute the cardinality of the quotient `M ⧸ N` is given by taking
@@ -38,7 +38,7 @@ theorem Submodule.natAbs_det_equiv (N : Submodule ℤ M) {E : Type*} [EquivLike 
       (LinearMap.det
         (N.subtype ∘ₗ AddMonoidHom.toIntLinearMap (e : M →+ N))) =
       Nat.card (M ⧸ N) := by
-  let b := Module.Free.chooseBasis ℤ M
+  let b := Module.IsFree.chooseBasis ℤ M
   -- Since `e : M ≃ₗ[ℤ] N`, the submodule `N` has full rank.
   have h : Module.finrank ℤ N = Module.finrank ℤ M :=
     (AddEquiv.toIntLinearEquiv e : M ≃ₗ[ℤ] N).symm.finrank_eq
@@ -98,7 +98,7 @@ section AddSubgroup
 theorem AddSubgroup.index_eq_natAbs_det {E : Type*} [AddCommGroup E] {ι : Type*}
     [DecidableEq ι] [Fintype ι] (bE : Basis ι ℤ E) (N : AddSubgroup E) (bN : Basis ι ℤ N) :
     N.index = (bE.det (bN ·)).natAbs :=
-  have : Module.Free ℤ E := Module.Free.of_basis bE
+  have : Module.IsFree ℤ E := Module.IsFree.of_basis bE
   have : Module.Finite ℤ E := Module.Finite.of_basis bE
   (Submodule.natAbs_det_basis_change bE N.toIntSubmodule bN).symm
 

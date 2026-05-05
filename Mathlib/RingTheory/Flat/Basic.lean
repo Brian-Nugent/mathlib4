@@ -228,7 +228,7 @@ instance of_projective [Projective R M] : Flat R M :=
   have ⟨e, he⟩:= Module.projective_def'.mp ‹_›
   of_retract _ _ he
 
-instance of_free [Free R M] : Flat R M := inferInstance
+instance of_free [IsFree R M] : Flat R M := inferInstance
 
 instance {S} [CommSemiring S] [Algebra R S] [Module S M] [IsScalarTower R S M]
     [Flat S M] [Flat R N] : Flat S (M ⊗[R] N) :=

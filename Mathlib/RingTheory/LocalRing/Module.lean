@@ -25,10 +25,10 @@ This file gathers various results about finite modules over a local ring `(R, �
 
 ## Main results
 - `IsLocalRing.subsingleton_tensorProduct`: If `M` is finitely generated, `k ⊗ M = 0 ↔ M = 0`.
-- `Module.free_of_maximalIdeal_rTensor_injective`:
+- `Module.IsFree_of_maximalIdeal_rTensor_injective`:
   If `M` is a finitely presented module such that `m ⊗ M → M` is injective
   (for example when `M` is flat), then `M` is free.
-- `Module.free_of_lTensor_residueField_injective`: If `N → M → P → 0` is a presentation of `P` with
+- `Module.IsFree_of_lTensor_residueField_injective`: If `N → M → P → 0` is a presentation of `P` with
   `N` finite and `M` finite free, then injectivity of `k ⊗ N → k ⊗ M` implies that `P` is free.
 - `IsLocalRing.split_injective_iff_lTensor_residueField_injective`:
   Given an `R`-linear map `l : M → N` with `M` finite and `N` finite free,
@@ -247,9 +247,9 @@ injective, then `M` is free.
 -/
 theorem free_of_maximalIdeal_rTensor_injective [Module.FinitePresentation R M]
     (H : Function.Injective ((𝔪).subtype.rTensor M)) :
-    Module.Free R M := by
+    Module.IsFree R M := by
   obtain ⟨_, _, b, _⟩ := exists_basis_of_span_of_maximalIdeal_rTensor_injective H id (by simp)
-  exact Free.of_basis b
+  exact IsFree.of_basis b
 
 theorem IsLocalRing.linearIndependent_of_flat [Flat R M] {ι : Type u} (v : ι → M)
     (h : LinearIndependent k (TensorProduct.mk R k M 1 ∘ v)) : LinearIndependent R v := by
@@ -299,8 +299,8 @@ theorem IsLocalRing.linearCombination_bijective_of_flat [Module.Finite R M] [Fla
   · simp
 
 @[stacks 00NZ]
-theorem free_of_flat_of_isLocalRing [Module.Finite R P] [Flat R P] : Free R P :=
-  let w := Free.chooseBasis k (k ⊗[R] P)
+theorem isFree_of_flat_of_isLocalRing [Module.Finite R P] [Flat R P] : IsFree R P :=
+  let w := IsFree.chooseBasis k (k ⊗[R] P)
   have ⟨v, eq⟩ := (TensorProduct.mk_surjective R P k Quotient.mk_surjective).comp_left w
   .of_basis <| .mk (IsLocalRing.linearIndependent_of_flat _ (eq ▸ w.linearIndependent)) <| by
     exact (span_eq_top_of_tmul_eq_basis _ w <| congr_fun eq).ge
@@ -310,9 +310,9 @@ If `M → N → P → 0` is a presentation of `P` over a local ring `(R, 𝔪, k
 `M` finite and `N` finite free, then injectivity of `k ⊗ M → k ⊗ N` implies that `P` is free.
 -/
 theorem free_of_lTensor_residueField_injective (hg : Surjective g) (h : Exact f g)
-    [Module.Finite R M] [Module.Finite R N] [Module.Free R N]
+    [Module.Finite R M] [Module.Finite R N] [Module.IsFree R N]
     (hf : Function.Injective (f.lTensor k)) :
-    Module.Free R P := by
+    Module.IsFree R P := by
   have := Module.finitePresentation_of_free_of_surjective g hg
     (by rw [h.linearMap_ker_eq, LinearMap.range_eq_map]; exact (Module.Finite.fg_top).map f)
   apply free_of_maximalIdeal_rTensor_injective
@@ -330,7 +330,7 @@ with `M` finite and `N` finite free,
 `l` is a split injection if and only if `k ⊗ l` is a (split) injection.
 -/
 theorem IsLocalRing.split_injective_iff_lTensor_residueField_injective [IsLocalRing R]
-    [Module.Finite R M] [Module.Finite R N] [Module.Free R N] (l : M →ₗ[R] N) :
+    [Module.Finite R M] [Module.Finite R N] [Module.IsFree R N] (l : M →ₗ[R] N) :
     (∃ l', l' ∘ₗ l = LinearMap.id) ↔ Function.Injective (l.lTensor (ResidueField R)) := by
   constructor
   · intro ⟨l', hl⟩
@@ -338,8 +338,8 @@ theorem IsLocalRing.split_injective_iff_lTensor_residueField_injective [IsLocalR
       rw [← LinearMap.lTensor_comp, hl, LinearMap.lTensor_id]
     exact Function.HasLeftInverse.injective ⟨_, LinearMap.congr_fun this⟩
   · intro h
-    -- By `Module.free_of_lTensor_residueField_injective`, `k ⊗ l` injective => `N ⧸ l(M)` free.
-    have := Module.free_of_lTensor_residueField_injective l (LinearMap.range l).mkQ
+    -- By `Module.IsFree_of_lTensor_residueField_injective`, `k ⊗ l` injective => `N ⧸ l(M)` free.
+    have := Module.IsFree_of_lTensor_residueField_injective l (LinearMap.range l).mkQ
       (Submodule.mkQ_surjective _) l.exact_map_mkQ_range h
     -- Hence `l(M)` is projective because `0 → l(M) → N → N ⧸ l(M) → 0` splits.
     have : Module.Projective R (LinearMap.range l) := by
@@ -419,7 +419,7 @@ at every maximal ideal, then `M` is free of rank `n`. -/
 
 @[stacks 02M9] theorem free_of_flat_of_finrank_eq [Module.Finite R M] [Flat R M]
     (n : ℕ) (rk : ∀ P : MaximalSpectrum R, finrank (R ⧸ P.1) ((R ⧸ P.1) ⊗[R] M) = n) :
-    Free R M :=
+    IsFree R M :=
   have ⟨b⟩ := nonempty_basis_of_flat_of_finrank_eq R M n rk
   .of_basis b
 

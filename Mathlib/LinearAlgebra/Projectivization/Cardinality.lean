@@ -66,7 +66,7 @@ lemma card : Nat.card V - 1 = Nat.card (ℙ k V) * (Nat.card k - 1) := by
   nontriviality V
   cases finite_or_infinite k with
   | inr h =>
-    have : Infinite V := Module.Free.infinite k V
+    have : Infinite V := Module.IsFree.infinite k V
     simp
   | inl h =>
   cases finite_or_infinite V with

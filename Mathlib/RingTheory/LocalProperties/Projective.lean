@@ -34,11 +34,11 @@ universe uM
 variable {R N N' : Type*} {M : Type uM} [CommRing R] [AddCommGroup M] [Module R M] [AddCommGroup N]
 variable [Module R N] [AddCommGroup N'] [Module R N'] (S : Submonoid R)
 
-theorem Module.free_of_isLocalizedModule {Rₛ Mₛ} [AddCommGroup Mₛ] [Module R Mₛ]
+theorem Module.IsFree_of_isLocalizedModule {Rₛ Mₛ} [AddCommGroup Mₛ] [Module R Mₛ]
     [CommRing Rₛ] [Algebra R Rₛ] [Module Rₛ Mₛ] [IsScalarTower R Rₛ Mₛ]
-    (S) (f : M →ₗ[R] Mₛ) [IsLocalization S Rₛ] [IsLocalizedModule S f] [Module.Free R M] :
-    Module.Free Rₛ Mₛ :=
-  Free.of_equiv (IsLocalizedModule.isBaseChange S Rₛ f).equiv
+    (S) (f : M →ₗ[R] Mₛ) [IsLocalization S Rₛ] [IsLocalizedModule S f] [Module.IsFree R M] :
+    Module.IsFree Rₛ Mₛ :=
+  IsFree.of_equiv (IsLocalizedModule.isBaseChange S Rₛ f).equiv
 
 universe uR' uM' in
 /--
@@ -48,7 +48,7 @@ but requires `S` to not contain any zero-divisors.
 theorem Module.lift_rank_of_isLocalizedModule_of_free
     (Rₛ : Type uR') {Mₛ : Type uM'} [AddCommGroup Mₛ] [Module R Mₛ]
     [CommRing Rₛ] [Algebra R Rₛ] [Module Rₛ Mₛ] [IsScalarTower R Rₛ Mₛ] (S : Submonoid R)
-    (f : M →ₗ[R] Mₛ) [IsLocalization S Rₛ] [IsLocalizedModule S f] [Module.Free R M]
+    (f : M →ₗ[R] Mₛ) [IsLocalization S Rₛ] [IsLocalizedModule S f] [Module.IsFree R M]
     [Nontrivial Rₛ] :
     Cardinal.lift.{uM} (Module.rank Rₛ Mₛ) = Cardinal.lift.{uM'} (Module.rank R M) := by
   apply Cardinal.lift_injective.{max uM' uR'}
@@ -62,7 +62,7 @@ theorem Module.lift_rank_of_isLocalizedModule_of_free
 theorem Module.finrank_of_isLocalizedModule_of_free
     (Rₛ : Type*) {Mₛ : Type*} [AddCommGroup Mₛ] [Module R Mₛ]
     [CommRing Rₛ] [Algebra R Rₛ] [Module Rₛ Mₛ] [IsScalarTower R Rₛ Mₛ] (S : Submonoid R)
-    (f : M →ₗ[R] Mₛ) [IsLocalization S Rₛ] [IsLocalizedModule S f] [Module.Free R M]
+    (f : M →ₗ[R] Mₛ) [IsLocalization S Rₛ] [IsLocalizedModule S f] [Module.IsFree R M]
     [Nontrivial Rₛ] :
     Module.finrank Rₛ Mₛ = Module.finrank R M := by
   simpa using congr(Cardinal.toNat $(Module.lift_rank_of_isLocalizedModule_of_free Rₛ S f))

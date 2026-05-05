@@ -194,7 +194,7 @@ lemma TensorProduct.sum_tmul_basis_left_eq_zero
 
 end
 
-instance Module.Free.tensor [Module.Free S M] [Module.Free R N] : Module.Free S (M ⊗[R] N) :=
+instance Module.IsFree.tensor [Module.IsFree S M] [Module.IsFree R N] : Module.IsFree S (M ⊗[R] N) :=
   let ⟨bM⟩ := exists_basis (R := S) (M := M)
   let ⟨bN⟩ := exists_basis (R := R) (M := N)
   of_basis (bM.2.tensorProduct bN.2)

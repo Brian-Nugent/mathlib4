@@ -164,21 +164,21 @@ include hS'
 
 /-- In a short exact sequence `0 ⟶ X₁ ⟶ X₂ ⟶ X₃ ⟶ 0`, if `X₁` and `X₃` are free,
 then `X₂` is free. -/
-theorem free_shortExact [Module.Free R S.X₁] [Module.Free R S.X₃] :
-    Module.Free R S.X₂ :=
-  Module.Free.of_basis (Basis.ofShortExact hS' (Module.Free.chooseBasis R S.X₁)
-    (Module.Free.chooseBasis R S.X₃))
+theorem free_shortExact [Module.IsFree R S.X₁] [Module.IsFree R S.X₃] :
+    Module.IsFree R S.X₂ :=
+  Module.IsFree.of_basis (Basis.ofShortExact hS' (Module.IsFree.chooseBasis R S.X₁)
+    (Module.IsFree.chooseBasis R S.X₃))
 
-theorem free_shortExact_rank_add [Module.Free R S.X₁] [Module.Free R S.X₃]
+theorem free_shortExact_rank_add [Module.IsFree R S.X₁] [Module.IsFree R S.X₃]
     [StrongRankCondition R] :
     Module.rank R S.X₂ = Module.rank R S.X₁ + Module.rank R S.X₃ := by
   haveI := free_shortExact hS'
-  rw [Module.Free.rank_eq_card_chooseBasisIndex, Module.Free.rank_eq_card_chooseBasisIndex R S.X₁,
-    Module.Free.rank_eq_card_chooseBasisIndex R S.X₃, Cardinal.add_def, Cardinal.eq]
-  exact ⟨Basis.indexEquiv (Module.Free.chooseBasis R S.X₂) (Basis.ofShortExact hS'
-    (Module.Free.chooseBasis R S.X₁) (Module.Free.chooseBasis R S.X₃))⟩
+  rw [Module.IsFree.rank_eq_card_chooseBasisIndex, Module.IsFree.rank_eq_card_chooseBasisIndex R S.X₁,
+    Module.IsFree.rank_eq_card_chooseBasisIndex R S.X₃, Cardinal.add_def, Cardinal.eq]
+  exact ⟨Basis.indexEquiv (Module.IsFree.chooseBasis R S.X₂) (Basis.ofShortExact hS'
+    (Module.IsFree.chooseBasis R S.X₁) (Module.IsFree.chooseBasis R S.X₃))⟩
 
-theorem free_shortExact_finrank_add {n p : ℕ} [Module.Free R S.X₁] [Module.Free R S.X₃]
+theorem free_shortExact_finrank_add {n p : ℕ} [Module.IsFree R S.X₁] [Module.IsFree R S.X₃]
     [Module.Finite R S.X₁] [Module.Finite R S.X₃]
     (hN : Module.finrank R S.X₁ = n)
     (hP : Module.finrank R S.X₃ = p)

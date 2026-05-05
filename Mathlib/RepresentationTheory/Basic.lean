@@ -753,8 +753,8 @@ noncomputable def finsuppLEquivFreeAsModule : (α →₀ k[G]) ≃ₗ[k[G]] (fre
 noncomputable def freeAsModuleBasis : Basis α k[G] (free k G α).asModule where
   repr := (finsuppLEquivFreeAsModule k G α).symm
 
-theorem free_asModule_free : Module.Free k[G] (free k G α).asModule :=
-  Module.Free.of_basis (freeAsModuleBasis k G α)
+theorem free_asModule_free : Module.IsFree k[G] (free k G α).asModule :=
+  Module.IsFree.of_basis (freeAsModuleBasis k G α)
 
 end
 end Representation

@@ -35,12 +35,12 @@ variable (R : Type u) (S : Type*) [CommRing R] [CommRing S] [Algebra R S]
 /-- EGA IV₁, 1.4.7.1 -/
 lemma Module.Finite.exists_free_surjective [Module.Finite R S] :
     ∃ (S' : Type u) (_ : CommRing S') (_ : Algebra R S') (_ : Module.Finite R S')
-      (_ : Module.Free R S') (_ : Algebra.FinitePresentation R S')
+      (_ : Module.IsFree R S') (_ : Algebra.FinitePresentation R S')
       (f : S' →ₐ[R] S), Function.Surjective f := by
   classical
   obtain ⟨s, hs⟩ : (⊤ : Submodule R S).FG := Module.finite_def.mp inferInstance
   suffices h : ∃ (S' : Type u) (_ : CommRing S') (_ : Algebra R S') (_ : Module.Finite R S')
-      (_ : Module.Free R S') (_ : Algebra.FinitePresentation R S')
+      (_ : Module.IsFree R S') (_ : Algebra.FinitePresentation R S')
       (f : S' →ₐ[R] S), (s : Set S) ⊆ AlgHom.range f by
     obtain ⟨S', _, _, _, _, _, f, hsf⟩ := h
     have hf : Function.Surjective f := by

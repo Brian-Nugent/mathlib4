@@ -122,7 +122,7 @@ variable [Finite ι]
   a consequence of the Erdős-Kaplansky theorem. -/
 theorem Basis.linearEquiv_dual_iff_finiteDimensional [Field K] [AddCommGroup V] [Module K V] :
     Nonempty (V ≃ₗ[K] Dual K V) ↔ FiniteDimensional K V := by
-  refine ⟨fun ⟨e⟩ ↦ ?_, fun h ↦ ⟨(Module.Free.chooseBasis K V).toDualEquiv⟩⟩
+  refine ⟨fun ⟨e⟩ ↦ ?_, fun h ↦ ⟨(Module.IsFree.chooseBasis K V).toDualEquiv⟩⟩
   rw [FiniteDimensional, ← Module.rank_lt_aleph0_iff]
   by_contra!
   apply (lift_rank_lt_rank_dual this).ne
@@ -139,8 +139,8 @@ namespace Module
 
 variable [Module.Finite R M]
 
-instance dual_free [Free R M] : Free R (Dual R M) :=
-  Free.of_basis (Free.chooseBasis R M).dualBasis
+instance dual_free [IsFree R M] : IsFree R (Dual R M) :=
+  IsFree.of_basis (IsFree.chooseBasis R M).dualBasis
 
 instance dual_projective [Projective R M] : Projective R (Dual R M) :=
   have ⟨_, f, g, _, _, hfg⟩ := Finite.exists_comp_eq_id_of_projective R M
@@ -148,7 +148,7 @@ instance dual_projective [Projective R M] : Projective R (Dual R M) :=
 
 instance dual_finite [Projective R M] : Module.Finite R (Dual R M) :=
   have ⟨n, f, g, _, _, hfg⟩ := Finite.exists_comp_eq_id_of_projective R M
-  have := Finite.of_basis (Free.chooseBasis R <| Fin n → R).dualBasis
+  have := Finite.of_basis (IsFree.chooseBasis R <| Fin n → R).dualBasis
   .of_surjective _ (surjective_of_comp_eq_id f.dualMap g.dualMap <| congr_arg dualMap hfg)
 
 end Module
@@ -197,7 +197,7 @@ theorem eval_apply_eq_zero_iff (v : V) : (eval K V) v = 0 ↔ v = 0 :=
 theorem Projective.exists_dual_ne_zero (R : Type*) [Semiring R] [Module R V]
     [Projective R V] {x : V} (hx : x ≠ 0) : ∃ f : Dual R V, f x ≠ 0 :=
   have ⟨M, _, _, _, ⟨i, s, his⟩⟩ := Projective.iff_split.mp ‹Projective R V›
-  let b := Free.chooseBasis R M
+  let b := IsFree.chooseBasis R M
   have : i x ≠ 0 := i.map_eq_zero_iff (injective_of_comp_eq_id i s his) |>.not.mpr hx
   have ⟨j, hj⟩ := not_forall.mp fun h ↦ b.repr.map_ne_zero_iff.mpr this <| Finsupp.ext h
   ⟨b.coord j ∘ₗ i, hj⟩
@@ -229,9 +229,9 @@ instance instNontrivialDual [Nontrivial V] : Nontrivial (Dual K V) :=
 omit [Projective K V] in
 /-- For an example of a non-free projective `K`-module `V` for which the forward implication
 fails, see https://stacks.math.columbia.edu/tag/05WG#comment-9913. -/
-theorem finite_dual_iff [Free K V] : Module.Finite K (Dual K V) ↔ Module.Finite K V := by
+theorem finite_dual_iff [IsFree K V] : Module.Finite K (Dual K V) ↔ Module.Finite K V := by
   refine ⟨fun h ↦ ?_, fun _ ↦ inferInstance⟩
-  have ⟨⟨ι, b⟩⟩ := Free.exists_basis (R := K) (M := V)
+  have ⟨⟨ι, b⟩⟩ := IsFree.exists_basis (R := K) (M := V)
   cases finite_or_infinite ι
   · exact .of_basis b
   nontriviality K
@@ -244,9 +244,9 @@ end
 
 omit [Projective K V]
 
-theorem dual_rank_eq [Free K V] [Module.Finite K V] :
+theorem dual_rank_eq [IsFree K V] [Module.Finite K V] :
     Module.rank K (Dual K V) = Cardinal.lift.{uK, uV} (Module.rank K V) :=
-  (Free.chooseBasis K V).dual_rank_eq
+  (IsFree.chooseBasis K V).dual_rank_eq
 
 section IsReflexive
 
@@ -256,10 +256,10 @@ variable (R M N : Type*)
 variable [CommSemiring R] [AddCommMonoid M] [AddCommMonoid N] [Module R M] [Module R N]
 
 /-- See also `Module.instFiniteDimensionalOfIsReflexive` for the converse over a field. -/
-instance (priority := 900) IsReflexive.of_finite_of_free [Module.Finite R M] [Free R M] :
+instance (priority := 900) IsReflexive.of_finite_of_free [Module.Finite R M] [IsFree R M] :
     IsReflexive R M where
-  bijective_dual_eval'.left := (Free.chooseBasis R M).eval_injective
-  bijective_dual_eval'.right := range_eq_top.mp (Free.chooseBasis R M).eval_range
+  bijective_dual_eval'.left := (IsFree.chooseBasis R M).eval_injective
+  bijective_dual_eval'.right := range_eq_top.mp (IsFree.chooseBasis R M).eval_range
 
 variable [IsReflexive R M]
 
@@ -637,7 +637,7 @@ theorem dualQuotEquivDualAnnihilator_symm_apply_mk (W : Submodule R M) (φ : W.d
     (x : M) : (dualQuotEquivDualAnnihilator W).symm φ (Quotient.mk x) = φ x :=
   rfl
 
-theorem finite_dualAnnihilator_iff {W : Submodule R M} [Free R (M ⧸ W)] :
+theorem finite_dualAnnihilator_iff {W : Submodule R M} [IsFree R (M ⧸ W)] :
     Module.Finite R W.dualAnnihilator ↔ Module.Finite R (M ⧸ W) :=
   (Finite.equiv_iff W.dualQuotEquivDualAnnihilator.symm).trans (finite_dual_iff R)
 
@@ -1024,9 +1024,9 @@ def orderIsoFiniteDimensional [FiniteDimensional K V] :
 open Submodule in
 theorem dualAnnihilator_dualAnnihilator_eq_map (W : Subspace K V) [FiniteDimensional K W] :
     W.dualAnnihilator.dualAnnihilator = W.map (Dual.eval K V) := by
-  let e1 := (Free.chooseBasis K W).toDualEquiv ≪≫ₗ W.quotAnnihilatorEquiv.symm
+  let e1 := (IsFree.chooseBasis K W).toDualEquiv ≪≫ₗ W.quotAnnihilatorEquiv.symm
   haveI := e1.finiteDimensional
-  let e2 := (Free.chooseBasis K _).toDualEquiv ≪≫ₗ W.dualAnnihilator.dualQuotEquivDualAnnihilator
+  let e2 := (IsFree.chooseBasis K _).toDualEquiv ≪≫ₗ W.dualAnnihilator.dualQuotEquivDualAnnihilator
   haveI := LinearEquiv.finiteDimensional (V₂ := W.dualAnnihilator.dualAnnihilator) e2
   rw [eq_of_le_of_finrank_eq (map_le_dualAnnihilator_dualAnnihilator W)]
   rw [← (equivMapOfInjective _ (eval_apply_injective K (V := V)) W).finrank_eq, e1.finrank_eq]
@@ -1179,7 +1179,7 @@ noncomputable def dualDistribEquivOfBasis (b : Basis ι R M) (c : Basis κ R N) 
   · exact dualDistrib_dualDistribInvOfBasis_right_inverse _ _
 
 variable (R M N)
-variable [Module.Finite R M] [Module.Finite R N] [Module.Free R M] [Module.Free R N]
+variable [Module.Finite R M] [Module.Finite R N] [Module.IsFree R M] [Module.IsFree R N]
 
 /--
 A linear equivalence between `Dual M ⊗ Dual N` and `Dual (M ⊗ N)` when `M` and `N` are finite free
@@ -1188,6 +1188,6 @@ isomorphism `R ⊗ R ≃ R`.
 -/
 @[simp]
 noncomputable def dualDistribEquiv : Dual R M ⊗[R] Dual R N ≃ₗ[R] Dual R (M ⊗[R] N) :=
-  dualDistribEquivOfBasis (Module.Free.chooseBasis R M) (Module.Free.chooseBasis R N)
+  dualDistribEquivOfBasis (Module.IsFree.chooseBasis R M) (Module.IsFree.chooseBasis R N)
 
 end TensorProduct

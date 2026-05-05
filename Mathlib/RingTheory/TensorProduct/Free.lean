@@ -14,7 +14,7 @@ public import Mathlib.LinearAlgebra.Matrix.ToLin
 # Results on bases of tensor products
 
 In the file we construct a basis for the base change of a module to an algebra,
-and deduce that `Module.Free` is stable under base change.
+and deduce that `Module.IsFree` is stable under base change.
 
 ## Main declarations
 
@@ -109,10 +109,10 @@ end baseChange
 end Basis
 
 instance instFree (R A M : Type*)
-    [CommSemiring R] [AddCommMonoid M] [Module R M] [Module.Free R M]
+    [CommSemiring R] [AddCommMonoid M] [Module R M] [Module.IsFree R M]
     [CommSemiring A] [Algebra R A] :
-    Module.Free A (A ⊗[R] M) :=
-  Module.Free.of_basis <| Algebra.TensorProduct.basis A (Module.Free.chooseBasis R M)
+    Module.IsFree A (A ⊗[R] M) :=
+  Module.IsFree.of_basis <| Algebra.TensorProduct.basis A (Module.IsFree.chooseBasis R M)
 
 end TensorProduct
 

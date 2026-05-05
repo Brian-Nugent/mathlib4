@@ -53,7 +53,7 @@ noncomputable def basis (n : ℕ) : Basis (Fin n) R R[X]_n :=
   .ofEquivFun (degreeLTEquiv R n)
 
 instance : Module.Finite R R[X]_n := .of_basis <| basis ..
-instance : Module.Free R R[X]_n := .of_basis <| basis ..
+instance : Module.IsFree R R[X]_n := .of_basis <| basis ..
 
 @[simp] lemma basis_repr : (basis R n).repr P i = (P : R[X]).coeff i :=
   rfl

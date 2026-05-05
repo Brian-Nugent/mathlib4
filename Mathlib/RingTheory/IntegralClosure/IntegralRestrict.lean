@@ -304,7 +304,7 @@ lemma Algebra.algebraMap_intTrace_fractionRing (x : B) :
 
 variable (A B)
 
-lemma Algebra.intTrace_eq_trace [Module.Free A B] : Algebra.intTrace A B = Algebra.trace A B := by
+lemma Algebra.intTrace_eq_trace [Module.IsFree A B] : Algebra.intTrace A B = Algebra.trace A B := by
   ext x
   haveI : IsIntegralClosure B A (FractionRing B) :=
     IsIntegralClosure.of_isIntegrallyClosed _ _ _
@@ -429,7 +429,7 @@ theorem Algebra.intNorm_intNorm {C : Type*} [CommRing C] [IsDomain C] [IsIntegra
   rw [algebraMap_intNorm_fractionRing, algebraMap_intNorm_fractionRing,
     algebraMap_intNorm_fractionRing, Algebra.norm_norm]
 
-lemma Algebra.intNorm_eq_norm [Module.Free A B] [Module.Finite A B] :
+lemma Algebra.intNorm_eq_norm [Module.IsFree A B] [Module.Finite A B] :
     Algebra.intNorm A B = Algebra.norm A := by
   ext x
   haveI : IsIntegralClosure B A (FractionRing B) :=

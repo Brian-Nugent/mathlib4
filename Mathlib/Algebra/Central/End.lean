@@ -16,7 +16,7 @@ This file shows that the algebra of endomorphisms on a free module is central.
 
 open Module
 
-variable {R S M : Type*} [Semiring R] [AddCommMonoid M] [Module R M] [Free R M]
+variable {R S M : Type*} [Semiring R] [AddCommMonoid M] [Module R M] [IsFree R M]
   [CommSemiring S] [Module S M] [SMulCommClass R S M] [Algebra S R] [IsScalarTower S R M]
 
 public theorem Module.End.mem_subsemiringCenter_iff {f : End R M} :

@@ -337,11 +337,11 @@ theorem _root_.IsField.of_isDomain_of_finite (K L : Type*) [Field K] [CommRing L
 
 section Semiring
 
-variable (R M : Type*) [Semiring R] [AddCommMonoid M] [Module R M] [Free R M] [Module.Finite R M]
+variable (R M : Type*) [Semiring R] [AddCommMonoid M] [Module R M] [IsFree R M] [Module.Finite R M]
 variable [IsStablyFiniteRing R]
 
 instance : IsStablyFiniteRing (Module.End R M) := by
-  let e := (Module.Free.chooseBasis R M).repr ≪≫ₗ Finsupp.linearEquivFunOnFinite ..
+  let e := (Module.IsFree.chooseBasis R M).repr ≪≫ₗ Finsupp.linearEquivFunOnFinite ..
   rw [RingEquiv.isStablyFiniteRing_iff e.conjRingEquiv]
   infer_instance
 

@@ -94,12 +94,12 @@ end Prod
 
 end Basis
 
-namespace Free
+namespace IsFree
 
 variable (R M N : Type*) [Semiring R] [AddCommMonoid M] [Module R M] [AddCommMonoid N] [Module R N]
-instance prod [Module.Free R M] [Module.Free R N] : Module.Free R (M × N) :=
-  .of_basis <| (Module.Free.chooseBasis R M).prod (Module.Free.chooseBasis R N)
+instance prod [Module.IsFree R M] [Module.IsFree R N] : Module.IsFree R (M × N) :=
+  .of_basis <| (Module.IsFree.chooseBasis R M).prod (Module.IsFree.chooseBasis R N)
 
-end Free
+end IsFree
 
 end Module

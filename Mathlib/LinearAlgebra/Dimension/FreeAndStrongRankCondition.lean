@@ -33,24 +33,24 @@ variable {K : Type u} {V : Type v} [Ring K] [StrongRankCondition K] [AddCommGrou
 
 See also `Module.finBasis`.
 -/
-noncomputable def Basis.ofRankEqZero [Module.Free K V] {ι : Type*} [IsEmpty ι]
+noncomputable def Basis.ofRankEqZero [Module.IsFree K V] {ι : Type*} [IsEmpty ι]
     (hV : Module.rank K V = 0) : Basis ι K V :=
   haveI : Subsingleton V := by
-    obtain ⟨_, b⟩ := Module.Free.exists_basis (R := K) (M := V)
+    obtain ⟨_, b⟩ := Module.IsFree.exists_basis (R := K) (M := V)
     haveI := mk_eq_zero_iff.1 (hV ▸ b.mk_eq_rank'')
     exact b.repr.toEquiv.subsingleton
   Basis.empty _
 
 @[simp]
-theorem Basis.ofRankEqZero_apply [Module.Free K V] {ι : Type*} [IsEmpty ι]
+theorem Basis.ofRankEqZero_apply [Module.IsFree K V] {ι : Type*} [IsEmpty ι]
     (hV : Module.rank K V = 0) (i : ι) : Basis.ofRankEqZero hV i = 0 := rfl
 
-theorem le_rank_iff_exists_linearIndependent [Module.Free K V] {c : Cardinal} :
+theorem le_rank_iff_exists_linearIndependent [Module.IsFree K V] {c : Cardinal} :
     c ≤ Module.rank K V ↔ ∃ s : Set V, #s = c ∧ LinearIndepOn K id s := by
   haveI := nontrivial_of_invariantBasisNumber K
   constructor
   · intro h
-    obtain ⟨κ, t'⟩ := Module.Free.exists_basis (R := K) (M := V)
+    obtain ⟨κ, t'⟩ := Module.IsFree.exists_basis (R := K) (M := V)
     let t := t'.reindexRange
     have : LinearIndepOn K id (Set.range t') := by
       convert t.linearIndependent.linearIndepOn_id
@@ -63,7 +63,7 @@ theorem le_rank_iff_exists_linearIndependent [Module.Free K V] {c : Cardinal} :
     exact si.cardinal_le_rank
 
 theorem le_rank_iff_exists_linearIndependent_finset
-    [Module.Free K V] {n : ℕ} : ↑n ≤ Module.rank K V ↔
+    [Module.IsFree K V] {n : ℕ} : ↑n ≤ Module.rank K V ↔
     ∃ s : Finset V, s.card = n ∧ LinearIndependent K ((↑) : ↥(s : Set V) → V) := by
   simp only [le_rank_iff_exists_linearIndependent, mk_set_eq_nat_iff_finset]
   constructor
@@ -74,9 +74,9 @@ theorem le_rank_iff_exists_linearIndependent_finset
 
 /-- A vector space has dimension at most `1` if and only if there is a
 single vector of which all vectors are multiples. -/
-theorem rank_le_one_iff [Module.Free K V] :
+theorem rank_le_one_iff [Module.IsFree K V] :
     Module.rank K V ≤ 1 ↔ ∃ v₀ : V, ∀ v, ∃ r : K, r • v₀ = v := by
-  obtain ⟨κ, b⟩ := Module.Free.exists_basis (R := K) (M := V)
+  obtain ⟨κ, b⟩ := Module.IsFree.exists_basis (R := K) (M := V)
   constructor
   · intro hd
     rw [← b.mk_eq_rank'', le_one_iff_subsingleton] at hd
@@ -102,7 +102,7 @@ theorem rank_le_one_iff [Module.Free K V] :
 
 /-- A vector space has dimension `1` if and only if there is a
 single non-zero vector of which all vectors are multiples. -/
-theorem rank_eq_one_iff [Module.Free K V] :
+theorem rank_eq_one_iff [Module.IsFree K V] :
     Module.rank K V = 1 ↔ ∃ v₀ : V, v₀ ≠ 0 ∧ ∀ v, ∃ r : K, r • v₀ = v := by
   haveI := nontrivial_of_invariantBasisNumber K
   refine ⟨fun h ↦ ?_, fun ⟨v₀, h, hv⟩ ↦ (rank_le_one_iff.2 ⟨v₀, hv⟩).antisymm ?_⟩
@@ -113,7 +113,7 @@ theorem rank_eq_one_iff [Module.Free K V] :
     exact one_ne_zero (h ▸ rank_subsingleton' K V)
   · by_contra H
     rw [not_le, Cardinal.lt_one_iff] at H
-    obtain ⟨κ, b⟩ := Module.Free.exists_basis (R := K) (M := V)
+    obtain ⟨κ, b⟩ := Module.IsFree.exists_basis (R := K) (M := V)
     haveI := mk_eq_zero_iff.1 (H ▸ b.mk_eq_rank'')
     haveI := b.repr.toEquiv.subsingleton
     exact h (Subsingleton.elim _ _)
@@ -121,7 +121,7 @@ theorem rank_eq_one_iff [Module.Free K V] :
 /-- A submodule has dimension at most `1` if and only if there is a
 single vector in the submodule such that the submodule is contained in
 its span. -/
-theorem rank_submodule_le_one_iff (s : Submodule K V) [Module.Free K s] :
+theorem rank_submodule_le_one_iff (s : Submodule K V) [Module.IsFree K s] :
     Module.rank K s ≤ 1 ↔ ∃ v₀ ∈ s, s ≤ K ∙ v₀ := by
   simp_rw [rank_le_one_iff, le_span_singleton_iff]
   simp
@@ -129,7 +129,7 @@ theorem rank_submodule_le_one_iff (s : Submodule K V) [Module.Free K s] :
 /-- A submodule has dimension `1` if and only if there is a
 single non-zero vector in the submodule such that the submodule is contained in
 its span. -/
-theorem rank_submodule_eq_one_iff (s : Submodule K V) [Module.Free K s] :
+theorem rank_submodule_eq_one_iff (s : Submodule K V) [Module.IsFree K s] :
     Module.rank K s = 1 ↔ ∃ v₀ ∈ s, v₀ ≠ 0 ∧ s ≤ K ∙ v₀ := by
   simp_rw [rank_eq_one_iff, le_span_singleton_iff]
   refine ⟨fun ⟨⟨v₀, hv₀⟩, H, h⟩ ↦ ⟨v₀, hv₀, fun h' ↦ by
@@ -144,7 +144,7 @@ theorem rank_submodule_eq_one_iff (s : Submodule K V) [Module.Free K s] :
 /-- A submodule has dimension at most `1` if and only if there is a
 single vector, not necessarily in the submodule, such that the
 submodule is contained in its span. -/
-theorem rank_submodule_le_one_iff' (s : Submodule K V) [Module.Free K s] :
+theorem rank_submodule_le_one_iff' (s : Submodule K V) [Module.IsFree K s] :
     Module.rank K s ≤ 1 ↔ ∃ v₀, s ≤ K ∙ v₀ := by
   haveI := nontrivial_of_invariantBasisNumber K
   constructor
@@ -152,11 +152,11 @@ theorem rank_submodule_le_one_iff' (s : Submodule K V) [Module.Free K s] :
     rintro ⟨v₀, _, h⟩
     exact ⟨v₀, h⟩
   · rintro ⟨v₀, h⟩
-    obtain ⟨κ, b⟩ := Module.Free.exists_basis (R := K) (M := s)
+    obtain ⟨κ, b⟩ := Module.IsFree.exists_basis (R := K) (M := s)
     simpa [b.mk_eq_rank''] using b.linearIndependent.map' _ (ker_inclusion _ _ h)
       |>.cardinal_le_rank.trans (rank_span_le {v₀})
 
-theorem Submodule.rank_le_one_iff_isPrincipal (W : Submodule K V) [Module.Free K W] :
+theorem Submodule.rank_le_one_iff_isPrincipal (W : Submodule K V) [Module.IsFree K W] :
     Module.rank K W ≤ 1 ↔ W.IsPrincipal := by
   simp only [rank_le_one_iff, Submodule.isPrincipal_iff, le_antisymm_iff, le_span_singleton_iff,
     span_singleton_le_iff_mem]
@@ -168,15 +168,15 @@ theorem Submodule.rank_le_one_iff_isPrincipal (W : Submodule K V) [Module.Free K
     choose f hf using h
     exact ⟨⟨a, ha⟩, fun v => ⟨f v.1 v.2, Subtype.ext (hf v.1 v.2)⟩⟩
 
-theorem Module.rank_le_one_iff_top_isPrincipal [Module.Free K V] :
+theorem Module.rank_le_one_iff_top_isPrincipal [Module.IsFree K V] :
     Module.rank K V ≤ 1 ↔ (⊤ : Submodule K V).IsPrincipal := by
-  haveI := Module.Free.of_equiv (topEquiv (R := K) (M := V)).symm
+  haveI := Module.IsFree.of_equiv (topEquiv (R := K) (M := V)).symm
   rw [← Submodule.rank_le_one_iff_isPrincipal, rank_top]
 
 /-- A module has dimension 1 iff there is some `v : V` so `{v}` is a basis.
 
 See also `Module.Basis.nonempty_unique_index_of_finrank_eq_one` -/
-theorem finrank_eq_one_iff [Module.Free K V] (ι : Type*) [Unique ι] :
+theorem finrank_eq_one_iff [Module.IsFree K V] (ι : Type*) [Unique ι] :
     finrank K V = 1 ↔ Nonempty (Basis ι K V) := by
   constructor
   · intro h
@@ -186,7 +186,7 @@ theorem finrank_eq_one_iff [Module.Free K V] (ι : Type*) [Unique ι] :
 
 /-- A module has dimension 1 iff there is some nonzero `v : V` so every vector is a multiple of `v`.
 -/
-theorem finrank_eq_one_iff' [Module.Free K V] :
+theorem finrank_eq_one_iff' [Module.IsFree K V] :
     finrank K V = 1 ↔ ∃ v ≠ 0, ∀ w : V, ∃ c : K, c • v = w := by
   rw [← rank_eq_one_iff]
   exact toNat_eq_iff one_ne_zero
@@ -194,24 +194,24 @@ theorem finrank_eq_one_iff' [Module.Free K V] :
 /-- A finite-dimensional module has dimension at most 1 iff
 there is some `v : V` so every vector is a multiple of `v`.
 -/
-theorem finrank_le_one_iff [Module.Free K V] [Module.Finite K V] :
+theorem finrank_le_one_iff [Module.IsFree K V] [Module.Finite K V] :
     finrank K V ≤ 1 ↔ ∃ v : V, ∀ w : V, ∃ c : K, c • v = w := by
   rw [← rank_le_one_iff, ← finrank_eq_rank, Nat.cast_le_one]
 
 theorem Submodule.finrank_le_one_iff_isPrincipal
-    (W : Submodule K V) [Module.Free K W] [Module.Finite K W] :
+    (W : Submodule K V) [Module.IsFree K W] [Module.Finite K W] :
     finrank K W ≤ 1 ↔ W.IsPrincipal := by
   rw [← W.rank_le_one_iff_isPrincipal, ← finrank_eq_rank, Nat.cast_le_one]
 
-theorem Module.finrank_le_one_iff_top_isPrincipal [Module.Free K V] [Module.Finite K V] :
+theorem Module.finrank_le_one_iff_top_isPrincipal [Module.IsFree K V] [Module.Finite K V] :
     finrank K V ≤ 1 ↔ (⊤ : Submodule K V).IsPrincipal := by
   rw [← Module.rank_le_one_iff_top_isPrincipal, ← finrank_eq_rank, Nat.cast_le_one]
 
 variable (K V) in
-theorem lift_cardinalMk_eq_lift_cardinalMk_field_pow_lift_rank [Module.Free K V]
+theorem lift_cardinalMk_eq_lift_cardinalMk_field_pow_lift_rank [Module.IsFree K V]
     [Module.Finite K V] : lift.{u} #V = lift.{v} #K ^ lift.{u} (Module.rank K V) := by
   haveI := nontrivial_of_invariantBasisNumber K
-  obtain ⟨s, hs⟩ := Module.Free.exists_basis (R := K) (M := V)
+  obtain ⟨s, hs⟩ := Module.IsFree.exists_basis (R := K) (M := V)
   -- `Module.Finite.finite_basis` is in a much later file, so we copy its proof to here
   haveI : Finite s := by
     obtain ⟨t, ht⟩ := ‹Module.Finite K V›
@@ -221,12 +221,12 @@ theorem lift_cardinalMk_eq_lift_cardinalMk_field_pow_lift_rank [Module.Free K V]
     lift_lift, lift_umax] at this
 
 theorem cardinalMk_eq_cardinalMk_field_pow_rank (K V : Type u) [Ring K] [StrongRankCondition K]
-    [AddCommGroup V] [Module K V] [Module.Free K V] [Module.Finite K V] :
+    [AddCommGroup V] [Module K V] [Module.IsFree K V] [Module.Finite K V] :
     #V = #K ^ Module.rank K V := by
   simpa using lift_cardinalMk_eq_lift_cardinalMk_field_pow_lift_rank K V
 
 variable (K V) in
-theorem cardinal_lt_aleph0_of_finiteDimensional [Finite K] [Module.Free K V] [Module.Finite K V] :
+theorem cardinal_lt_aleph0_of_finiteDimensional [Finite K] [Module.IsFree K V] [Module.Finite K V] :
     #V < ℵ₀ := by
   rw [← lift_lt_aleph0.{v, u}, lift_cardinalMk_eq_lift_cardinalMk_field_pow_lift_rank K V]
   exact power_lt_aleph0 (lift_lt_aleph0.2 (lt_aleph0_of_finite K))
@@ -239,9 +239,9 @@ namespace Subalgebra
 variable {F E : Type*} [CommRing F] [StrongRankCondition F] [Ring E] [Algebra F E]
   {S : Subalgebra F E}
 
-theorem eq_bot_of_rank_le_one (h : Module.rank F S ≤ 1) [Module.Free F S] : S = ⊥ := by
+theorem eq_bot_of_rank_le_one (h : Module.rank F S ≤ 1) [Module.IsFree F S] : S = ⊥ := by
   nontriviality E
-  obtain ⟨κ, b⟩ := Module.Free.exists_basis (R := F) (M := S)
+  obtain ⟨κ, b⟩ := Module.IsFree.exists_basis (R := F) (M := S)
   by_cases h1 : Module.rank F S = 1
   · refine bot_unique fun x hx ↦ Algebra.mem_bot.2 ?_
     rw [← b.mk_eq_rank'', eq_one_iff_unique, ← unique_iff_subsingleton_and_nonempty] at h1
@@ -253,16 +253,16 @@ theorem eq_bot_of_rank_le_one (h : Module.rank F S ≤ 1) [Module.Free F S] : S 
   haveI := b.repr.toEquiv.subsingleton
   exact False.elim <| one_ne_zero congr(S.val $(Subsingleton.elim 1 0))
 
-theorem eq_bot_of_finrank_one (h : finrank F S = 1) [Module.Free F S] : S = ⊥ := by
+theorem eq_bot_of_finrank_one (h : finrank F S = 1) [Module.IsFree F S] : S = ⊥ := by
   refine Subalgebra.eq_bot_of_rank_le_one ?_
   rw [finrank, toNat_eq_one] at h
   rw [h]
 
 @[simp]
-theorem rank_eq_one_iff [Nontrivial E] [Module.Free F S] : Module.rank F S = 1 ↔ S = ⊥ := by
+theorem rank_eq_one_iff [Nontrivial E] [Module.IsFree F S] : Module.rank F S = 1 ↔ S = ⊥ := by
   refine ⟨fun h ↦ Subalgebra.eq_bot_of_rank_le_one h.le, ?_⟩
   rintro rfl
-  obtain ⟨κ, b⟩ := Module.Free.exists_basis (R := F) (M := (⊥ : Subalgebra F E))
+  obtain ⟨κ, b⟩ := Module.IsFree.exists_basis (R := F) (M := (⊥ : Subalgebra F E))
   refine le_antisymm ?_ ?_
   · have := lift_rank_range_le (Algebra.linearMap F E)
     rwa [← one_eq_range, rank_self, lift_one, lift_le_one_iff,
@@ -274,18 +274,18 @@ theorem rank_eq_one_iff [Nontrivial E] [Module.Free F S] : Module.rank F S = 1 �
     exact one_ne_zero congr((⊥ : Subalgebra F E).val $(Subsingleton.elim 1 0))
 
 @[simp]
-theorem finrank_eq_one_iff [Nontrivial E] [Module.Free F S] : finrank F S = 1 ↔ S = ⊥ := by
+theorem finrank_eq_one_iff [Nontrivial E] [Module.IsFree F S] : finrank F S = 1 ↔ S = ⊥ := by
   rw [← Subalgebra.rank_eq_one_iff]
   exact toNat_eq_iff one_ne_zero
 
-theorem bot_eq_top_iff_rank_eq_one [Nontrivial E] [Module.Free F E] :
+theorem bot_eq_top_iff_rank_eq_one [Nontrivial E] [Module.IsFree F E] :
     (⊥ : Subalgebra F E) = ⊤ ↔ Module.rank F E = 1 := by
-  haveI := Module.Free.of_equiv (Subalgebra.topEquiv (R := F) (A := E)).toLinearEquiv.symm
+  haveI := Module.IsFree.of_equiv (Subalgebra.topEquiv (R := F) (A := E)).toLinearEquiv.symm
   rw [← rank_top, Subalgebra.rank_eq_one_iff, eq_comm]
 
-theorem bot_eq_top_iff_finrank_eq_one [Nontrivial E] [Module.Free F E] :
+theorem bot_eq_top_iff_finrank_eq_one [Nontrivial E] [Module.IsFree F E] :
     (⊥ : Subalgebra F E) = ⊤ ↔ finrank F E = 1 := by
-  haveI := Module.Free.of_equiv (Subalgebra.topEquiv (R := F) (A := E)).toLinearEquiv.symm
+  haveI := Module.IsFree.of_equiv (Subalgebra.topEquiv (R := F) (A := E)).toLinearEquiv.symm
   rw [← finrank_top, ← subalgebra_top_finrank_eq_submodule_top_finrank,
     Subalgebra.finrank_eq_one_iff, eq_comm]
 

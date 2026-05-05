@@ -455,7 +455,7 @@ private lemma statement : ∀ S : InductionObj R n, Statement R₀ R n S := by
     · simp
   · intro R _ g i hi hi_min _ R₀ _ f
     let M := R[X] ⧸ Ideal.span {g.1 i}
-    have : Module.Free R M := .of_basis (AdjoinRoot.powerBasis' hi).basis
+    have : Module.IsFree R M := .of_basis (AdjoinRoot.powerBasis' hi).basis
     have : Module.Finite R M := .of_basis (AdjoinRoot.powerBasis' hi).basis
     refine ⟨(Finset.range (Module.finrank R M)).image
       fun j ↦ ⟨(Algebra.lmul R M (Ideal.Quotient.mk _ f)).charpoly.coeff j, 0, 0⟩, ?_, ?_⟩

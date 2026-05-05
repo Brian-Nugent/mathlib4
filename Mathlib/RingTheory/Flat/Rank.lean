@@ -32,7 +32,7 @@ universe u
 
 open TensorProduct
 
-attribute [local instance] Module.free_of_flat_of_isLocalRing
+attribute [local instance] Module.IsFree_of_flat_of_isLocalRing
 
 variable {R S : Type*} [CommRing R] [CommRing S] [Algebra R S] [Module.Flat R S] [Module.Finite R S]
 
@@ -84,7 +84,7 @@ lemma Module.algebraMap_surjective_of_rankAtStalk_le_one (h : ∀ p, rankAtStalk
       apply Module.subsingleton_of_rank_zero (R := Localization.AtPrime p)
       simp [← finrank_eq_rank, ← rankAtStalk_eq_finrank_tensorProduct ⟨p, inferInstance⟩, hr]
     exact Function.surjective_to_subsingleton _
-  · refine (Free.bijective_algebraMap_of_finrank_eq_one ?_).2
+  · refine (IsFree.bijective_algebraMap_of_finrank_eq_one ?_).2
     grind [rankAtStalk_eq_finrank_tensorProduct ⟨p, inferInstance⟩]
 
 attribute [local instance] Algebra.TensorProduct.rightAlgebra in

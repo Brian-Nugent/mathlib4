@@ -733,7 +733,7 @@ lemma iSup_genWeightSpaceOf_eq_top [IsTriangularizable R L M] (x : L) :
 open LinearMap Module in
 @[simp]
 lemma trace_toEnd_genWeightSpace [IsDomain R] [IsPrincipalIdealRing R]
-    [Module.Free R M] [Module.Finite R M] (χ : L → R) (x : L) :
+    [Module.IsFree R M] [Module.Finite R M] (χ : L → R) (x : L) :
     trace R _ (toEnd R L (genWeightSpace M χ) x) = finrank R (genWeightSpace M χ) • χ x := by
   suffices _root_.IsNilpotent ((toEnd R L (genWeightSpace M χ) x) - χ x • LinearMap.id) by
     replace this := (isNilpotent_trace_of_isNilpotent this).eq_zero

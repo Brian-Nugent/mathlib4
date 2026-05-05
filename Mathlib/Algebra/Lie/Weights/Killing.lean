@@ -79,7 +79,7 @@ lemma traceForm_cartan_nondegenerate
   simp [LinearMap.separatingLeft_iff_ker_eq_bot,
     (LieModule.traceForm_isSymm R H L).isRefl.nondegenerate_iff_separatingLeft]
 
-variable [Module.Free R L] [Module.Finite R L]
+variable [Module.IsFree R L] [Module.Finite R L]
 
 instance instIsLieAbelianOfIsCartanSubalgebra
     [IsDomain R] [IsPrincipalIdealRing R] [IsArtinian R L]

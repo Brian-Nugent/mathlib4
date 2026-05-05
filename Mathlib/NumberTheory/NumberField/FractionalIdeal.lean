@@ -36,8 +36,8 @@ section Basis
 
 open Module
 
-instance (I : FractionalIdeal (𝓞 K)⁰ K) : Module.Free ℤ I := by
-  refine Free.of_equiv (LinearEquiv.restrictScalars ℤ (I.equivNum ?_)).symm
+instance (I : FractionalIdeal (𝓞 K)⁰ K) : Module.IsFree ℤ I := by
+  refine IsFree.of_equiv (LinearEquiv.restrictScalars ℤ (I.equivNum ?_)).symm
   exact nonZeroDivisors.coe_ne_zero I.den
 
 instance (I : FractionalIdeal (𝓞 K)⁰ K) : Module.Finite ℤ I := by
@@ -71,16 +71,16 @@ instance (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ) :
 
 /-- A `ℤ`-basis of a fractional ideal. -/
 noncomputable def fractionalIdealBasis (I : FractionalIdeal (𝓞 K)⁰ K) :
-    Basis (Free.ChooseBasisIndex ℤ I) ℤ I := Free.chooseBasis ℤ I
+    Basis (IsFree.ChooseBasisIndex ℤ I) ℤ I := IsFree.chooseBasis ℤ I
 
 /-- A `ℚ`-basis of `K` that spans `I` over `ℤ`, see `mem_span_basisOfFractionalIdeal` below. -/
 noncomputable def basisOfFractionalIdeal (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ) :
-    Basis (Free.ChooseBasisIndex ℤ I) ℚ K :=
+    Basis (IsFree.ChooseBasisIndex ℤ I) ℚ K :=
   (fractionalIdealBasis K I.1).ofIsLocalizedModule ℚ ℤ⁰
     ((Submodule.subtype (I : Submodule (𝓞 K) K)).restrictScalars ℤ)
 
 theorem basisOfFractionalIdeal_apply (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ)
-    (i : Free.ChooseBasisIndex ℤ I) :
+    (i : IsFree.ChooseBasisIndex ℤ I) :
     basisOfFractionalIdeal K I i = fractionalIdealBasis K I.1 i :=
   (fractionalIdealBasis K I.1).ofIsLocalizedModule_apply ℚ ℤ⁰ _ i
 
@@ -104,7 +104,7 @@ open Module
 /-- The absolute value of the determinant of the base change from `integralBasis` to
 `basisOfFractionalIdeal I` is equal to the norm of `I`. -/
 theorem det_basisOfFractionalIdeal_eq_absNorm (I : (FractionalIdeal (𝓞 K)⁰ K)ˣ)
-    (e : (Free.ChooseBasisIndex ℤ (𝓞 K)) ≃ (Free.ChooseBasisIndex ℤ I)) :
+    (e : (IsFree.ChooseBasisIndex ℤ (𝓞 K)) ≃ (IsFree.ChooseBasisIndex ℤ I)) :
     |(integralBasis K).det ((basisOfFractionalIdeal K I).reindex e.symm)| =
       FractionalIdeal.absNorm I.1 := by
   rw [← FractionalIdeal.abs_det_basis_change (RingOfIntegers.basis K) I.1

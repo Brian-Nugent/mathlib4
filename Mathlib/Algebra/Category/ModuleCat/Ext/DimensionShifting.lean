@@ -41,8 +41,8 @@ theorem ModuleCat.shortExact_projectiveShortComplex [Small.{v} R] (M : ModuleCat
   refine fun m ↦ ⟨Finsupp.single m 1, ?_⟩
   simp [Module.Basis.constr_apply]
 
-instance [Small.{v} R] (M : ModuleCat.{v} R) : Module.Free R M.projectiveShortComplex.X₂ :=
-  Module.Free.finsupp R _ _
+instance [Small.{v} R] (M : ModuleCat.{v} R) : Module.IsFree R M.projectiveShortComplex.X₂ :=
+  Module.IsFree.finsupp R _ _
 
 /-- The connection maps in the contravariant long exact sequence of `Ext` are surjective if
 the middle term of the short exact sequence is projective. -/

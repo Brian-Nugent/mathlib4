@@ -291,19 +291,19 @@ lemma polyCharpolyAux_eval_eq_toMatrix_charpoly_coeff (x : L) (i : ℕ) :
   simp [← polyCharpolyAux_map_eq_toMatrix_charpoly φ b bₘ x]
 
 @[simp]
-lemma polyCharpolyAux_map_eq_charpoly [Module.Finite R M] [Module.Free R M]
+lemma polyCharpolyAux_map_eq_charpoly [Module.Finite R M] [Module.IsFree R M]
     (x : L) :
     (polyCharpolyAux φ b bₘ).map (MvPolynomial.eval (b.repr x)) = (φ x).charpoly := by
   nontriviality R
   rw [polyCharpolyAux_map_eq_toMatrix_charpoly, LinearMap.charpoly_toMatrix]
 
 @[simp]
-lemma polyCharpolyAux_coeff_eval [Module.Finite R M] [Module.Free R M] (x : L) (i : ℕ) :
+lemma polyCharpolyAux_coeff_eval [Module.Finite R M] [Module.IsFree R M] (x : L) (i : ℕ) :
     MvPolynomial.eval (b.repr x) ((polyCharpolyAux φ b bₘ).coeff i) = (φ x).charpoly.coeff i := by
   nontriviality R
   rw [← polyCharpolyAux_map_eq_charpoly φ b bₘ x, Polynomial.coeff_map]
 
-lemma polyCharpolyAux_map_eval [Module.Finite R M] [Module.Free R M]
+lemma polyCharpolyAux_map_eval [Module.Finite R M] [Module.IsFree R M]
     (x : ι → R) :
     (polyCharpolyAux φ b bₘ).map (MvPolynomial.eval x) =
       (φ (b.repr.symm (Finsupp.equivFunOnFinite.symm x))).charpoly := by
@@ -312,7 +312,7 @@ lemma polyCharpolyAux_map_eval [Module.Finite R M] [Module.Free R M]
 
 open Algebra.TensorProduct TensorProduct in
 lemma polyCharpolyAux_map_aeval
-    (A : Type*) [CommRing A] [Algebra R A] [Module.Finite A (A ⊗[R] M)] [Module.Free A (A ⊗[R] M)]
+    (A : Type*) [CommRing A] [Algebra R A] [Module.Finite A (A ⊗[R] M)] [Module.IsFree A (A ⊗[R] M)]
     (x : ι → A) :
     (polyCharpolyAux φ b bₘ).map (MvPolynomial.aeval x).toRingHom =
       LinearMap.charpoly ((tensorProduct R A M M).comp (baseChange A φ)
@@ -343,15 +343,15 @@ lemma polyCharpolyAux_basisIndep {ιM' : Type*} [Fintype ιM'] [DecidableEq ιM'
   apply hf
   let _h1 : Module.Finite (MvPolynomial ι R) (TensorProduct R (MvPolynomial ι R) M) :=
     Module.Finite.of_basis (basis (MvPolynomial ι R) bₘ)
-  let _h2 : Module.Free (MvPolynomial ι R) (TensorProduct R (MvPolynomial ι R) M) :=
-    Module.Free.of_basis (basis (MvPolynomial ι R) bₘ)
+  let _h2 : Module.IsFree (MvPolynomial ι R) (TensorProduct R (MvPolynomial ι R) M) :=
+    Module.IsFree.of_basis (basis (MvPolynomial ι R) bₘ)
   simp only [f, polyCharpolyAux_map_aeval, polyCharpolyAux_map_aeval]
 
 end aux
 
 open Module Matrix
 
-variable [Module.Free R M] [Module.Finite R M] (b : Basis ι R L)
+variable [Module.IsFree R M] [Module.Finite R M] (b : Basis ι R L)
 
 /-- Let `L` and `M` be finite free modules over `R`,
 and let `φ : L →ₗ[R] Module.End R M` be a linear family of endomorphisms.
@@ -360,12 +360,12 @@ Then `LinearMap.polyCharpoly φ b` is the polynomial that evaluates on elements 
 to the characteristic polynomial of `φ x` acting on `M`. -/
 noncomputable
 def polyCharpoly : Polynomial (MvPolynomial ι R) :=
-  φ.polyCharpolyAux b (Module.Free.chooseBasis R M)
+  φ.polyCharpolyAux b (Module.IsFree.chooseBasis R M)
 
 lemma polyCharpoly_eq_of_basis [DecidableEq ιM] (bₘ : Basis ιM R M) :
     polyCharpoly φ b =
     (charpoly.univ R ιM).map (MvPolynomial.bind₁ (φ.toMvPolynomial b bₘ.end)) := by
-  rw [polyCharpoly, φ.polyCharpolyAux_basisIndep b (Module.Free.chooseBasis R M) bₘ,
+  rw [polyCharpoly, φ.polyCharpolyAux_basisIndep b (Module.IsFree.chooseBasis R M) bₘ,
     polyCharpolyAux]
 
 lemma polyCharpoly_monic : (polyCharpoly φ b).Monic :=
@@ -410,7 +410,7 @@ lemma polyCharpoly_coeff_eq_zero_of_basis (b : Basis ι R L) (b' : Basis ι' R L
     (H : (polyCharpoly φ b).coeff k = 0) :
     (polyCharpoly φ b').coeff k = 0 := by
   rw [polyCharpoly, polyCharpolyAux, Polynomial.coeff_map] at H ⊢
-  set B := (Module.Free.chooseBasis R M).end
+  set B := (Module.IsFree.chooseBasis R M).end
   set g := toMvPolynomial b' b LinearMap.id
   apply_fun (MvPolynomial.bind₁ g) at H
   have : toMvPolynomial b' B φ = fun i ↦ (MvPolynomial.bind₁ g) (toMvPolynomial b B φ i) :=
@@ -452,7 +452,7 @@ lemma nilRankAux_basis_indep [Nontrivial R] (b : Basis ι R L) (b' : Basis ι' R
 
 end aux
 
-variable [Module.Finite R L] [Module.Free R L]
+variable [Module.Finite R L] [Module.IsFree R L]
 
 /-- Let `L` and `M` be finite free modules over `R`,
 and let `φ : L →ₗ[R] Module.End R M` be a linear family of endomorphisms.
@@ -463,7 +463,7 @@ This number does not depend on the choice of `b`,
 see `LinearMap.nilRank_eq_polyCharpoly_natTrailingDegree`. -/
 noncomputable
 def nilRank (φ : L →ₗ[R] Module.End R M) : ℕ :=
-  nilRankAux φ (Module.Free.chooseBasis R L)
+  nilRankAux φ (Module.IsFree.chooseBasis R L)
 
 section
 variable [Nontrivial R]
@@ -477,7 +477,7 @@ lemma polyCharpoly_coeff_nilRank_ne_zero :
   rw [nilRank_eq_polyCharpoly_natTrailingDegree _ b]
   apply polyCharpoly_coeff_nilRankAux_ne_zero
 
-open Module Module.Free
+open Module Module.IsFree
 
 lemma nilRank_le_card {ι : Type*} [Fintype ι] (b : Basis ι R M) : nilRank φ ≤ Fintype.card ι := by
   apply Polynomial.natTrailingDegree_le_of_ne_zero
@@ -536,7 +536,7 @@ section IsDomain
 
 variable [IsDomain R]
 
-open Cardinal Module MvPolynomial Module.Free in
+open Cardinal Module MvPolynomial Module.IsFree in
 lemma exists_isNilRegular_of_finrank_le_card (h : finrank R M ≤ #R) :
     ∃ x : L, IsNilRegular φ x := by
   let b := chooseBasis R L

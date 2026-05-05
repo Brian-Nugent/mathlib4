@@ -14,7 +14,7 @@ public import Mathlib.Logic.UnivLE
 # Presentation of free modules
 
 A module is free iff it admits a presentation with generators but no relation,
-see `Module.free_iff_exists_presentation`.
+see `Module.isFree_iff_exists_presentation`.
 
 -/
 
@@ -57,8 +57,8 @@ variable {relations}
 
 lemma Solution.IsPresentation.free {solution : relations.Solution M}
     (h : solution.IsPresentation) :
-    Module.Free A M :=
-  Free.of_equiv ((solutionFinsupp_isPresentation relations).uniq h)
+    Module.IsFree A M :=
+  IsFree.of_equiv ((solutionFinsupp_isPresentation relations).uniq h)
 
 end Relations
 
@@ -76,10 +76,10 @@ noncomputable def presentationFinsupp (G : Type w₀) :
   toSolution := Relations.solutionFinsupp _
   toIsPresentation := by exact Relations.solutionFinsupp_isPresentation _
 
-lemma free_iff_exists_presentation :
-    Free A M ↔ ∃ (p : Presentation.{v, w₁} A M), IsEmpty p.R := by
+lemma isFree_iff_exists_presentation :
+    IsFree A M ↔ ∃ (p : Presentation.{v, w₁} A M), IsEmpty p.R := by
   constructor
-  · rw [free_def.{_, _, v}]
+  · rw [isFree_def.{_, _, v}]
     rintro ⟨G, ⟨⟨e⟩⟩⟩
     exact ⟨(presentationFinsupp A G).ofLinearEquiv e.symm, by dsimp; infer_instance⟩
   · rintro ⟨p, h⟩

@@ -66,8 +66,8 @@ theorem basis_repr_comp (v : V) :
   simp [basis_repr_comp_apply]
 
 include ibc in
-theorem free [Module.Free R V] : Module.Free S W :=
-  Module.Free.of_basis (ibc.basis (Module.Free.chooseBasis R V))
+theorem free [Module.IsFree R V] : Module.IsFree S W :=
+  Module.IsFree.of_basis (ibc.basis (Module.IsFree.chooseBasis R V))
 
 end IsBaseChange
 

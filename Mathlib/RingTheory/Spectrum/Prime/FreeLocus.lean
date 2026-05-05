@@ -24,8 +24,8 @@ public import Mathlib.RingTheory.Support
 ## Main definitions and results
 
 Let `M` be a finitely presented `R`-module.
-- `Module.freeLocus`: The set of points `x` in `Spec R` such that `Mₓ` is free over `Rₓ`.
-- `Module.freeLocus_eq_univ_iff`:
+- `Module.IsFreeLocus`: The set of points `x` in `Spec R` such that `Mₓ` is free over `Rₓ`.
+- `Module.IsFreeLocus_eq_univ_iff`:
   The free locus is the whole `Spec R` if and only if `M` is projective.
 - `Module.basicOpen_subset_freeLocus_iff`: `D(f)` is contained in the free locus if and only if
   `M_f` is projective over `R_f`.
@@ -47,12 +47,12 @@ open PrimeSpectrum TensorProduct
 
 /-- The free locus of a module, i.e. the set of primes `p` such that `Mₚ` is free over `Rₚ`. -/
 def freeLocus : Set (PrimeSpectrum R) :=
-  { p | Module.Free (Localization.AtPrime p.asIdeal) (LocalizedModule p.asIdeal.primeCompl M) }
+  { p | Module.IsFree (Localization.AtPrime p.asIdeal) (LocalizedModule p.asIdeal.primeCompl M) }
 
 variable {R M}
 
 lemma mem_freeLocus {p} : p ∈ freeLocus R M ↔
-    Module.Free (Localization.AtPrime p.asIdeal) (LocalizedModule p.asIdeal.primeCompl M) :=
+    Module.IsFree (Localization.AtPrime p.asIdeal) (LocalizedModule p.asIdeal.primeCompl M) :=
   Iff.rfl
 
 attribute [local instance] RingHomInvPair.of_ringEquiv in
@@ -60,10 +60,10 @@ lemma mem_freeLocus_of_isLocalization (p : PrimeSpectrum R)
     (Rₚ Mₚ) [CommRing Rₚ] [Algebra R Rₚ] [IsLocalization.AtPrime Rₚ p.asIdeal]
     [AddCommGroup Mₚ] [Module R Mₚ] (f : M →ₗ[R] Mₚ) [IsLocalizedModule p.asIdeal.primeCompl f]
     [Module Rₚ Mₚ] [IsScalarTower R Rₚ Mₚ] :
-    p ∈ freeLocus R M ↔ Module.Free Rₚ Mₚ := by
+    p ∈ freeLocus R M ↔ Module.IsFree Rₚ Mₚ := by
   set e := (IsLocalization.algEquiv p.asIdeal.primeCompl
       (Localization.AtPrime p.asIdeal) Rₚ).toRingEquiv
-  apply Module.Free.iff_of_equiv (σ := e)
+  apply Module.IsFree.iff_of_equiv (σ := e)
   refine { __ := IsLocalizedModule.iso p.asIdeal.primeCompl f, map_smul' := ?_ }
   intro r x
   obtain ⟨r, s, rfl⟩ := IsLocalization.exists_mk'_eq p.asIdeal.primeCompl r
@@ -77,7 +77,7 @@ lemma mem_freeLocus_of_isLocalization (p : PrimeSpectrum R)
 attribute [local instance] RingHomInvPair.of_ringEquiv in
 lemma mem_freeLocus_iff_tensor (p : PrimeSpectrum R)
     (Rₚ) [CommRing Rₚ] [Algebra R Rₚ] [IsLocalization.AtPrime Rₚ p.asIdeal] :
-    p ∈ freeLocus R M ↔ Module.Free Rₚ (Rₚ ⊗[R] M) := by
+    p ∈ freeLocus R M ↔ Module.IsFree Rₚ (Rₚ ⊗[R] M) := by
   exact mem_freeLocus_of_isLocalization p Rₚ (f := TensorProduct.mk R Rₚ M 1)
 
 lemma freeLocus_congr {M'} [AddCommGroup M'] [Module R M'] (e : M ≃ₗ[R] M') :
@@ -159,12 +159,12 @@ lemma freeLocus_eq_univ_iff [Module.FinitePresentation R M] :
     freeLocus R M = Set.univ ↔ Module.Projective R M := by
   simp_rw [Set.eq_univ_iff_forall, mem_freeLocus]
   exact ⟨fun H ↦ Module.projective_of_localization_maximal fun I hI ↦
-    have := H ⟨I, hI.isPrime⟩; .of_free, fun H x ↦ Module.free_of_flat_of_isLocalRing⟩
+    have := H ⟨I, hI.isPrime⟩; .of_free, fun H x ↦ Module.IsFree_of_flat_of_isLocalRing⟩
 
 lemma freeLocus_eq_univ [Module.Finite R M] [Module.Flat R M] :
     freeLocus R M = Set.univ := by
   simp_rw [Set.eq_univ_iff_forall, mem_freeLocus]
-  exact fun x ↦ Module.free_of_flat_of_isLocalRing
+  exact fun x ↦ Module.IsFree_of_flat_of_isLocalRing
 
 lemma basicOpen_subset_freeLocus_iff [Module.FinitePresentation R M] {f : R} :
     (basicOpen f : Set (PrimeSpectrum R)) ⊆ freeLocus R M ↔
@@ -175,7 +175,7 @@ lemma basicOpen_subset_freeLocus_iff [Module.FinitePresentation R M] {f : R} :
 lemma isOpen_freeLocus [Module.FinitePresentation R M] :
     IsOpen (freeLocus R M) := by
   refine isOpen_iff_forall_mem_open.mpr fun x hx ↦ ?_
-  have : Module.Free _ _ := hx
+  have : Module.IsFree _ _ := hx
   obtain ⟨r, hr, hr', _⟩ := Module.FinitePresentation.exists_free_localizedModule_powers
     x.asIdeal.primeCompl (LocalizedModule.mkLinearMap x.asIdeal.primeCompl M)
     (Localization.AtPrime x.asIdeal)
@@ -190,7 +190,7 @@ def rankAtStalk (p : PrimeSpectrum R) : ℕ :=
 lemma isLocallyConstant_rankAtStalk_freeLocus [Module.FinitePresentation R M] :
     IsLocallyConstant (fun x : freeLocus R M ↦ rankAtStalk M x.1) := by
   refine (IsLocallyConstant.iff_exists_open _).mpr fun ⟨x, hx⟩ ↦ ?_
-  have : Module.Free _ _ := hx
+  have : Module.IsFree _ _ := hx
   obtain ⟨f, hf, hf', hf''⟩ := Module.FinitePresentation.exists_free_localizedModule_powers
     x.asIdeal.primeCompl (LocalizedModule.mkLinearMap x.asIdeal.primeCompl M)
     (Localization.AtPrime x.asIdeal)
@@ -251,7 +251,7 @@ lemma rankAtStalk_eq_of_equiv {N : Type*} [AddCommGroup N] [Module R N] (e : M �
 
 /-- If `M` is `R`-free, its rank at stalks is constant and agrees with the `R`-rank of `M`. -/
 @[simp]
-lemma rankAtStalk_eq_finrank_of_free [Module.Free R M] :
+lemma rankAtStalk_eq_finrank_of_free [Module.IsFree R M] :
     rankAtStalk (R := R) M = Module.finrank R M := by
   ext p
   simp [rankAtStalk, finrank_of_isLocalizedModule_of_free _ p.asIdeal.primeCompl
@@ -274,9 +274,9 @@ lemma rankAtStalk_pi {ι : Type*} [Finite ι] (M : ι → Type*)
       Π i, LocalizedModule p.asIdeal.primeCompl (M i) :=
     IsLocalizedModule.linearEquiv p.asIdeal.primeCompl
       (mkLinearMap _ _) f |>.extendScalarsOfIsLocalization p.asIdeal.primeCompl _
-  have (i : ι) : Free (Localization.AtPrime p.asIdeal)
+  have (i : ι) : IsFree (Localization.AtPrime p.asIdeal)
       (LocalizedModule p.asIdeal.primeCompl (M i)) :=
-    free_of_flat_of_isLocalRing
+    isFree_of_flat_of_isLocalRing
   simp_rw [rankAtStalk, e.finrank_eq, Module.finrank_pi_fintype, finsum_eq_sum_of_fintype]
 
 lemma rankAtStalk_eq_finrank_tensorProduct (p : PrimeSpectrum R) :
@@ -289,7 +289,7 @@ lemma rankAtStalk_eq_finrank_tensorProduct (p : PrimeSpectrum R) :
 
 variable [Flat R M] [Module.Finite R M]
 
-attribute [local instance] free_of_flat_of_isLocalRing
+attribute [local instance] isFree_of_flat_of_isLocalRing
 
 lemma rankAtStalk_eq_zero_iff_notMem_support (p : PrimeSpectrum R) :
     rankAtStalk M p = 0 ↔ p ∉ support R M := by

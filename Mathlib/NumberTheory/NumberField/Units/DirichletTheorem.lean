@@ -423,8 +423,8 @@ theorem logEmbeddingEquiv_apply (x : (𝓞 K)ˣ) :
     logEmbeddingEquiv K (Additive.ofMul (QuotientGroup.mk x)) =
       logEmbedding K (Additive.ofMul x) := rfl
 
-instance : Module.Free ℤ (Additive ((𝓞 K)ˣ ⧸ (torsion K))) := by
-  classical exact Module.Free.of_equiv (logEmbeddingEquiv K).symm
+instance : Module.IsFree ℤ (Additive ((𝓞 K)ˣ ⧸ (torsion K))) := by
+  classical exact Module.IsFree.of_equiv (logEmbeddingEquiv K).symm
 
 instance : Module.Finite ℤ (Additive ((𝓞 K)ˣ ⧸ (torsion K))) := by
   classical exact Module.Finite.equiv (logEmbeddingEquiv K).symm
@@ -455,7 +455,7 @@ theorem rank_modTorsion :
 
 /-- A basis of the quotient `(𝓞 K)ˣ ⧸ (torsion K)` seen as an additive ℤ-module. -/
 def basisModTorsion : Basis (Fin (rank K)) ℤ (Additive ((𝓞 K)ˣ ⧸ (torsion K))) :=
-  Basis.reindex (Module.Free.chooseBasis ℤ _) (Fintype.equivOfCardEq <| by
+  Basis.reindex (Module.IsFree.chooseBasis ℤ _) (Fintype.equivOfCardEq <| by
     rw [← Module.finrank_eq_card_chooseBasisIndex, rank_modTorsion, Fintype.card_fin])
 
 /-- The basis of the `unitLattice` obtained by mapping `basisModTorsion` via `logEmbedding`. -/

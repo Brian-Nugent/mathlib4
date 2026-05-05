@@ -42,14 +42,14 @@ theorem max_aleph0_card_le_rank_fun_nat : max ℵ₀ #K ≤ Module.rank K (ℕ �
   obtain card_K | card_K := le_or_gt #K ℵ₀
   · exact card_K.trans aleph0_le
   by_contra!
-  obtain ⟨⟨ιK, bK⟩⟩ := Module.Free.exists_basis (R := K) (M := ℕ → K)
+  obtain ⟨⟨ιK, bK⟩⟩ := Module.IsFree.exists_basis (R := K) (M := ℕ → K)
   let L := Subfield.closure (Set.range (fun i : ιK × ℕ ↦ bK i.1 i.2))
   have hLK : #L < #K := by
     refine (Subfield.cardinalMk_closure_le_max _).trans_lt
       (max_lt_iff.mpr ⟨mk_range_le.trans_lt ?_, card_K⟩)
     rwa [mk_prod, ← aleph0, lift_uzero, bK.mk_eq_rank'', mul_aleph0_eq aleph0_le]
   letI := Module.compHom K (RingHom.op L.subtype)
-  obtain ⟨⟨ιL, bL⟩⟩ := Module.Free.exists_basis (R := Lᵐᵒᵖ) (M := K)
+  obtain ⟨⟨ιL, bL⟩⟩ := Module.IsFree.exists_basis (R := Lᵐᵒᵖ) (M := K)
   have card_ιL : ℵ₀ ≤ #ιL := by
     contrapose! hLK
     haveI := @Fintype.ofFinite _ (lt_aleph0_iff_finite.mp hLK)
@@ -85,7 +85,7 @@ variable {K}
 
 open Function in
 theorem rank_fun_infinite {ι : Type v} [hι : Infinite ι] : Module.rank K (ι → K) = #(ι → K) := by
-  obtain ⟨⟨ιK, bK⟩⟩ := Module.Free.exists_basis (R := K) (M := ι → K)
+  obtain ⟨⟨ιK, bK⟩⟩ := Module.IsFree.exists_basis (R := K) (M := ι → K)
   obtain ⟨e⟩ := lift_mk_le'.mp ((aleph0_le_mk_iff.mpr hι).trans_eq (lift_uzero #ι).symm)
   have := LinearMap.lift_rank_le_of_injective _ <|
     LinearMap.funLeft_injective_of_surjective K K _ (invFun_surjective e.injective)
@@ -102,7 +102,7 @@ theorem rank_fun_infinite {ι : Type v} [hι : Infinite ι] : Module.rank K (ι 
   over a division ring has dimension equal to its cardinality. -/
 theorem rank_dual_eq_card_dual_of_aleph0_le_rank' {V : Type*} [AddCommGroup V] [Module K V]
     (h : ℵ₀ ≤ Module.rank K V) : Module.rank Kᵐᵒᵖ (V →ₗ[K] K) = #(V →ₗ[K] K) := by
-  obtain ⟨⟨ι, b⟩⟩ := Module.Free.exists_basis (R := K) (M := V)
+  obtain ⟨⟨ι, b⟩⟩ := Module.IsFree.exists_basis (R := K) (M := V)
   rw [← b.mk_eq_rank'', aleph0_le_mk_iff] at h
   have e := (b.constr Kᵐᵒᵖ (M' := K)).symm.trans
     (LinearEquiv.piCongrRight fun _ ↦ MulOpposite.opLinearEquiv Kᵐᵒᵖ)
@@ -112,7 +112,7 @@ theorem rank_dual_eq_card_dual_of_aleph0_le_rank' {V : Type*} [AddCommGroup V] [
 /-- The **Erdős-Kaplansky Theorem** over a field. -/
 theorem rank_dual_eq_card_dual_of_aleph0_le_rank {K V} [Field K] [AddCommGroup V] [Module K V]
     (h : ℵ₀ ≤ Module.rank K V) : Module.rank K (V →ₗ[K] K) = #(V →ₗ[K] K) := by
-  obtain ⟨⟨ι, b⟩⟩ := Module.Free.exists_basis (R := K) (M := V)
+  obtain ⟨⟨ι, b⟩⟩ := Module.IsFree.exists_basis (R := K) (M := V)
   rw [← b.mk_eq_rank'', aleph0_le_mk_iff] at h
   have e := (b.constr K (M' := K)).symm
   rw [e.rank_eq, e.toEquiv.cardinal_eq]
@@ -121,7 +121,7 @@ theorem rank_dual_eq_card_dual_of_aleph0_le_rank {K V} [Field K] [AddCommGroup V
 theorem lift_rank_lt_rank_dual' {V : Type v} [AddCommGroup V] [Module K V]
     (h : ℵ₀ ≤ Module.rank K V) :
     Cardinal.lift.{u} (Module.rank K V) < Module.rank Kᵐᵒᵖ (V →ₗ[K] K) := by
-  obtain ⟨⟨ι, b⟩⟩ := Module.Free.exists_basis (R := K) (M := V)
+  obtain ⟨⟨ι, b⟩⟩ := Module.IsFree.exists_basis (R := K) (M := V)
   rw [← b.mk_eq_rank'', rank_dual_eq_card_dual_of_aleph0_le_rank' h,
       ← (b.constr ℕ (M' := K)).toEquiv.cardinal_eq, mk_arrow]
   apply cantor'

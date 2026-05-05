@@ -382,7 +382,7 @@ theorem Subspace.biUnion_ne_univ_of_top_notMem (hs : ⊤ ∉ s) : ⋃ p ∈ s, (
   have ⟨p, hp, hfi⟩ := Submodule.exists_finiteIndex_of_cover hcovers
   have : Finite (E ⧸ p) := AddSubgroup.finite_quotient_of_finiteIndex
   have : Nontrivial (E ⧸ p) := Submodule.Quotient.nontrivial_iff.mpr (ne_of_mem_of_not_mem hp hs)
-  have : Infinite (E ⧸ p) := Module.Free.infinite k (E ⧸ p)
+  have : Infinite (E ⧸ p) := Module.IsFree.infinite k (E ⧸ p)
   exact not_finite (E ⧸ p)
 
 /-- A vector space over an infinite field cannot be a finite union of proper subspaces. -/

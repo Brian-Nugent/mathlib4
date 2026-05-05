@@ -15,7 +15,7 @@ We provide some instances for finite and free modules involving matrices.
 
 ## Main results
 
-* `Module.Free.linearMap` : if `M` and `N` are finite and free, then `M →ₗ[R] N` is free.
+* `Module.IsFree.linearMap` : if `M` and `N` are finite and free, then `M →ₗ[R] N` is free.
 * `Module.Finite.ofBasis` : A free module with a basis indexed by a `Fintype` is finite.
 * `Module.Finite.linearMap` : if `M` and `N` are finite and free, then `M →ₗ[R] N`
   is finite.
@@ -28,26 +28,26 @@ universe u u' v w
 
 variable (R : Type u) (S : Type u') (M : Type v) (N : Type w)
 
-open Module.Free (chooseBasis ChooseBasisIndex)
+open Module.IsFree (chooseBasis ChooseBasisIndex)
 
 open Module (finrank)
 
 section Ring
 
-variable [Ring R] [Ring S] [AddCommGroup M] [Module R M] [Module.Free R M] [Module.Finite R M]
+variable [Ring R] [Ring S] [AddCommGroup M] [Module R M] [Module.IsFree R M] [Module.Finite R M]
 variable [AddCommGroup N] [Module R N] [Module S N] [SMulCommClass R S N]
 
 private noncomputable def linearMapEquivFun : (M →ₗ[R] N) ≃ₗ[S] ChooseBasisIndex R M → N :=
   (chooseBasis R M).repr.congrLeft N S ≪≫ₗ (Finsupp.lsum S).symm ≪≫ₗ
     LinearEquiv.piCongrRight fun _ ↦ LinearMap.ringLmapEquivSelf R S N
 
-instance Module.Free.linearMap [Module.Free S N] : Module.Free S (M →ₗ[R] N) :=
-  Module.Free.of_equiv (linearMapEquivFun R S M N).symm
+instance Module.IsFree.linearMap [Module.IsFree S N] : Module.IsFree S (M →ₗ[R] N) :=
+  Module.IsFree.of_equiv (linearMapEquivFun R S M N).symm
 
 instance Module.Finite.linearMap [Module.Finite S N] : Module.Finite S (M →ₗ[R] N) :=
   Module.Finite.equiv (linearMapEquivFun R S M N).symm
 
-variable [StrongRankCondition R] [StrongRankCondition S] [Module.Free S N]
+variable [StrongRankCondition R] [StrongRankCondition S] [Module.IsFree S N]
 
 open Cardinal
 theorem Module.rank_linearMap :
@@ -74,7 +74,7 @@ end Ring
 section AlgHom
 
 variable (K M : Type*) (L : Type v) [CommRing K] [Ring M] [Algebra K M]
-  [Module.Free K M] [Module.Finite K M] [CommRing L] [IsDomain L] [Algebra K L]
+  [Module.IsFree K M] [Module.Finite K M] [CommRing L] [IsDomain L] [Algebra K L]
 
 instance Finite.algHom : Finite (M →ₐ[K] L) :=
   (linearIndependent_algHom_toLinearMap K M L).finite
@@ -97,13 +97,13 @@ end AlgHom
 
 section Integer
 
-variable [AddCommGroup M] [Module.Finite ℤ M] [Module.Free ℤ M] [AddCommGroup N]
+variable [AddCommGroup M] [Module.Finite ℤ M] [Module.IsFree ℤ M] [AddCommGroup N]
 
 instance Module.Finite.addMonoidHom [Module.Finite ℤ N] : Module.Finite ℤ (M →+ N) :=
   Module.Finite.equiv (addMonoidHomLequivInt ℤ).symm
 
-instance Module.Free.addMonoidHom [Module.Free ℤ N] : Module.Free ℤ (M →+ N) :=
-  letI : Module.Free ℤ (M →ₗ[ℤ] N) := Module.Free.linearMap _ _ _ _
-  Module.Free.of_equiv (addMonoidHomLequivInt ℤ).symm
+instance Module.IsFree.addMonoidHom [Module.IsFree ℤ N] : Module.IsFree ℤ (M →+ N) :=
+  letI : Module.IsFree ℤ (M →ₗ[ℤ] N) := Module.IsFree.linearMap _ _ _ _
+  Module.IsFree.of_equiv (addMonoidHomLequivInt ℤ).symm
 
 end Integer
