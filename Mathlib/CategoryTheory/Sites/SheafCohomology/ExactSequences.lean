@@ -89,7 +89,7 @@ noncomputable abbrev longSequenceHom (h : n₀ + 1 = n₁ := by lia) :
   any_goals
     dsimp
     ext
-    simp [← H.map_comp_apply, f.4, f.5, ← δ_naturality n₀ n₁ h h₁ h₂ f],
+    simp [← H.map_comp_apply, f.4, f.5, ← δ_naturality n₀ n₁ h h₁ h₂ f]
 
 @[simp]
 lemma longSequenceHom_id (h : n₀ + 1 = n₁ := by lia) :
