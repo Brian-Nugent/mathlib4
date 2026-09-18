@@ -8,6 +8,7 @@ module
 public import Mathlib.Algebra.Category.ModuleCat.Presheaf.OfCommRing
 public import Mathlib.Algebra.Category.ModuleCat.Sheaf.ChangeOfRings
 public import Mathlib.Algebra.Category.ModuleCat.Sheaf.PullbackContinuous
+public import Mathlib.Algebra.Category.ModuleCat.Sheaf.Quasicoherent
 public import Mathlib.Algebra.Category.Ring.Limits
 
 /-!
@@ -27,9 +28,9 @@ morphism universes are bounded by the universe of the rings.
 
 @[expose] public section
 
-universe v v₁ v₂ u₁ u₂ u
+universe v v₁ v₂ v₃ v₄ u₁ u₂ u₃ u₄ u
 
-open CategoryTheory Functor
+open CategoryTheory Functor Limits
 
 /-- The category of sheaves of modules over a sheaf of commutative rings. -/
 abbrev SheafOfModulesOfCommRing {C : Type u₁} [Category.{v₁} C]
@@ -92,6 +93,10 @@ instance : (forget.{v} R).Full := (SheafOfModules.fullyFaithfulForget _).full
 
 instance : (forget.{v} R).Faithful := (SheafOfModules.fullyFaithfulForget _).faithful
 
+/-- The forgetful functor to presheaves of modules is fully faithful. -/
+abbrev fullyFaithfulForget (R : Sheaf J CommRingCat.{u}) : (forget.{v} R).FullyFaithful :=
+  SheafOfModules.fullyFaithfulForget _
+
 /-- Evaluation of sheaves of modules over a sheaf of commutative rings. -/
 abbrev evaluation (R : Sheaf J CommRingCat.{u}) (X : Cᵒᵖ) :
     SheafOfModulesOfCommRing.{v} R ⥤ ModuleCat.{v} (R.obj.obj X) :=
@@ -102,6 +107,12 @@ noncomputable abbrev toSheaf (R : Sheaf J CommRingCat.{u}) :
     SheafOfModulesOfCommRing.{v} R ⥤ Sheaf J AddCommGrpCat.{v} :=
   SheafOfModules.toSheaf _
 
+/-- Forget to sheaves of modules over the ring of sections at an initial object. -/
+noncomputable abbrev forgetToSheafModuleCat (R : Sheaf J CommRingCat.{u})
+    (X : Cᵒᵖ) (hX : IsInitial X) :
+    SheafOfModulesOfCommRing.{v} R ⥤ Sheaf J (ModuleCat.{v} (R.obj.obj X)) :=
+  SheafOfModules.forgetToSheafModuleCat _ X hX
+
 /-- The free sheaf of modules of rank one over a sheaf of commutative rings. -/
 noncomputable abbrev unit (R : Sheaf J CommRingCat.{u}) :
     SheafOfModulesOfCommRing.{u} R :=
@@ -111,6 +122,52 @@ noncomputable abbrev unit (R : Sheaf J CommRingCat.{u}) :
 noncomputable abbrev restrictScalars {S : Sheaf J CommRingCat.{u}} (φ : R ⟶ S) :
     SheafOfModulesOfCommRing.{v} S ⥤ SheafOfModulesOfCommRing.{v} R :=
   SheafOfModules.restrictScalars ((sheafCompose J (forget₂ CommRingCat RingCat.{u})).map φ)
+
+section Sheafification
+
+variable [HasWeakSheafify J AddCommGrpCat.{v}] [J.WEqualsLocallyBijective AddCommGrpCat.{v}]
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Sheafification of modules over a sheaf of commutative rings. -/
+noncomputable abbrev sheafification (R : Sheaf J CommRingCat.{u}) :
+    PresheafOfModulesOfCommRing.{v} R.obj ⥤ SheafOfModulesOfCommRing.{v} R :=
+  PresheafOfModules.sheafification
+    (R := (sheafCompose J (forget₂ CommRingCat RingCat.{u})).obj R) (𝟙 _)
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Sheafification is left adjoint to the forgetful functor to presheaves of modules. -/
+noncomputable abbrev sheafificationAdjunction (R : Sheaf J CommRingCat.{u}) :
+    sheafification.{v} R ⊣ forget R :=
+  PresheafOfModules.sheafificationAdjunction
+    (R := (sheafCompose J (forget₂ CommRingCat RingCat.{u})).obj R) (𝟙 _)
+
+end Sheafification
+
+/-- The free sheaf of modules on a type. -/
+noncomputable abbrev free [HasWeakSheafify J AddCommGrpCat.{u}]
+    [J.WEqualsLocallyBijective AddCommGrpCat.{u}] (I : Type u) :
+    SheafOfModulesOfCommRing.{u} R :=
+  SheafOfModules.free I
+
+/-- Restrict a sheaf of modules to an over-category. -/
+noncomputable abbrev overFunctor (R : Sheaf J CommRingCat.{u}) (X : C)
+    [(J.over X).HasSheafCompose (forget₂ CommRingCat RingCat.{u})] :
+    SheafOfModulesOfCommRing.{v} R ⥤ SheafOfModulesOfCommRing.{v} (R.over X) :=
+  SheafOfModules.overFunctor _ X
+
+/-- Restrict sheaves of modules along a morphism of objects of the site. -/
+noncomputable abbrev overMap (R : Sheaf J CommRingCat.{u}) {X Y : C} (f : X ⟶ Y)
+    [(J.over X).HasSheafCompose (forget₂ CommRingCat RingCat.{u})]
+    [(J.over Y).HasSheafCompose (forget₂ CommRingCat RingCat.{u})] :
+    SheafOfModulesOfCommRing.{v} (R.over Y) ⥤ SheafOfModulesOfCommRing.{v} (R.over X) :=
+  SheafOfModules.overMap ((sheafCompose J (forget₂ CommRingCat RingCat.{u})).obj R) f
+
+/-- The property of being a quasicoherent sheaf of modules. -/
+abbrev isQuasicoherent (R : Sheaf J CommRingCat.{u})
+    [∀ X, HasWeakSheafify (J.over X) AddCommGrpCat.{u}]
+    [∀ X, (J.over X).WEqualsLocallyBijective AddCommGrpCat.{u}] :
+    ObjectProperty (SheafOfModulesOfCommRing.{u} R) :=
+  SheafOfModules.isQuasicoherent _
 
 end Basic
 
@@ -144,6 +201,140 @@ noncomputable abbrev pullbackPushforwardAdjunction
     pullback.{v} φ ⊣ pushforward.{v} φ :=
   SheafOfModules.pullbackPushforwardAdjunction _
 
+set_option backward.isDefEq.respectTransparency false in
+/-- Pushforward commutes with forgetting to sheaves of modules over a fixed ring. -/
+noncomputable abbrev pushforwardCompForgetToSheafModuleCat
+    (X : Cᵒᵖ) (hX : IsInitial X) (hX' : IsInitial (F.op.obj X)) :
+    pushforward.{max u₂ v₂ v} φ ⋙ forgetToSheafModuleCat S X hX ≅
+      forgetToSheafModuleCat R _ hX' ⋙
+        sheafCompose K (ModuleCat.restrictScalars.{max u₂ v₂ v} (φ.hom.app X).hom) ⋙
+          F.sheafPushforwardContinuous _ J K :=
+  SheafOfModules.pushforwardCompForgetToSheafModuleCat.{v₁, v₂, u₁, u₂, u, v} _ X hX hX'
+
+/-- Pushforward by the identity identifies with the identity functor. -/
+noncomputable abbrev pushforwardId (S : Sheaf J CommRingCat.{u}) :
+    pushforward.{v} (F := 𝟭 C) (𝟙 S) ≅ 𝟭 _ :=
+  SheafOfModules.pushforwardId _
+
+instance (S : Sheaf J CommRingCat.{u}) :
+    (pushforward.{v} (F := 𝟭 C) (𝟙 S)).IsRightAdjoint :=
+  Functor.isRightAdjoint_of_iso (pushforwardId S).symm
+
+/-- Pullback by the identity identifies with the identity functor. -/
+noncomputable abbrev pullbackId (S : Sheaf J CommRingCat.{u}) :
+    pullback.{v} (F := 𝟭 C) (𝟙 S) ≅ 𝟭 _ :=
+  SheafOfModules.pullbackId _
+
+section Composition
+
+variable {D' : Type u₃} [Category.{v₃} D'] {K' : GrothendieckTopology D'}
+  [K'.HasSheafCompose (forget₂ CommRingCat RingCat.{u})]
+  {G : D ⥤ D'} [G.IsContinuous K K'] {R' : Sheaf K' CommRingCat.{u}}
+  (ψ : R ⟶ (G.sheafPushforwardContinuous CommRingCat K K').obj R')
+
+/-- The composition of pushforwards identifies with pushforward along the composite. -/
+noncomputable abbrev pushforwardComp :
+    haveI := Functor.isContinuous_comp F G J K K'
+    pushforward.{v} ψ ⋙ pushforward.{v} φ ≅
+      pushforward.{v} (F := F ⋙ G)
+        (φ ≫ (F.sheafPushforwardContinuous CommRingCat J K).map ψ) :=
+  SheafOfModules.pushforwardComp _ _
+
+variable [(F ⋙ G).IsContinuous J K']
+  [(pushforward.{v} φ).IsRightAdjoint] [(pushforward.{v} ψ).IsRightAdjoint]
+
+instance : (pushforward.{v} (F := F ⋙ G)
+    (φ ≫ (F.sheafPushforwardContinuous CommRingCat J K).map ψ)).IsRightAdjoint :=
+  Functor.isRightAdjoint_of_iso (pushforwardComp φ ψ)
+
+/-- The composition of pullbacks identifies with pullback along the composite. -/
+noncomputable abbrev pullbackComp :
+    pullback.{v} φ ⋙ pullback.{v} ψ ≅
+      pullback.{v} (F := F ⋙ G)
+        (φ ≫ (F.sheafPushforwardContinuous CommRingCat J K).map ψ) :=
+  SheafOfModules.pullbackComp _ _
+
+variable {D'' : Type u₄} [Category.{v₄} D''] {K'' : GrothendieckTopology D''}
+  [K''.HasSheafCompose (forget₂ CommRingCat RingCat.{u})]
+  {G' : D' ⥤ D''} [G'.IsContinuous K' K''] {R'' : Sheaf K'' CommRingCat.{u}}
+  [(G ⋙ G').IsContinuous K K''] [((F ⋙ G) ⋙ G').IsContinuous J K'']
+  [(F ⋙ G ⋙ G').IsContinuous J K'']
+  (ψ' : R' ⟶ (G'.sheafPushforwardContinuous CommRingCat K' K'').obj R'')
+  [(pushforward.{v} ψ').IsRightAdjoint]
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Associativity of the composition isomorphisms for pullback. -/
+abbrev pullback_assoc :
+    isoWhiskerLeft _ (pullbackComp.{v} ψ ψ') ≪≫
+      pullbackComp.{v} (G := G ⋙ G') φ
+        (ψ ≫ (G.sheafPushforwardContinuous CommRingCat K K').map ψ') =
+    (associator _ _ _).symm ≪≫ isoWhiskerRight (pullbackComp.{v} φ ψ) _ ≪≫
+      pullbackComp.{v} (F := F ⋙ G)
+        (φ ≫ (F.sheafPushforwardContinuous CommRingCat J K).map ψ) ψ' :=
+  SheafOfModules.pullback_assoc.{v} (F := F) (G := G) (G' := G')
+    (J := J) (K := K) (K' := K') (K'' := K'')
+    (S := (sheafCompose J (forget₂ CommRingCat RingCat.{u})).obj S)
+    (R := (sheafCompose K (forget₂ CommRingCat RingCat.{u})).obj R)
+    (R' := (sheafCompose K' (forget₂ CommRingCat RingCat.{u})).obj R')
+    (R'' := (sheafCompose K'' (forget₂ CommRingCat RingCat.{u})).obj R'')
+    ((sheafCompose J (forget₂ CommRingCat RingCat.{u})).map φ)
+    ((sheafCompose K (forget₂ CommRingCat RingCat.{u})).map ψ)
+    ((sheafCompose K' (forget₂ CommRingCat RingCat.{u})).map ψ')
+
+end Composition
+
+variable [(pushforward.{v} φ).IsRightAdjoint]
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Compatibility of pullback composition with an identity on the source site. -/
+abbrev pullback_id_comp :
+    pullbackComp.{v} (F := 𝟭 C) (𝟙 S) φ =
+      isoWhiskerRight (pullbackId S) (pullback φ) ≪≫ Functor.leftUnitor _ :=
+  SheafOfModules.pullback_id_comp.{v} (F := F) (J := J) (K := K)
+    (S := (sheafCompose J (forget₂ CommRingCat RingCat.{u})).obj S)
+    (R := (sheafCompose K (forget₂ CommRingCat RingCat.{u})).obj R)
+    ((sheafCompose J (forget₂ CommRingCat RingCat.{u})).map φ)
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Compatibility of pullback composition with an identity on the target site. -/
+abbrev pullback_comp_id :
+    pullbackComp.{v} (G := 𝟭 D) φ (𝟙 R) =
+      isoWhiskerLeft _ (pullbackId R) ≪≫ Functor.rightUnitor _ :=
+  SheafOfModules.pullback_comp_id.{v} (F := F) (J := J) (K := K)
+    (S := (sheafCompose J (forget₂ CommRingCat RingCat.{u})).obj S)
+    (R := (sheafCompose K (forget₂ CommRingCat RingCat.{u})).obj R)
+    ((sheafCompose J (forget₂ CommRingCat RingCat.{u})).map φ)
+
 end PushforwardPullback
+
+section Quasicoherent
+
+variable {C : Type u₁} [Category.{v₁} C] {D : Type u₂} [Category.{v₂} D]
+  {J : GrothendieckTopology C} {K : GrothendieckTopology D}
+  [J.HasSheafCompose (forget₂ CommRingCat RingCat.{u})]
+  [K.HasSheafCompose (forget₂ CommRingCat RingCat.{u})]
+  [∀ X, HasSheafify (J.over X) AddCommGrpCat.{u}]
+  [∀ X, HasSheafify (K.over X) AddCommGrpCat.{u}]
+  [∀ X, (J.over X).WEqualsLocallyBijective AddCommGrpCat.{u}]
+  [∀ X, (K.over X).WEqualsLocallyBijective AddCommGrpCat.{u}]
+  {R : Sheaf K CommRingCat.{u}} {S : Sheaf J CommRingCat.{u}}
+  (F : C ⥤ D) [F.IsContinuous J K] [F.IsCocontinuous J K]
+  (φ : S ⟶ (F.sheafPushforwardContinuous CommRingCat J K).obj R)
+
+set_option backward.isDefEq.respectTransparency false in
+/-- Pushforward along a left adjoint preserves quasicoherence when the structure sheaves
+are isomorphic and their rank-one modules correspond. -/
+abbrev isQuasicoherent_pushforward_of_isLeftAdjoint
+    (η : (pushforward φ).obj (unit R) ≅ unit S) [F.IsLeftAdjoint] [IsIso φ]
+    [∀ X, (Over.post (X := X) F).IsContinuous (J.over X) (K.over (F.obj X))]
+    [HasPullbacks C] [HasPullbacks D]
+    {M : SheafOfModulesOfCommRing.{u} R} [SheafOfModules.IsQuasicoherent M] :
+    SheafOfModules.IsQuasicoherent ((pushforward φ).obj M) :=
+  SheafOfModules.isQuasicoherent_pushforward_of_isLeftAdjoint F
+    (R := (sheafCompose K (forget₂ CommRingCat RingCat.{u})).obj R)
+    (S := (sheafCompose J (forget₂ CommRingCat RingCat.{u})).obj S) (M := M)
+    ((sheafCompose J (forget₂ CommRingCat RingCat.{u})).map φ) η
+
+end Quasicoherent
 
 end SheafOfModulesOfCommRing

@@ -43,7 +43,7 @@ set_option backward.isDefEq.respectTransparency.types false in
 /-- The forgetful functor from `𝒪_{Spec R}` modules to sheaves of `R`-modules. -/
 def modulesSpecToSheaf :
     (Spec R).Modules ⥤ TopCat.Sheaf (ModuleCat R) (Spec R) :=
-  SheafOfModules.forgetToSheafModuleCat (Spec R).ringCatSheaf (.op ⊤)
+  SheafOfModulesOfCommRing.forgetToSheafModuleCat (Spec R).sheaf (.op ⊤)
     (Limits.initialOpOfTerminal Limits.isTerminalTop) ⋙
   sheafCompose _ (ModuleCat.restrictScalars (Scheme.ΓSpecIso R).inv.hom)
 
@@ -56,30 +56,32 @@ set_option backward.isDefEq.respectTransparency false in
 open PrimeSpectrum in
 /-- The forgetful functor from `𝒪_{Spec R}` modules to sheaves of `R`-modules is fully faithful. -/
 def SpecModulesToSheafFullyFaithful : (modulesSpecToSheaf (R := R)).FullyFaithful where
-  preimage {M N} f := ⟨fun U ↦ ModuleCat.ofHom ⟨(f.1.app U).hom.toAddHom, by
-    intro t m
-    apply TopCat.Presheaf.IsSheaf.section_ext (modulesSpecToSheaf.obj N).2
-    intro x hxU
-    obtain ⟨a, ⟨_, ⟨r, rfl⟩, rfl⟩, hxr, hrU : basicOpen _ ≤ _⟩ :=
-      PrimeSpectrum.isBasis_basic_opens.exists_subset_of_mem_open hxU U.unop.2
-    refine ⟨_, hrU, hxr, ?_⟩
-    refine Eq.trans ?_ (N.val.map_smul (homOfLE hrU).op t _).symm
-    change N.1.map (homOfLE hrU).op (f.1.app _ _) = _ • N.1.map (homOfLE hrU).op (f.1.app _ _)
-    have (x : _) :
-        f.1.app _ (M.1.map (homOfLE hrU).op _) = N.1.map (homOfLE hrU).op (f.1.app _ x) :=
-      congr($(f.1.naturality (homOfLE hrU).op).hom x)
-    rw [← this, ← this, M.val.map_smul]
-    generalize (Spec R).ringCatSheaf.obj.map (homOfLE hrU).op t = t
-    let := Module.compHom (R := Γ(Spec R, basicOpen r)) Γ(M, basicOpen r)
-      (algebraMap R Γ(Spec R, basicOpen r))
-    have : IsScalarTower R Γ(Spec R, basicOpen r) Γ(M, basicOpen r) :=
-      .of_algebraMap_smul fun _ _ ↦ rfl
-    let := Module.compHom Γ(N, basicOpen r) (algebraMap R Γ(Spec R, basicOpen r))
-    have : IsScalarTower R Γ(Spec R, basicOpen r) Γ(N, basicOpen r) :=
-      .of_algebraMap_smul fun _ _ ↦ rfl
-    exact (IsLocalization.linearMap_compatibleSMul (.powers (M := R) r)
-      Γ(Spec R, basicOpen r) Γ(M, basicOpen r) Γ(N, basicOpen r)).map_smul
-      (f.hom.app _).hom _ _⟩, fun i ↦ by ext x; exact congr($(f.1.naturality i).hom x)⟩
+  preimage {M N} f := SheafOfModulesOfCommRing.homMk (R := (Spec R).sheaf)
+    (M₁ := M) (M₂ := N) (fun U ↦ ModuleCat.ofHom ⟨(f.1.app U).hom.toAddHom, by
+      intro t m
+      apply TopCat.Presheaf.IsSheaf.section_ext (modulesSpecToSheaf.obj N).2
+      intro x hxU
+      obtain ⟨a, ⟨_, ⟨r, rfl⟩, rfl⟩, hxr, hrU : basicOpen _ ≤ _⟩ :=
+        PrimeSpectrum.isBasis_basic_opens.exists_subset_of_mem_open hxU U.unop.2
+      refine ⟨_, hrU, hxr, ?_⟩
+      refine Eq.trans ?_ (N.val.map_smul (homOfLE hrU).op t _).symm
+      change N.val.map (homOfLE hrU).op (f.1.app _ _) = _ • N.val.map (homOfLE hrU).op (f.1.app _ _)
+      have (x : _) :
+          f.1.app _ (M.val.map (homOfLE hrU).op _) = N.val.map (homOfLE hrU).op (f.1.app _ x) :=
+        congr($(f.1.naturality (homOfLE hrU).op).hom x)
+      rw [← this, ← this]
+      erw [M.val.map_smul]
+      generalize (Spec R).presheaf.map (homOfLE hrU).op t = t
+      let := Module.compHom (R := Γ(Spec R, basicOpen r)) Γ(M, basicOpen r)
+        (algebraMap R Γ(Spec R, basicOpen r))
+      have : IsScalarTower R Γ(Spec R, basicOpen r) Γ(M, basicOpen r) :=
+        .of_algebraMap_smul fun _ _ ↦ rfl
+      let := Module.compHom Γ(N, basicOpen r) (algebraMap R Γ(Spec R, basicOpen r))
+      have : IsScalarTower R Γ(Spec R, basicOpen r) Γ(N, basicOpen r) :=
+        .of_algebraMap_smul fun _ _ ↦ rfl
+      exact (IsLocalization.linearMap_compatibleSMul (.powers (M := R) r)
+        Γ(Spec R, basicOpen r) Γ(M, basicOpen r) Γ(N, basicOpen r)).map_smul
+        (f.hom.app _).hom _ _⟩) (fun i ↦ by ext x; exact congr($(f.1.naturality i).hom x))
   map_preimage f := rfl
   preimage_map f := rfl
 
@@ -149,10 +151,10 @@ end Scheme.Modules
 /--
 `M^~` as a sheaf of `𝒪_{Spec R}`-modules
 -/
-def tilde : (Spec R).Modules where
-  val := moduleStructurePresheaf R M
-  isSheaf := (TopCat.Presheaf.isSheaf_iff_isSheaf_comp (forget AddCommGrpCat) _).2
-    (structureSheafInType R M).2
+def tilde : (Spec R).Modules :=
+  SheafOfModulesOfCommRing.mk (R := (Spec R).sheaf) (moduleStructurePresheaf R M)
+    ((TopCat.Presheaf.isSheaf_iff_isSheaf_comp (forget AddCommGrpCat) _).2
+      (structureSheafInType R M).2)
 
 namespace tilde
 
@@ -410,24 +412,27 @@ open Limits
 
 /-- Tilde of `R` as an `R`-module is isomorphic to the structure sheaf `𝒪_{Spec R}`. -/
 noncomputable
-def tildeSelf : tilde (ModuleCat.of R R) ≅ SheafOfModules.unit.{u} _ := .refl _
+def tildeSelf : tilde (ModuleCat.of R R) ≅
+    SheafOfModulesOfCommRing.unit (Spec R).sheaf := .refl _
 
-instance : IsIso (Scheme.Modules.fromTildeΓ (SheafOfModules.unit.{u} (Spec R).ringCatSheaf)) :=
+instance : IsIso (Scheme.Modules.fromTildeΓ (SheafOfModulesOfCommRing.unit (Spec R).sheaf)) :=
   isIso_fromTildeΓ_iff.mpr ⟨_, ⟨tildeSelf⟩⟩
 
 /-- Tilde of direct sums of `R` as an `R`-module is isomorphic to the free sheaf. -/
 noncomputable
-def tildeFinsupp (ι : Type u) : tilde (ModuleCat.of R (ι →₀ R)) ≅ SheafOfModules.free.{u} ι :=
+def tildeFinsupp (ι : Type u) : tilde (ModuleCat.of R (ι →₀ R)) ≅
+    SheafOfModulesOfCommRing.free (R := (Spec R).sheaf) ι :=
   letI H : IsColimit <| (tilde.functor R).mapCocone (ModuleCat.finsuppCocone R R ι) :=
     isColimitOfPreserves (tilde.functor R) (ModuleCat.finsuppCoconeIsColimit R R ι)
   letI iso : (Discrete.functor fun (_ : ι) ↦ ↧R) ⋙ tilde.functor R ≅
-         Discrete.functor fun _ ↦ SheafOfModules.unit.{u} _ :=
+         Discrete.functor fun _ ↦ SheafOfModulesOfCommRing.unit (Spec R).sheaf :=
       Discrete.natIso (fun _ ↦ tildeSelf)
   IsColimit.coconePointUniqueUpToIso
     ((IsColimit.precomposeHomEquiv iso.symm _).symm H) (coproductIsCoproduct _)
 
 instance (ι : Type u) :
-    IsIso (Scheme.Modules.fromTildeΓ (R := R) (SheafOfModules.free.{u} ι)) :=
+    IsIso (Scheme.Modules.fromTildeΓ (R := R)
+      (SheafOfModulesOfCommRing.free (R := (Spec R).sheaf) ι)) :=
   isIso_fromTildeΓ_iff.mpr ⟨_, ⟨tildeFinsupp _⟩⟩
 
 set_option backward.isDefEq.respectTransparency false in
@@ -538,8 +543,9 @@ def pushforwardCompModulesSpecToSheafIso :
       modulesSpecToSheaf ⋙ TopCat.Sheaf.pushforward (ModuleCat S) (Spec.map φ).base ⋙
       sheafCompose _ (ModuleCat.restrictScalars φ.hom) :=
   (Functor.associator _ _ _).symm ≪≫
-    Functor.isoWhiskerRight (SheafOfModules.pushforwardCompForgetToSheafModuleCat _ _ _
-    (initialOpOfTerminal isTerminalTop)) _ ≪≫ Functor.associator _ _ _ ≪≫
+    Functor.isoWhiskerRight (SheafOfModulesOfCommRing.pushforwardCompForgetToSheafModuleCat
+      (F := Opens.map (Spec.map φ).base) (Spec.map φ).toCommRingCatSheafHom _ _
+      (initialOpOfTerminal isTerminalTop)) _ ≪≫ Functor.associator _ _ _ ≪≫
     (Functor.isoWhiskerLeft _ (Functor.associator _ _ _)) ≪≫
     Functor.isoWhiskerLeft _ (Scheme.Modules.sheafComposePushforwardComp φ) ≪≫
     (Functor.associator _ _ _).symm
@@ -550,8 +556,6 @@ theorem isLocalizing_pushforward_of_isLocalizing {M : (Spec S).Modules}
     IsLocalizing (modulesSpecToSheaf.obj ((Scheme.Modules.pushforward (Spec.map φ)).obj M)) := by
   rw [← Functor.comp_obj,
   isLocalizing_iff_of_iso ((pushforwardCompModulesSpecToSheafIso φ).app M)]
-  have : CommRing ((Spec S).ringCatSheaf.obj.obj ((Opens.map (Spec.map φ).base).op.obj (op ⊤))) :=
-    inferInstanceAs (CommRing Γ(Spec S, ⊤))
   algebraize [φ.hom]
   exact fun f => IsLocalizedModule.restrictScalars_powers f _ (h := h (φ f))
 
@@ -570,14 +574,13 @@ instance Scheme.Modules.isQuasicoherent_restrictFunctor {X Y : Scheme.{u}} (f : 
     ((restrictFunctor f).obj M).IsQuasicoherent := by
   let α : X.presheaf ⟶ f.opensFunctor.op ⋙ Y.presheaf := { app U := (f.appIso U.unop).inv }
   have hα : IsIso α := NatIso.isIso_of_isIso_app _
-  let φ : X.ringCatSheaf ⟶ (f.opensFunctor.sheafPushforwardContinuous _ _ _).obj Y.ringCatSheaf :=
-    ⟨Functor.whiskerRight α (forget₂ CommRingCat RingCat)⟩
+  let φ : X.sheaf ⟶ (f.opensFunctor.sheafPushforwardContinuous CommRingCat _ _).obj Y.sheaf :=
+    ⟨α⟩
   have : IsIso φ := by
     rw [← isIso_iff_of_reflects_iso _ (ObjectProperty.ι _)]
-    dsimp [φ]
-    infer_instance
-  exact SheafOfModules.isQuasicoherent_pushforward_of_isLeftAdjoint.{u}
-    f.opensFunctor φ (Scheme.Modules.restrictUnitIso _)
+    exact hα
+  exact SheafOfModulesOfCommRing.isQuasicoherent_pushforward_of_isLeftAdjoint
+    (R := Y.sheaf) (S := X.sheaf) (M := M) f.opensFunctor φ (Scheme.Modules.restrictUnitIso f)
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The presentation of `M.restrict f` by restricting a presentation of `M`. -/
@@ -599,7 +602,7 @@ lemma Scheme.Modules.exists_isOpenCover_presentation {X : Scheme.{u}} (M : X.Mod
   · let u := X.homOfLE (U := i.2) (V := W i.1) (by simp [heq, le_sSup])
     have : PreservesColimitsOfSize.{u, u} (restrictFunctor u) := inferInstance
     let F := (overEquiv (W i.1)).functor ⋙ restrictFunctor u
-    let iso : SheafOfModules.overFunctor X.ringCatSheaf _ ⋙ F ≅ restrictFunctor
+    let iso : SheafOfModulesOfCommRing.overFunctor X.sheaf _ ⋙ F ≅ restrictFunctor
       (Scheme.Opens.ι i.2.1) := (Functor.associator _ _ _).symm ≪≫
         Functor.isoWhiskerRight (Scheme.Modules.overFunctorEquiv _) _ ≪≫
         (restrictFunctorComp _ _).symm ≪≫ (restrictFunctorCongr (by simp [u]))
@@ -868,16 +871,16 @@ set_option backward.isDefEq.respectTransparency false in
 theorem isQuasicoherent_iff_isIso_fromTildeΓ (M : (Spec R).Modules) :
     M.IsQuasicoherent ↔ IsIso M.fromTildeΓ := by
   refine ⟨fun h ↦ inferInstance, fun h ↦ ?_⟩
-  exact (SheafOfModules.isQuasicoherent (Spec R).ringCatSheaf).prop_of_iso
+  exact (SheafOfModulesOfCommRing.isQuasicoherent (Spec R).sheaf).prop_of_iso
     (asIso <| M.fromTildeΓ) inferInstance
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
 lemma essImage_tilde : (tilde.functor R).essImage =
-    SheafOfModules.isQuasicoherent (Spec R).ringCatSheaf := by
+    SheafOfModulesOfCommRing.isQuasicoherent (Spec R).sheaf := by
   refine le_antisymm ?_ ?_
   · intro M ⟨N, ⟨e⟩⟩
-    exact (SheafOfModules.isQuasicoherent (Spec R).ringCatSheaf).prop_of_iso e
+    exact (SheafOfModulesOfCommRing.isQuasicoherent (Spec R).sheaf).prop_of_iso e
       (by dsimp; infer_instance)
   · intro M (h : M.IsQuasicoherent)
     exact ⟨((modulesSpecToSheaf.obj M).presheaf.obj (.op ⊤)), ⟨asIso <| M.fromTildeΓ⟩⟩
@@ -888,14 +891,14 @@ set_option backward.isDefEq.respectTransparency false in
 of quasi-coherent `𝒪_{Spec R}`-modules. -/
 @[simps! functor inverse unitIso counitIso_hom_app_hom]
 def tildeEquiv :
-    ModuleCat R ≌ (SheafOfModules.isQuasicoherent (Spec R).ringCatSheaf).FullSubcategory where
+    ModuleCat R ≌ (SheafOfModulesOfCommRing.isQuasicoherent (Spec R).sheaf).FullSubcategory where
   functor := ObjectProperty.lift _ (tilde.functor R) fun _ ↦ by
-    dsimp [SheafOfModules.isQuasicoherent]
+    dsimp [SheafOfModulesOfCommRing.isQuasicoherent, SheafOfModules.isQuasicoherent]
     infer_instance
   inverse := ObjectProperty.ι _ ⋙ moduleSpecΓFunctor (R := R)
   unitIso := tilde.toTildeΓNatIso
   counitIso :=
-    haveI (M : (SheafOfModules.isQuasicoherent (Spec R).ringCatSheaf).FullSubcategory) :
+    haveI (M : (SheafOfModulesOfCommRing.isQuasicoherent (Spec R).sheaf).FullSubcategory) :
       IsIso (Scheme.Modules.fromTildeΓ M.obj) := inferInstance
     NatIso.ofComponents
       (fun M ↦ ObjectProperty.isoMk _ (asIso <| Scheme.Modules.fromTildeΓ M.obj))

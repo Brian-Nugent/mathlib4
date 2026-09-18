@@ -5,7 +5,7 @@ Authors: Andrew Yang
 -/
 module
 
-public import Mathlib.Algebra.Category.ModuleCat.Sheaf.PushforwardContinuous
+public import Mathlib.Algebra.Category.ModuleCat.Sheaf.OfCommRing
 public import Mathlib.Topology.Sheaves.Over
 public import Mathlib.Topology.Sheaves.SheafCondition.Sites
 
@@ -45,5 +45,17 @@ def sheafOfModulesEquivOverInverseUnit (R : X.Sheaf RingCat.{u}) :
       SheafOfModules.unit.{u} _ :=
   (U.sheafOfModulesEquivOver R).inverse.mapIso (U.sheafOfModulesEquivOverUnit R).symm ≪≫
     ((U.sheafOfModulesEquivOver R).unitIso.app _).symm
+
+/-- Sheaves of modules over `R.over U` are equivalent to sheaves of modules over `R |_ U`
+for a sheaf of commutative rings `R`. -/
+abbrev sheafOfModulesOfCommRingEquivOver (R : X.Sheaf CommRingCat.{v})
+    [(_root_.Opens.grothendieckTopology X).HasSheafCompose (forget₂ CommRingCat RingCat.{v})]
+    [(_root_.Opens.grothendieckTopology U).HasSheafCompose (forget₂ CommRingCat RingCat.{v})]
+    [((_root_.Opens.grothendieckTopology X).over U).HasSheafCompose
+      (forget₂ CommRingCat RingCat.{v})] :
+    SheafOfModulesOfCommRing.{w} (R.over U) ≌
+      SheafOfModulesOfCommRing.{w} (U.sheafRestrict.obj R) :=
+  U.sheafOfModulesEquivOver
+    ((sheafCompose (_root_.Opens.grothendieckTopology X) (forget₂ CommRingCat RingCat.{v})).obj R)
 
 end TopologicalSpace.Opens

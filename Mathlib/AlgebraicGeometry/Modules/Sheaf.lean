@@ -5,7 +5,7 @@ Authors: Joël Riou, Andrew Yang
 -/
 module
 
-public import Mathlib.Algebra.Category.ModuleCat.Sheaf.PullbackContinuous
+public import Mathlib.Algebra.Category.ModuleCat.Sheaf.OfCommRing
 public import Mathlib.AlgebraicGeometry.Modules.Presheaf
 public import Mathlib.AlgebraicGeometry.Restrict
 public import Mathlib.CategoryTheory.Abelian.GrothendieckAxioms.SheafOfModules
@@ -33,7 +33,7 @@ variable {X Y Z T : Scheme.{u}}
 
 variable (X) in
 /-- The category of sheaves of modules over a scheme. -/
-def Modules := SheafOfModules.{u} X.ringCatSheaf
+def Modules := SheafOfModulesOfCommRing.{u} X.sheaf
 
 namespace Modules
 
@@ -42,15 +42,22 @@ def Hom (M N : X.Modules) : Type u := SheafOfModules.Hom M N
 
 instance : Category X.Modules where
   Hom := Modules.Hom
-  __ := (inferInstance : Category (SheafOfModules.{u} X.ringCatSheaf))
+  __ := (inferInstance : Category (SheafOfModulesOfCommRing.{u} X.sheaf))
 
 noncomputable instance : Abelian X.Modules :=
-  inferInstanceAs <| Abelian (SheafOfModules.{u} X.ringCatSheaf)
-instance : HasLimits X.Modules := inferInstanceAs (HasLimits (SheafOfModules X.ringCatSheaf))
-instance : HasColimits X.Modules := inferInstanceAs (HasColimits (SheafOfModules X.ringCatSheaf))
+  inferInstanceAs <| Abelian (SheafOfModulesOfCommRing.{u} X.sheaf)
+instance : HasLimits X.Modules := inferInstanceAs (HasLimits (SheafOfModulesOfCommRing X.sheaf))
+instance : HasColimits X.Modules := inferInstanceAs (HasColimits (SheafOfModulesOfCommRing X.sheaf))
 
 instance : IsGrothendieckAbelian.{u} X.Modules :=
-  inferInstanceAs (IsGrothendieckAbelian (SheafOfModules _))
+  inferInstanceAs (IsGrothendieckAbelian (SheafOfModulesOfCommRing X.sheaf))
+
+/-- The underlying presheaf of modules over the structure presheaf of a scheme. -/
+abbrev val (M : X.Modules) : X.PresheafOfModules :=
+  SheafOfModulesOfCommRing.val (R := X.sheaf) M
+
+/-- The underlying morphism of presheaves of modules over the structure presheaf. -/
+abbrev Hom.val {M N : X.Modules} (f : M ⟶ N) : M.val ⟶ N.val := SheafOfModules.Hom.val f
 
 section Functor
 
@@ -58,16 +65,17 @@ variable (X) in
 /-- The forgetful functor from `𝒪ₓ`-modules to presheaves of modules.
 This is mostly useful to transport results from (pre)sheaves of modules to `𝒪ₓ`-modules and
 usually shouldn't be used directly when working with actual `𝒪ₓ`-modules. -/
-def toPresheafOfModules : X.Modules ⥤ X.PresheafOfModules := SheafOfModules.forget _
+def toPresheafOfModules : X.Modules ⥤ X.PresheafOfModules :=
+  SheafOfModulesOfCommRing.forget X.sheaf
 
 /-- The forgetful functor from `𝒪ₓ`-modules to presheaves of modules is fully faithful. -/
 def fullyFaithfulToPresheafOfModules : (Modules.toPresheafOfModules X).FullyFaithful :=
-  SheafOfModules.fullyFaithfulForget _
+  SheafOfModulesOfCommRing.fullyFaithfulForget X.sheaf
 
 instance : (toPresheafOfModules X).Full := fullyFaithfulToPresheafOfModules.full
 instance : (toPresheafOfModules X).Faithful := fullyFaithfulToPresheafOfModules.faithful
 instance : (toPresheafOfModules X).IsRightAdjoint :=
-  (PresheafOfModules.sheafificationAdjunction (𝟙 X.ringCatSheaf.obj)).isRightAdjoint
+  (SheafOfModulesOfCommRing.sheafificationAdjunction X.sheaf).isRightAdjoint
 
 variable (X) in
 /-- The forgetful functor from `𝒪ₓ`-modules to presheaves of abelian groups. -/
@@ -86,7 +94,7 @@ variable {M N K : X.Modules} {φ : M ⟶ N} {U V : X.Opens}
 section Presheaf
 
 /-- The underlying abelian presheaf of an `𝒪ₓ`-module. -/
-noncomputable def presheaf (M : X.Modules) : TopCat.Presheaf Ab X := M.1.presheaf
+noncomputable def presheaf (M : X.Modules) : TopCat.Presheaf Ab X := M.val.presheaf
 
 /-- Notation for sections of a presheaf of module. -/
 scoped[AlgebraicGeometry] notation3 "Γ(" M ", " U ")" => (Scheme.Modules.presheaf M).obj (.op U)
@@ -117,14 +125,14 @@ noncomputable def Hom.mapPresheaf (φ : M ⟶ N) : M.presheaf ⟶ N.presheaf :=
 
 /-- The application of a morphism of `𝒪ₓ`-modules to sections. -/
 def Hom.app (φ : M ⟶ N) (U : X.Opens) : Γ(M, U) ⟶ Γ(N, U) :=
-  (forget₂ _ _).map (φ.val.app (.op U))
+  (forget₂ _ _).map (φ.val.app' (.op U))
 
 @[simp] lemma mapPresheaf_app (φ : M ⟶ N) (U) : φ.mapPresheaf.app U = φ.app U.unop := rfl
 
 @[simp]
 lemma Hom.app_smul (φ : M ⟶ N) (r : Γ(X, U)) (x : Γ(M, U)) :
     φ.app U (r • x) = r • φ.app U x :=
-  (φ.val.app (.op U)).hom.map_smul r x
+  (φ.val.app' (.op U)).hom.map_smul r x
 
 @[simp] lemma Hom.add_app (φ ψ : M ⟶ N) : (φ + ψ).app U = φ.app U + ψ.app U := rfl
 @[simp] lemma Hom.sub_app (φ ψ : M ⟶ N) : (φ - ψ).app U = φ.app U - ψ.app U := rfl
@@ -163,7 +171,8 @@ variable (f : X ⟶ Y) (g : Y ⟶ Z) (h : Z ⟶ T)
 
 /-- The pushforward functor for categories of sheaves of modules over schemes. -/
 def pushforward : X.Modules ⥤ Y.Modules :=
-  SheafOfModules.pushforward f.toRingCatSheafHom
+  SheafOfModulesOfCommRing.pushforward (F := Opens.map f.base) (R := X.sheaf) (S := Y.sheaf)
+    f.toCommRingCatSheafHom
 
 @[simp]
 lemma pushforward_obj_obj (M : X.Modules) (U : Y.Opens) :
@@ -180,13 +189,15 @@ lemma pushforward_map_app (φ : M ⟶ N) (U : Y.Opens) :
 set_option backward.isDefEq.respectTransparency.types false in
 /-- The pullback functor for categories of sheaves of modules over schemes. -/
 def pullback : Y.Modules ⥤ X.Modules :=
-  SheafOfModules.pullback f.toRingCatSheafHom
+  SheafOfModulesOfCommRing.pullback (F := Opens.map f.base) (R := X.sheaf) (S := Y.sheaf)
+    f.toCommRingCatSheafHom
 
 set_option backward.isDefEq.respectTransparency.types false in
 /-- The pullback functor for categories of sheaves of modules over schemes
 is left adjoint to the pushforward functor. -/
 def pullbackPushforwardAdjunction : pullback f ⊣ pushforward f :=
-  SheafOfModules.pullbackPushforwardAdjunction _
+  SheafOfModulesOfCommRing.pullbackPushforwardAdjunction
+    (F := Opens.map f.base) (R := X.sheaf) (S := Y.sheaf) f.toCommRingCatSheafHom
 
 section
 
@@ -204,7 +215,7 @@ variable (X) in
 /-- The pushforward of sheaves of modules by the identity morphism identifies
 to the identity functor. -/
 def pushforwardId : pushforward (𝟙 X) ≅ 𝟭 _ :=
-  SheafOfModules.pushforwardId _
+  SheafOfModulesOfCommRing.pushforwardId X.sheaf
 
 @[simp] lemma pushforwardId_hom_app_app : ((pushforwardId X).hom.app M).app U = 𝟙 _ := rfl
 @[simp] lemma pushforwardId_inv_app_app : ((pushforwardId X).inv.app M).app U = 𝟙 _ := rfl
@@ -213,7 +224,7 @@ variable (X) in
 /-- The pullback of sheaves of modules by the identity morphism identifies
 to the identity functor. -/
 def pullbackId : pullback (𝟙 X) ≅ 𝟭 _ :=
-  SheafOfModules.pullbackId _
+  SheafOfModulesOfCommRing.pullbackId X.sheaf
 
 variable (X) in
 lemma conjugateEquiv_pullbackId_hom :
@@ -225,7 +236,8 @@ lemma conjugateEquiv_pullbackId_hom :
 identify to the pushforward for the composition. -/
 def pushforwardComp :
     pushforward f ⋙ pushforward g ≅ pushforward (f ≫ g) :=
-  SheafOfModules.pushforwardComp _ _
+  SheafOfModulesOfCommRing.pushforwardComp (F := Opens.map g.base) (G := Opens.map f.base)
+    g.toCommRingCatSheafHom f.toCommRingCatSheafHom
 
 @[simp] lemma pushforwardComp_hom_app_app (U) : ((pushforwardComp f g).hom.app M).app U = 𝟙 _ := rfl
 @[simp] lemma pushforwardComp_inv_app_app (U) : ((pushforwardComp f g).inv.app M).app U = 𝟙 _ := rfl
@@ -235,7 +247,8 @@ set_option backward.isDefEq.respectTransparency.types false in
 identify to the pullback for the composition. -/
 def pullbackComp :
     pullback g ⋙ pullback f ≅ pullback (f ≫ g) :=
-  SheafOfModules.pullbackComp _ _
+  SheafOfModulesOfCommRing.pullbackComp (F := Opens.map g.base) (G := Opens.map f.base)
+    g.toCommRingCatSheafHom f.toCommRingCatSheafHom
 
 set_option backward.isDefEq.respectTransparency.types false in
 /-- Pushforwards along equal morphisms are isomorphic. -/
@@ -273,8 +286,9 @@ lemma pseudofunctor_associativity :
   let e₄ := pullbackComp (f ≫ g) h
   change e₁.inv ≫ e₂.inv ≫ (Functor.associator _ _ _).hom ≫ e₃.hom ≫ e₄.hom = _
   have : e₃.hom ≫ e₄.hom = (Functor.associator _ _ _).inv ≫ e₂.hom ≫ e₁.hom :=
-    congr_arg Iso.hom (SheafOfModules.pullback_assoc.{u}
-      h.toRingCatSheafHom g.toRingCatSheafHom f.toRingCatSheafHom)
+    congr_arg Iso.hom (SheafOfModulesOfCommRing.pullback_assoc.{u}
+      (F := Opens.map h.base) (G := Opens.map g.base) (G' := Opens.map f.base)
+      h.toCommRingCatSheafHom g.toCommRingCatSheafHom f.toCommRingCatSheafHom)
   simp [this]
 
 set_option backward.isDefEq.respectTransparency false in
@@ -288,7 +302,8 @@ lemma pseudofunctor_left_unitality :
   let e₃ := (pullback f).leftUnitor
   change e₁.inv ≫ e₂.hom ≫ e₃.hom = _
   have : e₁.hom = e₂.hom ≫ e₃.hom :=
-    congr_arg Iso.hom (SheafOfModules.pullback_id_comp.{u} f.toRingCatSheafHom)
+    congr_arg Iso.hom (SheafOfModulesOfCommRing.pullback_id_comp.{u}
+      (F := Opens.map f.base) f.toCommRingCatSheafHom)
   simp [← this]
 
 set_option backward.isDefEq.respectTransparency false in
@@ -302,7 +317,8 @@ lemma pseudofunctor_right_unitality :
   let e₃ := (pullback f).rightUnitor
   change e₁.inv ≫ e₂.hom ≫ e₃.hom = _
   have : e₁.hom = e₂.hom ≫ e₃.hom :=
-    congr_arg Iso.hom (SheafOfModules.pullback_comp_id.{u} f.toRingCatSheafHom)
+    congr_arg Iso.hom (SheafOfModulesOfCommRing.pullback_comp_id.{u}
+      (F := Opens.map f.base) f.toCommRingCatSheafHom)
   simp [← this]
 
 set_option backward.defeqAttrib.useBackward true in
@@ -338,8 +354,7 @@ This is isomorphic to the pullback functor (see `restrictFunctorIsoPullback`)
 but has better defeqs. -/
 def restrictFunctor : Y.Modules ⥤ X.Modules :=
   letI α : X.presheaf ⟶ f.opensFunctor.op ⋙ Y.presheaf := { app U := (f.appIso U.unop).inv }
-  SheafOfModules.pushforward (F := f.opensFunctor)
-    ⟨Functor.whiskerRight α (forget₂ CommRingCat RingCat)⟩
+  SheafOfModulesOfCommRing.pushforward (F := f.opensFunctor) ⟨α⟩
 
 /-- The restriction of a module along an open immersion. -/
 abbrev restrict (M : Y.Modules) (f : X ⟶ Y) [IsOpenImmersion f] : X.Modules :=
@@ -388,10 +403,11 @@ lemma restrict_map (M : Y.Modules) (f : X ⟶ Y) [IsOpenImmersion f] {U V} (i : 
 
 /-- `Scheme.Modules.restrict` along an open immersion `X ⟶ Y` sends `𝒪_Y` to `𝒪_X`. -/
 def restrictUnitIso (f : X ⟶ Y) [IsOpenImmersion f] :
-    restrict (.unit <| Y.ringCatSheaf) f ≅ .unit X.ringCatSheaf := by
-  refine (fullyFaithfulForget _).preimageIso <| PresheafOfModules.isoMk (fun U ↦ ?_) ?_
+    restrict (SheafOfModulesOfCommRing.unit Y.sheaf) f ≅
+      SheafOfModulesOfCommRing.unit X.sheaf := by
+  refine SheafOfModulesOfCommRing.isoMk (R := X.sheaf) (fun U ↦ ?_) ?_
   · refine ModuleCat.isoMk
-      ((forget₂ CommRingCat RingCat ⋙ forget₂ _ Ab).mapIso (f.appIso U.unop)) ?_
+      (f.appIso U.unop).commRingCatIsoToRingEquiv.toAddEquiv.toAddCommGrpIso ?_
     intro (r : Γ(X, U.unop))
     ext (x : Γ(Y, f ''ᵁ U.unop))
     change r * (f.appIso U.unop).hom x = (f.appIso U.unop).hom ((f.appIso U.unop).inv r * x)
@@ -546,15 +562,15 @@ noncomputable def sheafComposePushforwardComp {R S : CommRingCat.{u}} (φ : R �
 /-- Sheaves of modules on `𝒪_X` restricted to `U` are equivalent to sheaves of `𝒪_U`-modules. -/
 noncomputable
 def overEquiv {X : Scheme.{u}} (U : X.Opens) :
-    SheafOfModules (X.ringCatSheaf.over U) ≌ (U : Scheme.{u}).Modules :=
-  TopologicalSpace.Opens.sheafOfModulesEquivOver _ _
+    SheafOfModulesOfCommRing (X.sheaf.over U) ≌ (U : Scheme.{u}).Modules :=
+  TopologicalSpace.Opens.sheafOfModulesOfCommRingEquivOver U X.sheaf
 
 set_option backward.isDefEq.respectTransparency false in
-/-- Up to `Scheme.Modules.overEquiv`, `SheafOfModules.overMap` is isomorphic to
+/-- Up to `Scheme.Modules.overEquiv`, `SheafOfModulesOfCommRing.overMap` is isomorphic to
 `Scheme.Modules.restrictFunctor`. -/
 noncomputable
 def overMapCompOverEquiv {X : Scheme.{u}} {U V : X.Opens} (f : V ⟶ U) :
-    overMap X.ringCatSheaf f ⋙ (overEquiv V).functor ≅
+    SheafOfModulesOfCommRing.overMap X.sheaf f ⋙ (overEquiv V).functor ≅
       (overEquiv U).functor ⋙ restrictFunctor (X.homOfLE <| leOfHom f) := by
   haveI : (Hom.opensFunctor (X.homOfLE <| leOfHom f)).IsContinuous
       (Opens.grothendieckTopology V.toScheme) (Opens.grothendieckTopology U.carrier) :=
@@ -589,11 +605,12 @@ def overMapCompOverEquiv {X : Scheme.{u}} {U V : X.Opens} (f : V ⟶ U) :
     rw [Scheme.Hom.appIso_homOfLE_inv]
     rfl
 
-/-- Up to `Scheme.Modules.overEquiv`, `SheafOfModules.overFunctor` is isomorphic to
+/-- Up to `Scheme.Modules.overEquiv`, `SheafOfModulesOfCommRing.overFunctor` is isomorphic to
 `Scheme.Modules.restrictFunctor`. -/
 noncomputable
 def overFunctorEquiv {X : Scheme.{u}} (U : X.Opens) :
-    overFunctor X.ringCatSheaf U ⋙ (overEquiv U).functor ≅ restrictFunctor U.ι := by
+    SheafOfModulesOfCommRing.overFunctor X.sheaf U ⋙ (overEquiv U).functor ≅
+      restrictFunctor U.ι := by
   have : ((Opens.overEquivalence U).symm.functor ⋙ Over.forget U).IsContinuous
       (Opens.grothendieckTopology ↥U) (Opens.grothendieckTopology ↥X) :=
     Functor.isContinuous_comp _ _ _ (.over (Opens.grothendieckTopology _) U) _

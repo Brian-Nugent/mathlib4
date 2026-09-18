@@ -5,7 +5,7 @@ Authors: Joël Riou
 -/
 module
 
-public import Mathlib.Algebra.Category.ModuleCat.Presheaf
+public import Mathlib.Algebra.Category.ModuleCat.Presheaf.OfCommRing
 public import Mathlib.AlgebraicGeometry.Scheme
 public import Mathlib.CategoryTheory.Sites.Whiskering
 
@@ -13,10 +13,8 @@ public import Mathlib.CategoryTheory.Sites.Whiskering
 # The category of presheaves of modules over a scheme
 
 In this file, given a scheme `X`, we define the category of presheaves
-of modules over `X`. As categories of presheaves of modules are
-defined for presheaves of rings (and not presheaves of commutative rings),
-we also introduce a definition `X.ringCatSheaf` for the underlying sheaf
-of rings of `X`.
+of modules over its presheaf of commutative rings. We also provide the morphism of
+sheaves of commutative rings induced by a morphism of schemes.
 
 -/
 
@@ -30,18 +28,14 @@ namespace AlgebraicGeometry.Scheme
 
 variable (X Y : Scheme.{u})
 
-/-- The underlying sheaf of rings of a scheme. -/
-abbrev ringCatSheaf : TopCat.Sheaf RingCat.{u} X :=
-  (sheafCompose _ (forget₂ CommRingCat RingCat.{u})).obj X.sheaf
-
 /-- The category of presheaves of modules over a scheme. -/
-nonrec abbrev PresheafOfModules := PresheafOfModules.{u} X.ringCatSheaf.obj
+abbrev PresheafOfModules := PresheafOfModulesOfCommRing.{u} X.presheaf
 
 variable {X Y} in
-/-- The morphism of sheaves of rings corresponding to a morphism of schemes. -/
-def Hom.toRingCatSheafHom (f : X ⟶ Y) :
-    Y.ringCatSheaf ⟶ ((TopologicalSpace.Opens.map f.base).sheafPushforwardContinuous
-      _ _ _).obj X.ringCatSheaf where
-  hom := Functor.whiskerRight f.c _
+/-- The morphism of sheaves of commutative rings corresponding to a morphism of schemes. -/
+def Hom.toCommRingCatSheafHom (f : X ⟶ Y) :
+    Y.sheaf ⟶ ((TopologicalSpace.Opens.map f.base).sheafPushforwardContinuous
+      CommRingCat _ _).obj X.sheaf where
+  hom := f.c
 
 end AlgebraicGeometry.Scheme
